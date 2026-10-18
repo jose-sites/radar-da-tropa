@@ -228,11 +228,20 @@ function toast(message, isError = false) {
 }
 function showView(name, scroll = true) {
   if (!document.getElementById(name)?.classList.contains('view')) return;
+  if (name !== 'relatar' && document.getElementById('relatar').classList.contains('active')) clearStreamerAccess();
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   history.replaceState(null, '', '#' + name);
   if (name === 'admin' && adminSession) loadDashboard();
+}
+function clearStreamerAccess() {
+  streamerPin = null;
+  document.getElementById('pin-input').value = '';
+  document.getElementById('report-panel').classList.remove('show');
+  document.getElementById('report-preview').classList.remove('show');
+  document.getElementById('pin-panel').style.display = 'block';
+  document.getElementById('report-form').reset();
 }
 document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', event => {
   event.preventDefault(); showView(el.dataset.go);
@@ -360,6 +369,7 @@ document.getElementById('pin-preview').addEventListener('click', async event => 
     const streamer = await rpc('radar_verify_pin', { p_pin: pin });
     if (!streamer?.id) throw new Error('PIN inválido ou inativo.');
     streamerPin = pin;
+    document.getElementById('pin-input').value = '';
     document.getElementById('streamer-name').textContent = `Acesso de ${streamer.name}`;
     document.getElementById('pin-panel').style.display = 'none';
     document.getElementById('report-panel').classList.add('show');
@@ -368,11 +378,7 @@ document.getElementById('pin-preview').addEventListener('click', async event => 
   finally { busy(button, false); }
 });
 document.getElementById('back-to-pin').addEventListener('click', () => {
-  streamerPin = null;
-  document.getElementById('pin-input').value = '';
-  document.getElementById('report-panel').classList.remove('show');
-  document.getElementById('report-preview').classList.remove('show');
-  document.getElementById('pin-panel').style.display = 'block';
+  clearStreamerAccess();
   document.getElementById('pin-input').focus();
 });
 document.getElementById('report-form').addEventListener('submit', async event => {
@@ -633,6 +639,10 @@ document.getElementById('admin-password').addEventListener('keydown', event => {
 document.getElementById('close-dashboard').addEventListener('click', async () => {
   const token = adminSession?.access_token;
   adminSession = null; sessionStorage.removeItem(SESSION_KEY);
+  dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
+  for (const id of ['reports-list','streamers-list','appeals-list','audit-list']) document.getElementById(id).textContent = '';
+  if (document.getElementById('evidence-dialog').open) document.getElementById('evidence-dialog').close();
+  closeModal();
   document.getElementById('admin-dashboard').classList.remove('show');
   document.getElementById('admin-login').style.display = 'block';
   if (token) fetch(`${SUPABASE_URL}/auth/v1/logout`, { method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${token}`} }).catch(() => {});
@@ -680,7 +690,7 @@ document.getElementById('streamers-list').addEventListener('click', async event 
 });
 const modal = document.getElementById('admin-modal');
 function openModal() { modal.hidden = false; document.getElementById('new-streamer-name').focus(); }
-function closeModal() { modal.hidden = true; document.getElementById('new-streamer-name').value = ''; document.getElementById('pin-output').hidden = true; }
+function closeModal() { modal.hidden = true; document.getElementById('new-streamer-name').value = ''; document.getElementById('pin-output').hidden = true; document.getElementById('pin-code').textContent = ''; document.getElementById('pin-owner').textContent = ''; }
 document.getElementById('create-streamer-open').addEventListener('click', openModal);
 document.getElementById('create-streamer-close').addEventListener('click', closeModal);
 modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
