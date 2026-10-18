@@ -180,12 +180,18 @@ async function scheduledSync() {
     .select('id,handle,profile_id').is('profile_id', null).neq('status', 'rejected')
     .or(`profile_resolution_attempt_at.is.null,profile_resolution_attempt_at.lt.${due}`)
     .order('profile_resolution_attempt_at', { ascending: true, nullsFirst: true }).limit(10);
-  if (reportError) throw new Error('reports_unavailable');
+  if (reportError) {
+    console.error('report query:', reportError);
+    throw new Error(`reports_unavailable_${reportError.code || 'unknown'}`);
+  }
   for (const report of reports || []) (await resolveReport(report)) ? resolved++ : failed++;
   const { data: profiles, error: profileError } = await admin.from('radar_profiles')
     .select('id,tiktok_user_id').or(`last_attempt_at.is.null,last_attempt_at.lt.${due}`)
     .order('last_attempt_at', { ascending: true, nullsFirst: true }).limit(20);
-  if (profileError) throw new Error('profiles_unavailable');
+  if (profileError) {
+    console.error('profile query:', profileError);
+    throw new Error(`profiles_unavailable_${profileError.code || 'unknown'}`);
+  }
   for (const profile of profiles || []) (await syncProfile(profile)) ? updated++ : failed++;
   return { resolved, updated, failed };
 }
