@@ -6,11 +6,8 @@
   <meta name="theme-color" content="#10110f">
   <meta name="description" content="Radar da Tropa — consulte relatos da comunidade de streamers e encontre variações de arrobas.">
   <title>Radar da Tropa — Consulte antes da próxima rodada</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{color-scheme:dark;--bg:#10110f;--panel:#191b18;--panel2:#20231e;--line:#34382f;--text:#f3f4ed;--muted:#9ea497;--lime:#d5fb69;--lime2:#b5d94b;--orange:#f8ac74;--display:'Space Grotesk',Arial,sans-serif;--body:'DM Sans',Arial,sans-serif;--radius:22px}
+    :root{color-scheme:dark;--bg:#10110f;--panel:#191b18;--panel2:#20231e;--line:#34382f;--text:#f3f4ed;--muted:#9ea497;--lime:#d5fb69;--lime2:#b5d94b;--orange:#f8ac74;--display:'Arial Black',Arial,sans-serif;--body:Inter,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;--radius:22px}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--body);overflow-x:hidden}button,input,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}svg{display:block}::selection{background:var(--lime);color:#10110f}
     .site-shell{min-height:100vh;position:relative;background:radial-gradient(ellipse 47% 34% at 74% 12%,rgba(142,177,62,.14),transparent 75%),radial-gradient(ellipse 36% 25% at 8% 45%,rgba(185,124,70,.05),transparent 78%),var(--bg)}
     .container{width:min(1184px,calc(100% - 48px));margin-inline:auto}.topbar{height:82px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;position:relative;z-index:10}.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:22px}.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}.brand-mark{width:39px;height:39px;border-radius:12px;background:var(--lime);color:#10110f;display:grid;place-items:center;box-shadow:0 0 26px rgba(213,251,105,.18)}.brand-name{font:700 19px/1 var(--display);letter-spacing:-.055em}.brand-name span{color:var(--lime)}.brand-tag{border-left:1px solid var(--line);padding-left:13px;margin-left:3px;color:#888f82;font-size:11px;font-weight:700;letter-spacing:.17em;text-transform:uppercase}.nav{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid #353930;border-radius:999px;background:#1a1d18}.nav-btn{border:0;background:transparent;color:#aeb4a7;padding:10px 15px;border-radius:999px;font-size:13px;font-weight:700;transition:.2s}.nav-btn:hover{color:var(--text)}.nav-btn.active{background:#31372a;color:var(--lime)}.top-action{border:1px solid #59633f;background:transparent;color:var(--lime);border-radius:12px;padding:11px 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;white-space:nowrap;transition:.2s}.top-action:hover{background:rgba(213,251,105,.09);border-color:var(--lime)}
@@ -44,19 +41,25 @@
     .modal-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.modal-head small{color:var(--lime);font-size:10px;font-weight:800;letter-spacing:.18em}.modal-head h2{font:700 24px var(--display);letter-spacing:-.05em;margin:6px 0 10px}.modal-close{background:transparent;border:0;color:#aab6a2;font-size:28px;line-height:1}
     .pin-output{border:1px solid #7b9a50;border-radius:14px;background:#2d3a25;padding:17px;margin-top:20px;display:grid;gap:10px}.pin-output small{color:#bbd5a7}.pin-output strong{font:700 23px var(--display);color:var(--lime);letter-spacing:.11em;word-break:break-all}
     @media(max-width:520px){.dash-row{align-items:start}.row-side{max-width:48%}.row-reason{font-size:11px}.admin-top-buttons{width:100%}.admin-top-buttons .ghost-btn{flex:1}}
+    .credit-ribbon{background:linear-gradient(90deg,#d5fb69,#b8dd57);color:#172013;text-align:center;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.credit-ribbon b{letter-spacing:0}.brand-credit{display:block;color:#829675;font-size:10px;letter-spacing:.03em;margin-top:5px}.nav{flex-wrap:wrap}.hero-facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}.hero-facts span{border:1px solid #526041;background:#20281c;color:#d3e9bb;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:800}.hero-facts b{color:var(--lime);margin-right:5px}.search-category{background:#20241d;border:1px solid #434b37;border-radius:11px;color:#dcebd1;padding:10px 13px;max-width:170px}.search-tools{display:flex;align-items:center;gap:12px;margin-top:13px;color:#879581;font-size:12px}.case-link{border:0;background:transparent;color:var(--lime);font-size:12px;font-weight:800;padding:0;margin-top:13px}.case-link:hover{text-decoration:underline}.field select,.field input[type=file]{width:100%;background:#131612;border:1px solid #3d4538;border-radius:12px;padding:14px;color:var(--text)}.field select:focus,.field input[type=file]:focus{outline:2px solid var(--lime)}.field input[type=file]::file-selector-button{border:0;background:#34442b;color:var(--lime);padding:8px 12px;border-radius:8px;margin-right:12px;font-weight:800}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:86px}.feature-card{min-height:193px;background:linear-gradient(155deg,#242e20,#1b201a);border:1px solid #3d5135;border-radius:19px;padding:23px}.feature-card .number{color:var(--lime);font-size:11px;font-weight:900;letter-spacing:.18em}.feature-card h3{font:800 20px/1.2 var(--display);letter-spacing:-.05em;margin:21px 0 9px}.feature-card p{color:#a7b5a0;font-size:13px;margin:0}.appeal-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:36px auto 0}.appeal-layout .glass-card{height:max-content}.appeal-matches{display:grid;gap:9px;margin:15px 0}.appeal-matches button{display:grid;gap:5px;text-align:left;border:1px solid #455b37;background:#263122;color:#eaf5de;border-radius:12px;padding:13px}.appeal-matches button span{font-size:12px;color:#aebda8}.appeal-matches button small{color:var(--lime);font-weight:800}.selected-case,.appeal-confirmation{border:1px solid #779956;background:#273a22;border-radius:13px;color:#dceecf;padding:14px;margin:15px 0;font-size:13px}.appeal-confirmation strong{display:block;color:var(--lime);font-size:18px}.appeal-confirmation code{display:block;color:#f2ffdf;word-break:break-all;font:800 18px var(--display);margin:12px 0}.status-box{border:1px solid #4f6045;border-radius:12px;padding:13px;margin-top:13px;color:var(--lime)}.evidence-buttons{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.evidence-buttons button{border:1px solid #536f45;background:#2a3925;color:var(--lime);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700}.review-label{display:block;color:#9dae95;font-size:11px;font-weight:700;margin-top:12px}.review-label textarea{display:block;width:100%;min-width:160px;min-height:65px;margin-top:5px;background:#121711;border:1px solid #3d4f36;border-radius:8px;color:#f4f9ef;padding:8px;font:12px var(--body);resize:vertical}.review-row{align-items:start}.review-row .dash-row-main{flex:1}.review-row .row-side{max-width:170px}.no-evidence{display:block;margin-top:8px;color:#778973}.lower-admin{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.audit-item{display:flex;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid #303b2d;color:#adbea7;font-size:12px}.audit-item time{color:#82917d}.media-dialog{border:1px solid #5b704b;border-radius:18px;background:#171e16;color:var(--text);width:min(900px,calc(100% - 30px));max-height:90vh;padding:20px}.media-dialog::backdrop{background:rgba(0,0,0,.8)}.media-dialog img,.media-dialog video{display:block;max-width:100%;max-height:72vh;margin:14px auto}.media-dialog .ghost-btn{float:right}.privacy-panel{margin-top:24px;background:#1e291b;border:1px solid #4c6540;border-radius:15px;padding:17px;color:#baceb3;font-size:12px}.privacy-panel strong{display:block;color:var(--lime);font-size:13px;margin-bottom:6px}.credit-link{color:var(--lime);font-weight:800}.footer-credit{display:flex;flex-direction:column;gap:3px}.footer-credit small{color:#96aa87}.footer-credit a:hover{text-decoration:underline}.metric-grid{grid-template-columns:repeat(4,1fr)}
+    @media(max-width:1000px){.metric-grid{grid-template-columns:repeat(2,1fr)}.lower-admin{grid-template-columns:1fr}.feature-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:760px){.appeal-layout{grid-template-columns:1fr}.feature-grid{grid-template-columns:1fr}.nav{overflow-x:auto;flex-wrap:nowrap}.nav-btn{white-space:nowrap;min-width:max-content}.hero-facts{gap:7px}}
+    @media(max-width:520px){.metric-grid{grid-template-columns:repeat(2,1fr)}.metric:last-child{grid-column:auto}.review-row{flex-direction:column}.review-row .row-side{max-width:none;align-items:flex-start}.search-tools{align-items:start;flex-direction:column}.search-category{max-width:none;width:100%}}
   </style>
 </head>
 <body>
   <div class="site-shell">
+    <div class="credit-ribbon">Um projeto da comunidade · criado por <b>@jose027._</b></div>
     <header class="topbar">
       <div class="container topbar-inner">
         <a class="brand" href="#consultar" data-go="consultar" aria-label="Radar da Tropa, ir para consulta">
           <span class="brand-mark" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-5 4.3 10L16 12h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span class="brand-name">RADAR<span>.</span>TROPA</span><span class="brand-tag">Comunidade de lives</span>
+          <span><span class="brand-name">RADAR<span>.</span>TROPA</span><span class="brand-credit">por @jose027._</span></span><span class="brand-tag">Comunidade de lives</span>
         </a>
         <nav class="nav" aria-label="Navegação principal">
           <button class="nav-btn active" type="button" data-go="consultar">Consultar @</button>
           <button class="nav-btn" type="button" data-go="relatar">Enviar relato</button>
+          <button class="nav-btn" type="button" data-go="recorrer">Recorrer</button>
           <button class="nav-btn" type="button" data-go="admin">Administrador</button>
         </nav>
         <button class="top-action" type="button" data-go="relatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg> Acesso streamer</button>
@@ -75,7 +78,9 @@
               <input id="search-input" aria-label="Buscar arroba" autocomplete="off" placeholder="Buscar arroba, ex: @joao" maxlength="40">
               <button class="primary-btn" type="submit">Buscar <span aria-hidden="true">↗</span></button>
             </form>
+            <div class="search-tools"><label for="search-category">Filtrar por tipo:</label><select id="search-category" class="search-category"><option value="">Todos os relatos</option><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></div>
             <div class="popular"><span>Experimente buscar:</span><button type="button" data-search="joao">@joao</button><button type="button" data-search="mar1ana">@mar1ana</button><button type="button" data-search="j04o">@j04o</button></div>
+            <div class="hero-facts"><span><b>01</b> Busca flexível</span><span><b>02</b> Revisão humana</span><span><b>03</b> Direito de recorrer</span></div>
           </div>
           <div class="visual" aria-hidden="true">
             <span class="orbit-dot one"></span><span class="orbit-dot two"></span>
@@ -100,6 +105,7 @@
         </div></div>
 
         <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Digite um arroba para consultar os relatos publicados.</p></div><span class="result-count"><b id="result-number">0</b> relatos encontrados</span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Pronto para consultar</strong><p>Digite pelo menos dois caracteres para iniciar a busca.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
+        <div class="container feature-grid"><article class="feature-card"><span class="number">CAMADA 01</span><h3>Encontre variações</h3><p>Busque partes do arroba, com acentos ou números no lugar das letras.</p></article><article class="feature-card"><span class="number">CAMADA 02</span><h3>Provas reservadas</h3><p>Fotos e vídeos ficam em área privada para revisão do administrador.</p></article><article class="feature-card"><span class="number">CAMADA 03</span><h3>Recurso com protocolo</h3><p>Quem discordar de um relato publicado pode apresentar contexto e acompanhar a análise.</p></article></div>
         <div class="container"><div class="cta"><div><small>Você faz parte da comunidade?</small><h2>Viu algo suspeito na live?</h2><p>Entre com seu PIN e envie o ocorrido para análise.</p></div><button type="button" class="dark-btn" data-go="relatar">Acessar área do streamer <span aria-hidden="true">↗</span></button></div></div>
       </section>
 
@@ -110,20 +116,39 @@
             <div>
               <div id="pin-panel" class="glass-card">
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">⌁</span><span><h2>Acessar com PIN</h2><small>Identificação do streamer</small></span></div>
-                <label class="field"><span>Seu código de acesso</span><input id="pin-input" class="pin-input" type="text" inputmode="text" autocomplete="off" maxlength="17" placeholder="ABCD EFGH 1234" aria-describedby="pin-help"></label>
+                <label class="field"><span>Seu código de acesso</span><input id="pin-input" class="pin-input" type="text" inputmode="text" autocomplete="off" maxlength="29" placeholder="Seu PIN privado" aria-describedby="pin-help"></label>
                 <button class="primary-btn full" id="pin-preview" type="button">Validar PIN <span aria-hidden="true">→</span></button>
-                <p class="helper" id="pin-help">Código de 12 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p>
+                <p class="helper" id="pin-help">Código de 12 ou 20 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p>
               </div>
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
-                <form id="report-form"><label class="field"><span>Arroba da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <form id="report-form"><label class="field"><span>Arroba da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
                 <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
                 <p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
               </div>
             </div>
-            <aside class="side-panel"><div><small>Como funciona</small><h3>Direto ao ponto, sem complicar.</h3><p>O PIN identifica o streamer. Depois do envio, o relato passa pela revisão do administrador antes de ficar público.</p></div><div class="step-list"><div class="step"><b>01</b> Entre com seu PIN</div><div class="step"><b>02</b> Informe o arroba e o motivo</div><div class="step"><b>03</b> Aguarde a análise</div></div></aside>
+            <aside class="side-panel"><div><small>Como funciona</small><h3>Direto ao ponto, com responsabilidade.</h3><p>O PIN identifica o streamer. Depois do envio, o relato e suas provas passam pela revisão do administrador antes de ficar público.</p></div><div class="step-list"><div class="step"><b>01</b> Entre com seu PIN</div><div class="step"><b>02</b> Informe o arroba, contexto e provas</div><div class="step"><b>03</b> Aguarde a análise</div></div></aside>
           </div>
+        </div>
+      </section>
+
+      <section id="recorrer" class="view" aria-label="Recorrer de um relato">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Direito de resposta <span class="eyebrow-line"></span></div><h1>Seu lado também <em>faz parte.</em></h1><p>Conteste um relato publicado, envie provas e acompanhe a revisão pelo seu protocolo privado.</p></div>
+          <div class="appeal-layout">
+            <div class="glass-card"><div class="card-topline"><span class="circle-icon">↺</span><span><h2>Apresentar recurso</h2><small>Escolha um relato publicado</small></span></div>
+              <form id="appeal-search-form" class="search-box"><input id="appeal-search" aria-label="Buscar relato para recorrer" placeholder="Busque o arroba do relato" maxlength="40"><button class="primary-btn" type="submit">Buscar</button></form>
+              <div id="appeal-matches" class="appeal-matches"></div>
+              <p id="selected-case" class="selected-case" hidden></p>
+              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
+              <div id="appeal-confirmation" class="appeal-confirmation" hidden><strong>Recurso recebido</strong><span>Guarde este protocolo. Ele aparece só agora:</span><code id="appeal-protocol"></code><span id="appeal-upload-status"></span></div>
+            </div>
+            <div><div class="side-panel"><div><small>Processo justo</small><h3>Uma revisão feita por gente.</h3><p>Seu recurso não aparece na busca pública. O administrador vê o texto e as provas e pode retirar o relato da consulta.</p></div><div class="step-list"><div class="step"><b>01</b> Escolha o relato</div><div class="step"><b>02</b> Envie contexto e provas</div><div class="step"><b>03</b> Guarde o protocolo</div></div></div>
+              <div class="glass-card" style="margin-top:18px"><h2>Consultar recurso</h2><p class="helper">O protocolo identifica o recurso. Sem ele, não é possível acompanhar o resultado.</p><form id="appeal-status-form"><label class="field"><span>Seu protocolo</span><input id="status-protocol" maxlength="40" placeholder="Cole o protocolo recebido" required></label><button class="ghost-btn" type="submit">Ver andamento ↗</button></form><div id="appeal-status-result" class="status-box" hidden></div></div>
+            </div>
+          </div>
+          <div class="privacy-panel"><strong>Privacidade das provas</strong>Fotos são recriadas antes do envio para retirar metadados comuns da câmera. Vídeos e arquivos passam pelo servidor de armazenamento; evite incluir dados pessoais na imagem ou no áudio. O limite de 30 segundos é verificado no navegador e conferido pelo administrador.</div>
         </div>
       </section>
 
@@ -152,8 +177,9 @@
             </div></div>
             <div id="admin-dashboard" class="admin-dash">
               <div class="admin-top"><div><span class="admin-badge">● Visão geral</span><h2>Painel da tropa</h2><p>Gerencie relatos e acessos em tempo real.</p></div><div class="admin-top-buttons"><button class="ghost-btn" id="refresh-dashboard" type="button">Atualizar</button><button class="ghost-btn" id="close-dashboard" type="button">Sair</button></div></div>
-              <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div></div>
+              <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div><div class="metric"><small>Recursos abertos</small><strong id="metric-appeals">0</strong><span>Aguardando decisão</span></div></div>
               <div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
+              <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
               <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
             </div>
           </div>
@@ -161,7 +187,8 @@
       </section>
     </main>
 
-    <footer class="footer"><div class="container footer-inner"><strong>RADAR<span>.</span>TROPA</strong><span>Feito para a comunidade de lives. Relatos sujeitos à análise.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Área streamer</a><a href="#admin" data-go="admin">Administrador</a></div></div></footer>
+    <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Idealizado e criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Streamer</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#admin" data-go="admin">Admin</a></div></div></footer>
+    <dialog id="evidence-dialog" class="media-dialog" aria-label="Prova privada"><button id="evidence-close" class="ghost-btn" type="button">Fechar ×</button><div id="evidence-content"></div></dialog>
     <div class="modal-backdrop" id="admin-modal" hidden>
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-head"><div><small>NOVO ACESSO</small><h2 id="modal-title">Gerar PIN para streamer</h2></div><button type="button" class="modal-close" id="create-streamer-close" aria-label="Fechar">×</button></div>
@@ -186,8 +213,10 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'
 let toastTimer, searchTimer, searchSerial = 0;
 let streamerPin = null;
 let adminSession = null;
-let dashboard = { reports: [], streamers: [] };
+let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
+let selectedAppealReport = null;
 let setupSession = null;
+const categoryLabels = { nao_pagamento:'Não pagamento', falsidade:'Identidade falsa', abuso:'Abuso', outro:'Outro' };
 
 function toast(message, isError = false) {
   const el = document.getElementById('toast');
@@ -279,7 +308,8 @@ function renderReports(reports, query, message = '') {
   resultsGrid.style.display = reports.length ? 'grid' : 'none';
   resultsGrid.innerHTML = reports.map(item => {
     const handle = item.handle.startsWith('@') ? item.handle : '@' + item.handle;
-    return `<article class="result-card"><div class="result-card-head"><span class="handle-avatar">${escapeHtml(handle.slice(1,2).toUpperCase())}</span><span class="status-pill">RELATO</span></div><h3>${escapeHtml(handle)}</h3><p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>Relato publicado</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div></article>`;
+    const category = categoryLabels[item.category] || 'Outro';
+    return `<article class="result-card"><div class="result-card-head"><span class="handle-avatar">${escapeHtml(handle.slice(1,2).toUpperCase())}</span><span class="status-pill">${escapeHtml(category)}</span></div><h3>${escapeHtml(handle)}</h3><p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>${escapeHtml(item.event_date || 'Relato publicado')}</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div><button class="case-link" type="button" data-appeal-report="${escapeHtml(item.id)}" data-appeal-handle="${escapeHtml(handle)}">Contestar este relato ↗</button></article>`;
   }).join('');
 }
 async function searchReports(query, scroll = false) {
@@ -291,7 +321,7 @@ async function searchReports(query, scroll = false) {
   }
   document.getElementById('results-title').textContent = 'Consultando o radar...';
   try {
-    const reports = await rpc('radar_search_reports', { p_query: query.trim() });
+    const reports = await rpc('radar_search_reports_v2', { p_query: query.trim(), p_category: document.getElementById('search-category').value || null });
     if (serial !== searchSerial) return;
     renderReports(Array.isArray(reports) ? reports : [], query);
     if (scroll) document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -310,6 +340,11 @@ document.getElementById('search-input').addEventListener('input', event => {
   const value = event.target.value;
   searchTimer = setTimeout(() => searchReports(value), 350);
 });
+document.getElementById('search-category').addEventListener('change', () => searchReports(document.getElementById('search-input').value));
+resultsGrid.addEventListener('click', event => {
+  const button = event.target.closest('[data-appeal-report]');
+  if (button) selectAppealReport(button.dataset.appealReport, button.dataset.appealHandle);
+});
 document.querySelectorAll('[data-search]').forEach(button => button.addEventListener('click', () => {
   const value = button.dataset.search;
   document.getElementById('search-input').value = '@' + value;
@@ -319,7 +354,7 @@ document.querySelectorAll('[data-search]').forEach(button => button.addEventList
 document.getElementById('pin-preview').addEventListener('click', async event => {
   const button = event.currentTarget;
   const pin = document.getElementById('pin-input').value.toUpperCase().replace(/[^0-9A-F]/g, '');
-  if (!/^[0-9A-F]{12}$/.test(pin)) return toast('O PIN deve ter 12 caracteres.', true);
+  if (!/^([0-9A-F]{12}|[0-9A-F]{20})$/.test(pin)) return toast('O PIN deve ter 12 ou 20 caracteres.', true);
   busy(button, true, 'Validando PIN...');
   try {
     const streamer = await rpc('radar_verify_pin', { p_pin: pin });
@@ -345,40 +380,181 @@ document.getElementById('report-form').addEventListener('submit', async event =>
   if (!streamerPin) return toast('Entre com seu PIN primeiro.', true);
   const handle = document.getElementById('report-handle').value.trim();
   const reason = document.getElementById('report-reason').value.trim();
+  const files = [...document.getElementById('report-files').files];
   if (reason.length < 15) return toast('Descreva o motivo em pelo menos 15 caracteres.', true);
   const button = event.target.querySelector('button[type=submit]');
   busy(button, true, 'Enviando...');
   try {
-    await rpc('radar_submit_report', { p_pin: streamerPin, p_handle: handle, p_reason: reason });
+    await validateFiles(files);
+    const reportId = await rpc('radar_submit_report_v2', { p_pin: streamerPin, p_handle: handle, p_reason: reason,
+      p_category: document.getElementById('report-category').value, p_event_date: document.getElementById('report-date').value || null });
+    let uploadProblem = false;
+    for (const file of files) {
+      try { await uploadEvidence('report', reportId, streamerPin, file); }
+      catch (error) { uploadProblem = true; toast(`Relato salvo, mas uma prova falhou: ${error.message}`, true); }
+    }
     document.getElementById('preview-handle').textContent = handle.startsWith('@') ? handle : '@' + handle;
-    document.getElementById('preview-reason').textContent = 'Relato recebido. O administrador vai analisar antes de publicar.';
+    document.getElementById('preview-reason').textContent = uploadProblem ? 'Relato recebido. Uma prova não foi enviada; avise o administrador.' : 'Relato e provas recebidos. O administrador vai analisar antes de publicar.';
     document.getElementById('report-preview').classList.add('show');
     event.target.reset();
-    toast('Relato enviado para análise.');
+    if (!uploadProblem) toast('Relato enviado para análise.');
   } catch (error) { toast(error.message, true); }
   finally { busy(button, false); }
 });
 
+async function validateFiles(files) {
+  if (files.length > 3) throw new Error('Envie no máximo três arquivos.');
+  const allowed = ['image/jpeg','image/png','image/webp','video/mp4','video/webm'];
+  for (const file of files) {
+    if (!allowed.includes(file.type)) throw new Error('Use JPG, PNG, WebP, MP4 ou WebM.');
+    if (file.size > 20 * 1024 * 1024) throw new Error('Cada arquivo deve ter até 20 MB.');
+    if (file.type.startsWith('video/')) {
+      const url = URL.createObjectURL(file);
+      try {
+        const duration = await new Promise((resolve, reject) => {
+          const video = document.createElement('video');
+          video.preload = 'metadata';
+          video.onloadedmetadata = () => resolve(video.duration);
+          video.onerror = () => reject(new Error('Não foi possível ler o vídeo.'));
+          video.src = url;
+        });
+        if (!Number.isFinite(duration) || duration > 30) throw new Error('O vídeo deve ter até 30 segundos.');
+      } finally { URL.revokeObjectURL(url); }
+    }
+  }
+}
+async function imageWithoutMetadata(file) {
+  if (!file.type.startsWith('image/')) return file;
+  const bitmap = await createImageBitmap(file);
+  try {
+    const ratio = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * ratio));
+    canvas.height = Math.max(1, Math.round(bitmap.height * ratio));
+    const context = canvas.getContext('2d');
+    if (file.type === 'image/jpeg') { context.fillStyle = '#fff'; context.fillRect(0,0,canvas.width,canvas.height); }
+    context.drawImage(bitmap,0,0,canvas.width,canvas.height);
+    return await new Promise((resolve,reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Não foi possível preparar a imagem.')),file.type,.9));
+  } finally { bitmap.close(); }
+}
+async function uploadEvidence(context,targetId,secret,file) {
+  const body = await imageWithoutMetadata(file);
+  const path = await rpc('radar_create_upload_ticket', { p_context:context,p_target_id:targetId,p_secret:secret,p_mime:file.type });
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/radar-evidence/${path}`, {
+    method:'POST', headers:{ apikey:SUPABASE_KEY, 'Content-Type':file.type, 'x-upsert':'false' }, body
+  });
+  await parseResponse(response);
+}
+
+function selectAppealReport(id,handle) {
+  selectedAppealReport = id;
+  document.getElementById('selected-case').hidden = false;
+  document.getElementById('selected-case').textContent = `Relato selecionado: ${handle}`;
+  document.getElementById('appeal-handle').value = handle;
+  showView('recorrer');
+  document.getElementById('appeal-message').focus();
+}
+document.getElementById('appeal-search-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const query = document.getElementById('appeal-search').value.trim();
+  if (foldHandle(query).length < 2) return toast('Digite pelo menos dois caracteres.',true);
+  try {
+    const matches = await rpc('radar_search_reports_v2',{p_query:query,p_category:null});
+    const target = document.getElementById('appeal-matches');
+    target.innerHTML = matches.length ? matches.map(item => `<button type="button" data-id="${escapeHtml(item.id)}" data-handle="@${escapeHtml(item.handle)}"><strong>@${escapeHtml(item.handle)}</strong><span>${escapeHtml(item.reason.slice(0,100))}</span><small>Selecionar relato ↗</small></button>`).join('') : '<p>Nenhum relato publicado encontrado para esse arroba.</p>';
+  } catch(error) { toast(error.message,true); }
+});
+document.getElementById('appeal-matches').addEventListener('click',event => {
+  const button = event.target.closest('[data-id]');
+  if(button) selectAppealReport(button.dataset.id,button.dataset.handle);
+});
+document.getElementById('appeal-form').addEventListener('submit',async event => {
+  event.preventDefault();
+  if (!selectedAppealReport) return toast('Selecione o relato que deseja contestar.',true);
+  const files = [...document.getElementById('appeal-files').files];
+  const button = event.target.querySelector('[type=submit]');
+  busy(button,true,'Enviando recurso...');
+  try {
+    await validateFiles(files);
+    const created = await rpc('radar_create_appeal',{p_report_id:selectedAppealReport,
+      p_handle:document.getElementById('appeal-handle').value.trim(),p_message:document.getElementById('appeal-message').value.trim()});
+    let failures=0;
+    for(const file of files) { try { await uploadEvidence('appeal',created.id,created.protocol,file); } catch { failures++; } }
+    const output = document.getElementById('appeal-confirmation');
+    output.hidden=false;
+    document.getElementById('appeal-protocol').textContent=created.protocol;
+    document.getElementById('appeal-upload-status').textContent=failures ? `${failures} arquivo(s) não foram enviados. O texto do recurso foi recebido.` : 'Recurso e arquivos recebidos para análise.';
+    event.target.reset();
+    toast('Recurso registrado. Guarde seu protocolo.');
+  } catch(error) { toast(error.message,true); }
+  finally { busy(button,false); }
+});
+document.getElementById('appeal-status-form').addEventListener('submit',async event => {
+  event.preventDefault();
+  const protocol=document.getElementById('status-protocol').value.trim().replace(/[^0-9a-f]/gi,'').toUpperCase();
+  try {
+    const result=await rpc('radar_appeal_status',{p_protocol:protocol});
+    const box=document.getElementById('appeal-status-result');
+    box.hidden=false;
+    box.textContent=result ? `${({pending:'Em análise',accepted:'Aceito: relato retirado',denied:'Não aceito'})[result.status] || result.status}. ${result.admin_note || ''}` : 'Protocolo não encontrado.';
+  } catch(error) { toast(error.message,true); }
+});
+
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v2', {}, true);
     renderDashboard();
   } catch (error) { toast(error.message, true); }
 }
 function renderDashboard() {
   const reports = dashboard.reports || [];
   const streamers = dashboard.streamers || [];
+  const appeals = dashboard.appeals || [];
   document.getElementById('metric-reports').textContent = reports.length;
   document.getElementById('metric-streamers').textContent = streamers.filter(s => s.active).length;
   document.getElementById('metric-pending').textContent = reports.filter(r => r.status === 'pending').length;
+  document.getElementById('metric-appeals').textContent = appeals.filter(a => a.status === 'pending').length;
   const reportsList = document.getElementById('reports-list');
   reportsList.innerHTML = reports.length ? reports.map(r => {
     const statusLabel = {pending:'Em análise',published:'Publicado',rejected:'Rejeitado'}[r.status] || r.status;
-    return `<div class="dash-row"><div class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))}</small><p class="row-reason">${escapeHtml(r.reason)}</p></div><div class="row-side"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></div>`;
+    return `<div class="dash-row review-row" data-review-id="${escapeHtml(r.id)}"><div class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))} · ${escapeHtml(categoryLabels[r.category] || 'Outro')}${r.event_date ? ` · Ocorrido em ${escapeHtml(r.event_date)}` : ''}</small><p class="row-reason">${escapeHtml(r.reason)}</p>${evidenceButtons(r.evidence)}<label class="review-label">Nota da revisão <textarea maxlength="500" placeholder="Contexto da decisão (opcional)">${escapeHtml(r.review_note || '')}</textarea></label></div><div class="row-side"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></div>`;
   }).join('') : '<div class="list-empty">Nenhum relato recebido ainda.</div>';
   const streamersList = document.getElementById('streamers-list');
-  streamersList.innerHTML = streamers.length ? streamers.map(s => `<div class="dash-row"><div class="dash-row-main"><strong>${escapeHtml(s.name)}</strong><small>${s.active ? 'Ativo' : 'Suspenso'} · criado em ${escapeHtml(formattedDate(s.created_at))}</small></div><div class="row-side"><span class="code">•••• ${escapeHtml(s.last4)}</span><div class="row-buttons"><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></div>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
+  streamersList.innerHTML = streamers.length ? streamers.map(s => `<div class="dash-row"><div class="dash-row-main"><strong>${escapeHtml(s.name)}</strong><small>${s.active ? 'Ativo' : 'Suspenso'} · criado em ${escapeHtml(formattedDate(s.created_at))}</small></div><div class="row-side"><span class="code">PIN protegido</span><div class="row-buttons"><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></div>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
+  document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<div class="dash-row review-row" data-appeal-id="${escapeHtml(a.id)}"><div class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label></div><div class="row-side"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></div>`).join('') : '<div class="list-empty">Nenhum recurso recebido ainda.</div>';
+  document.getElementById('audit-list').innerHTML = (dashboard.audit || []).length ? dashboard.audit.map(a => `<div class="audit-item"><span>${escapeHtml(a.action.replaceAll('_',' '))}</span><time>${escapeHtml(formattedDate(a.created_at))}</time></div>`).join('') : '<p class="list-empty">Sem ações recentes.</p>';
 }
+function evidenceButtons(paths) {
+  return paths?.length ? `<div class="evidence-buttons">${paths.map((path,index) => `<button type="button" data-evidence="${escapeHtml(path)}">Ver prova ${index+1} ↗</button>`).join('')}</div>` : '<small class="no-evidence">Sem prova anexada</small>';
+}
+async function openEvidence(path) {
+  const dialog = document.getElementById('evidence-dialog');
+  const holder = document.getElementById('evidence-content');
+  holder.textContent='Carregando prova privada...';
+  dialog.showModal();
+  try {
+    if (!/^(reports|appeals)\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|mp4|webm)$/.test(path)) throw new Error('Caminho inválido.');
+    const response=await fetch(`${SUPABASE_URL}/storage/v1/object/authenticated/radar-evidence/${path}`,{
+      headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`}
+    });
+    if (!response.ok) throw new Error('Não foi possível abrir esta prova.');
+    const blob=await response.blob();
+    const url=URL.createObjectURL(blob);
+    if (dialog.dataset.objectUrl) URL.revokeObjectURL(dialog.dataset.objectUrl);
+    dialog.dataset.objectUrl=url;
+    holder.innerHTML=blob.type.startsWith('video/') ? `<video controls playsinline src="${url}"></video>` : `<img src="${url}" alt="Prova privada enviada para revisão">`;
+  } catch(error) { holder.textContent=error.message; }
+}
+document.getElementById('admin-dashboard').addEventListener('click',event => {
+  const button=event.target.closest('[data-evidence]');
+  if(button) openEvidence(button.dataset.evidence);
+});
+document.getElementById('evidence-close').addEventListener('click',() => document.getElementById('evidence-dialog').close());
+document.getElementById('evidence-dialog').addEventListener('close',event => {
+  const dialog=event.target;
+  document.getElementById('evidence-content').textContent='';
+  if(dialog.dataset.objectUrl) { URL.revokeObjectURL(dialog.dataset.objectUrl); delete dialog.dataset.objectUrl; }
+});
 function openDashboard() {
   document.getElementById('admin-login').style.display = 'none';
   document.getElementById('admin-dashboard').classList.add('show');
@@ -468,10 +644,22 @@ document.getElementById('reports-list').addEventListener('click', async event =>
   const status = button.dataset.status;
   busy(button, true, '...');
   try {
-    await rpc('radar_admin_set_report_status', { p_report_id: button.dataset.report, p_status: status }, true);
+    const note=button.closest('.review-row').querySelector('textarea').value.trim();
+    await rpc('radar_admin_review_report', { p_report_id: button.dataset.report, p_status: status, p_note: note || null }, true);
     await loadDashboard();
     toast(status === 'published' ? 'Relato publicado.' : 'Relato retirado da consulta.');
   } catch (error) { toast(error.message, true); busy(button, false); }
+});
+document.getElementById('appeals-list').addEventListener('click',async event => {
+  const button=event.target.closest('[data-appeal]');
+  if(!button) return;
+  busy(button,true,'...');
+  try {
+    const note=button.closest('.review-row').querySelector('textarea').value.trim();
+    await rpc('radar_admin_review_appeal',{p_appeal_id:button.dataset.appeal,p_status:button.dataset.status,p_note:note || null},true);
+    await loadDashboard();
+    toast(button.dataset.status==='accepted' ? 'Recurso aceito. Relato retirado da consulta.' : 'Recurso negado.');
+  } catch(error) { toast(error.message,true); busy(button,false); }
 });
 document.getElementById('streamers-list').addEventListener('click', async event => {
   const button = event.target.closest('[data-streamer]');
@@ -545,7 +733,7 @@ try {
 } catch { sessionStorage.removeItem(SESSION_KEY); }
 renderReports([], '');
 const initialView = location.hash.replace('#','');
-if (['consultar','relatar','admin'].includes(initialView)) showView(initialView, false);
+if (['consultar','relatar','recorrer','admin'].includes(initialView)) showView(initialView, false);
   </script>
 </body>
 </html>
