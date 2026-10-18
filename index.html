@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <meta name="description" content="Radar da Tropa — consulte relatos da comunidade de streamers e encontre variações de arrobas.">
+  <title>Radar da Tropa — Consulte antes da próxima rodada</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#10110f;--panel:#191b18;--panel2:#20231e;--line:#34382f;--text:#f3f4ed;--muted:#9ea497;--lime:#d5fb69;--lime2:#b5d94b;--orange:#f8ac74;--display:'Space Grotesk',Arial,sans-serif;--body:'DM Sans',Arial,sans-serif;--radius:22px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--body);overflow-x:hidden}button,input,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}svg{display:block}::selection{background:var(--lime);color:#10110f}
+    .site-shell{min-height:100vh;position:relative;background:radial-gradient(ellipse 47% 34% at 74% 12%,rgba(142,177,62,.14),transparent 75%),radial-gradient(ellipse 36% 25% at 8% 45%,rgba(185,124,70,.05),transparent 78%),var(--bg)}
+    .container{width:min(1184px,calc(100% - 48px));margin-inline:auto}.topbar{height:82px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;position:relative;z-index:10}.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:22px}.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}.brand-mark{width:39px;height:39px;border-radius:12px;background:var(--lime);color:#10110f;display:grid;place-items:center;box-shadow:0 0 26px rgba(213,251,105,.18)}.brand-name{font:700 19px/1 var(--display);letter-spacing:-.055em}.brand-name span{color:var(--lime)}.brand-tag{border-left:1px solid var(--line);padding-left:13px;margin-left:3px;color:#888f82;font-size:11px;font-weight:700;letter-spacing:.17em;text-transform:uppercase}.nav{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid #353930;border-radius:999px;background:#1a1d18}.nav-btn{border:0;background:transparent;color:#aeb4a7;padding:10px 15px;border-radius:999px;font-size:13px;font-weight:700;transition:.2s}.nav-btn:hover{color:var(--text)}.nav-btn.active{background:#31372a;color:var(--lime)}.top-action{border:1px solid #59633f;background:transparent;color:var(--lime);border-radius:12px;padding:11px 16px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;white-space:nowrap;transition:.2s}.top-action:hover{background:rgba(213,251,105,.09);border-color:var(--lime)}
+    .view{display:none}.view.active{display:block;animation:enter .35s ease both}@keyframes enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+    .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(390px,.95fr);gap:54px;align-items:center;padding-top:92px;padding-bottom:68px}.eyebrow{display:flex;align-items:center;gap:10px;color:var(--lime);font-size:11px;font-weight:700;letter-spacing:.21em;text-transform:uppercase}.eyebrow-line{height:1px;width:29px;background:var(--lime)}.hero h1{font:700 clamp(47px,5.4vw,79px)/.99 var(--display);letter-spacing:-.078em;margin:24px 0 23px;max-width:690px}.hero h1 em{color:var(--lime);font-style:normal}.hero-copy{color:#adb3a6;max-width:520px;font-size:17px;line-height:1.7;margin:0 0 32px}.search-box{background:#20241d;border:1px solid #434b37;border-radius:18px;padding:8px;display:flex;align-items:center;gap:9px;max-width:620px;box-shadow:0 22px 65px rgba(0,0,0,.16),0 0 0 5px rgba(213,251,105,.025)}.search-icon{color:var(--lime);margin-left:15px;flex:none}.search-box input{background:transparent;border:0;outline:none;color:var(--text);min-width:0;flex:1;font-size:16px;padding:11px 2px}.search-box input::placeholder{color:#737d6d}.search-box:focus-within{border-color:var(--lime)}.primary-btn{border:0;background:var(--lime);color:#171a12;border-radius:12px;font-weight:800;padding:15px 20px;display:inline-flex;justify-content:center;align-items:center;gap:9px;transition:.2s;white-space:nowrap}.primary-btn:hover{background:#e5ff9d;transform:translateY(-2px)}.primary-btn:active{transform:translateY(0)}.popular{display:flex;align-items:center;gap:9px;margin-top:18px;flex-wrap:wrap;color:#747d6f;font-size:12px}.popular button{border:1px solid #3c4335;background:#1d211b;color:#c6ceba;border-radius:999px;padding:6px 12px;font-size:12px;transition:.2s}.popular button:hover{border-color:var(--lime);color:var(--lime)}
+    .visual{height:498px;position:relative;display:grid;place-items:center;isolation:isolate}.visual::before{content:'';position:absolute;width:430px;height:430px;border:1px dashed rgba(213,251,105,.21);border-radius:50%;transform:rotate(-16deg)}.visual::after{content:'';position:absolute;width:310px;height:310px;border:1px solid rgba(213,251,105,.1);border-radius:50%;box-shadow:0 0 100px rgba(190,222,74,.08)}.orbit-dot{position:absolute;z-index:1;width:8px;height:8px;background:var(--lime);border-radius:50%;box-shadow:0 0 20px var(--lime)}.orbit-dot.one{top:48px;left:15%}.orbit-dot.two{right:3%;bottom:111px;width:5px;height:5px}.dice-wrap{position:absolute;z-index:2;width:250px;height:250px;display:grid;place-items:center;filter:drop-shadow(0 30px 30px rgba(0,0,0,.38));transform:rotate(-13deg)}.dice-wrap svg{width:100%;height:100%}.floating-card{position:absolute;z-index:3;background:rgba(31,35,28,.94);border:1px solid #464d3d;box-shadow:0 24px 55px rgba(0,0,0,.32);backdrop-filter:blur(16px);border-radius:17px}.floating-card.top{width:245px;top:58px;right:0;padding:17px 18px;transform:rotate(5deg)}.floating-card.bottom{width:274px;left:-6px;bottom:45px;padding:17px 18px;transform:rotate(-4deg)}.card-overline{color:#90998a;font-size:10px;text-transform:uppercase;letter-spacing:.17em;font-weight:800}.floating-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}.floating-main{font:700 16px var(--display);letter-spacing:-.025em}.signal{display:flex;gap:4px;align-items:flex-end;height:18px}.signal span{width:4px;border-radius:3px;background:var(--lime)}.signal span:nth-child(1){height:7px}.signal span:nth-child(2){height:13px}.signal span:nth-child(3){height:18px}.floating-sub{font-size:11px;color:#a2aa9b;margin-top:4px}.avatars{display:flex;margin-right:9px}.avatars i{width:25px;height:25px;margin-right:-8px;border:2px solid #242a20;border-radius:50%;display:grid;place-items:center;font:700 9px var(--body);color:#1a1a18;background:#d3b8a3;font-style:normal}.avatars i:nth-child(2){background:#b8d2b3}.avatars i:nth-child(3){background:#c9b4dc}.small-verified{font-size:10px;font-weight:800;color:var(--lime);background:#3a4930;border-radius:6px;padding:5px 7px}
+    .proof-strip{border-top:1px solid #30342d;border-bottom:1px solid #30342d;background:#171a16}.proof-inner{min-height:98px;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center}.proof-item{display:flex;gap:14px;align-items:center;padding:12px 23px;border-right:1px solid #34382e}.proof-item:first-child{padding-left:0}.proof-item:last-child{border:0}.proof-icon{width:39px;height:39px;border-radius:11px;background:#2b3323;color:var(--lime);display:grid;place-items:center;flex:none}.proof-item strong{display:block;font:700 14px var(--display)}.proof-item small{display:block;color:#929b8a;font-size:12px;margin-top:2px}
+    .results-section{padding:76px 0 100px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:27px}.section-kicker{color:var(--lime);font-size:11px;text-transform:uppercase;font-weight:800;letter-spacing:.19em;margin-bottom:9px}.section-head h2,.page-intro h1{font:700 clamp(30px,3vw,42px)/1.08 var(--display);letter-spacing:-.055em;margin:0}.section-head p{color:var(--muted);margin:8px 0 0}.result-count{border:1px solid #46523a;background:#232a20;color:#d8e4cc;padding:8px 12px;border-radius:9px;font-size:12px;white-space:nowrap}.result-count b{color:var(--lime)}.results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.result-card{border:1px solid #343a31;background:linear-gradient(140deg,#1e221d,#1a1d19);border-radius:19px;padding:22px;min-height:204px;position:relative;transition:.25s}.result-card:hover{transform:translateY(-4px);border-color:#77875a;background:#222720}.result-card-head{display:flex;justify-content:space-between;align-items:start;gap:10px}.handle-avatar{width:39px;height:39px;border-radius:12px;background:#354229;color:var(--lime);font:700 18px var(--display);display:grid;place-items:center}.status-pill{font-size:10px;font-weight:800;border:1px solid #6a6548;color:#eac992;background:#382f22;border-radius:999px;padding:5px 9px}.result-card h3{font:700 19px var(--display);letter-spacing:-.04em;margin:17px 0 6px}.result-card p{color:#abb3a3;font-size:13px;line-height:1.6;margin:0}.result-card-foot{border-top:1px solid #32372d;margin-top:18px;padding-top:14px;display:flex;align-items:center;justify-content:space-between;color:#8f9889;font-size:11px}.result-card-foot span:last-child{color:#cdd6c1}.empty-state{display:none;border:1px dashed #4c5545;background:#1b1f1a;border-radius:20px;padding:47px;text-align:center;color:#aab3a2}.empty-state svg{margin:0 auto 14px;color:var(--lime)}.empty-state strong{display:block;color:var(--text);font:700 21px var(--display);margin-bottom:7px}.empty-state p{margin:0}.note{margin-top:18px;color:#747d72;font-size:12px;line-height:1.6}.note b{color:#aab5a4}
+    .cta{margin-bottom:96px;background:var(--lime);color:#171b13;border-radius:27px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:30px;position:relative;overflow:hidden}.cta::after{content:'✱';font:400 230px/1 var(--display);position:absolute;right:190px;top:-61px;color:rgba(29,38,15,.08);pointer-events:none}.cta small{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800}.cta h2{font:700 clamp(27px,3vw,40px)/1.04 var(--display);letter-spacing:-.06em;margin:8px 0}.cta p{margin:0;color:#3a442b;font-size:14px}.dark-btn{border:0;background:#191d15;color:var(--lime);font-weight:800;padding:15px 20px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:10px;position:relative;z-index:1}.dark-btn:hover{background:#303a23}
+    .inner-page{padding-top:71px;padding-bottom:112px;min-height:calc(100vh - 160px)}.page-intro{text-align:center;max-width:620px;margin:0 auto 34px}.page-intro .eyebrow{justify-content:center}.page-intro h1{font-size:clamp(39px,4.4vw,59px);margin:17px 0}.page-intro h1 em{font-style:normal;color:var(--lime)}.page-intro p{color:#a8b0a3;font-size:15px;line-height:1.7;margin:0}.access-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:23px;max-width:970px;margin:40px auto 0}.glass-card{background:#1d211b;border:1px solid #3a4136;border-radius:24px;padding:31px;box-shadow:0 30px 70px rgba(0,0,0,.13)}.card-topline{display:flex;align-items:center;gap:10px;margin-bottom:25px}.circle-icon{width:39px;height:39px;display:grid;place-items:center;background:#334126;color:var(--lime);border-radius:11px}.card-topline h2{font:700 20px var(--display);letter-spacing:-.04em;margin:0}.card-topline small{display:block;color:#8e9989;font-size:12px}.field{display:block;margin:18px 0}.field span{display:block;font-size:12px;font-weight:800;color:#c6cec0;margin-bottom:9px}.field input,.field textarea{width:100%;background:#131612;border:1px solid #3d4538;border-radius:12px;padding:15px 16px;color:var(--text);outline:0;transition:.2s}.field input:focus,.field textarea:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(213,251,105,.1)}.field input::placeholder,.field textarea::placeholder{color:#687363}.field textarea{min-height:125px;resize:vertical}.pin-input{font:700 24px var(--display)!important;letter-spacing:.25em;text-align:center}.full{width:100%}.helper{font-size:12px;color:#899484;margin:13px 0 0;line-height:1.6}.side-panel{background:radial-gradient(circle at 78% 12%,rgba(213,251,105,.13),transparent 39%),#222821;border:1px solid #45513d;border-radius:24px;padding:32px;display:flex;flex-direction:column;justify-content:space-between;min-height:330px}.side-panel small{color:var(--lime);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em}.side-panel h3{font:700 30px/1.1 var(--display);letter-spacing:-.055em;max-width:280px;margin:15px 0}.side-panel p{color:#a7b2a1;font-size:13px;line-height:1.7;max-width:320px;margin:0}.step-list{display:grid;gap:13px;margin-top:31px}.step{display:flex;align-items:center;gap:12px;color:#d3dec9;font-size:13px}.step b{color:var(--lime);width:26px;height:26px;border:1px solid #7f936b;border-radius:7px;display:grid;place-items:center;font:700 11px var(--display)}.form-panel{display:none}.form-panel.show{display:block}.form-panel .card-topline{margin-bottom:13px}.back-link{border:0;background:transparent;color:var(--lime);font-size:12px;font-weight:800;padding:0;display:flex;align-items:center;gap:6px;margin-bottom:15px}.preview-report{display:none;margin-top:20px;border:1px solid #778e55;background:#293822;border-radius:14px;padding:16px;color:#dce8cf}.preview-report.show{display:block}.preview-report b{display:block;color:var(--lime)}.preview-report p{font-size:13px;margin:6px 0 0}
+    .admin-layout{max-width:1100px;margin:36px auto 0}.admin-login{max-width:480px;margin:0 auto}.admin-login .glass-card{padding:32px}.admin-badge{display:inline-flex;gap:7px;align-items:center;color:var(--lime);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;border:1px solid #47573b;background:#273122;border-radius:999px;padding:7px 10px}.admin-top{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:22px}.admin-top h2{font:700 32px var(--display);letter-spacing:-.06em;margin:8px 0 0}.admin-top p{color:var(--muted);margin:4px 0 0;font-size:13px}.ghost-btn{background:transparent;border:1px solid #495243;color:#d5e2ca;border-radius:10px;padding:10px 13px;font-weight:700;font-size:12px}.ghost-btn:hover{border-color:var(--lime);color:var(--lime)}.admin-dash{display:none}.admin-dash.show{display:block}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:21px}.metric{border:1px solid #3c4339;background:#1e231c;border-radius:18px;padding:21px}.metric small{color:#919d8c;font-size:11px;text-transform:uppercase;letter-spacing:.13em;font-weight:800}.metric strong{font:700 34px var(--display);letter-spacing:-.06em;display:block;margin:8px 0 2px}.metric span{font-size:11px;color:#aebbaa}.metric.accent{background:var(--lime);border-color:var(--lime);color:#202716}.metric.accent small,.metric.accent span{color:#46513c}.admin-columns{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.dashboard-card{border:1px solid #3c4438;background:#1c201b;border-radius:20px;overflow:hidden}.dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px;border-bottom:1px solid #353d32}.dashboard-head h3{font:700 18px var(--display);letter-spacing:-.035em;margin:0}.dashboard-head span{font-size:11px;color:var(--lime);font-weight:800}.dash-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;border-bottom:1px solid #30372f}.dash-row:last-child{border:0}.dash-row-main{min-width:0}.dash-row-main strong{display:block;font:700 14px var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dash-row-main small{display:block;color:#899585;font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dash-status{color:#f2d7a7;background:#473b29;border:1px solid #6e5a36;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:800;white-space:nowrap}.dash-status.live{color:var(--lime);border-color:#5b7544;background:#2c3a27}.admin-actions{display:flex;align-items:center;gap:8px}.icon-btn{border:1px solid #45513e;background:#293226;color:var(--lime);width:29px;height:29px;border-radius:8px;display:grid;place-items:center}.code{font:700 12px var(--display);letter-spacing:.12em;color:#d1dfca}.admin-footnote{color:#7e8a7a;font-size:11px;margin-top:16px}
+    .footer{border-top:1px solid #30362e;padding:27px 0;color:#879083;font-size:12px}.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:20px}.footer strong{font:700 15px var(--display);color:var(--text);letter-spacing:-.04em}.footer strong span{color:var(--lime)}.footer-links{display:flex;gap:22px}.footer-links a:hover{color:var(--lime)}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#d5fb69;color:#1a2014;padding:12px 17px;border-radius:12px;font-size:13px;font-weight:800;box-shadow:0 20px 55px rgba(0,0,0,.4);z-index:50;opacity:0;pointer-events:none;transition:.25s;max-width:calc(100% - 30px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:1000px){.brand-tag{display:none}.hero{gap:10px;grid-template-columns:1fr .85fr}.visual{transform:scale(.84);transform-origin:center}.results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.floating-card.bottom{left:-25px}.admin-columns{grid-template-columns:1fr}}
+    @media(max-width:760px){.container{width:min(100% - 30px,620px)}.topbar{height:auto;min-height:74px}.topbar-inner{flex-wrap:wrap;justify-content:space-between;padding:15px 0}.top-action{display:none}.nav{order:3;width:100%;justify-content:space-between}.nav-btn{flex:1;padding:10px 7px}.hero{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:53px;padding-bottom:48px}.hero h1{font-size:clamp(45px,10vw,68px);max-width:620px}.hero-copy{font-size:15px}.visual{height:360px;transform:scale(.76);margin:-30px -40px -30px}.proof-inner{grid-template-columns:1fr;gap:0;padding:8px 0}.proof-item{border-right:0;border-bottom:1px solid #30362e;padding:13px 0}.proof-item:last-child{border:0}.results-section{padding:55px 0 65px}.cta{padding:29px;display:block;margin-bottom:65px}.dark-btn{margin-top:23px;width:100%;justify-content:center}.access-layout{grid-template-columns:1fr}.side-panel{min-height:250px}.inner-page{padding-top:50px}.footer-inner{align-items:start;flex-direction:column}}
+    @media(max-width:520px){.brand-name{font-size:17px}.hero h1{font-size:46px}.search-box{flex-wrap:wrap;padding:8px}.search-box input{font-size:14px}.search-box .primary-btn{width:100%;padding:13px}.visual{height:300px;transform:scale(.61);margin:-52px -85px -43px}.results-grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column;gap:12px}.result-card{min-height:190px}.glass-card,.side-panel{padding:22px}.page-intro h1{font-size:39px}.metric-grid{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:span 2}.metric{padding:16px}.metric strong{font-size:29px}.admin-top{align-items:start;flex-direction:column}.dashboard-head,.dash-row{padding-inline:15px}.footer-links{gap:13px;flex-wrap:wrap}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    .toast.error{background:#ffc9aa;color:#3d2117}
+    .primary-btn:disabled,.mini-btn:disabled{opacity:.65;cursor:wait;transform:none}
+    .row-reason{font-size:12px;color:#b8c3b2;line-height:1.5;margin:8px 0 0;white-space:normal}
+    .row-side{display:flex;align-items:flex-end;flex-direction:column;gap:9px;flex:none}
+    .row-buttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .mini-btn{border:1px solid #728b53;border-radius:7px;background:#334128;color:var(--lime);padding:6px 8px;font-size:10px;font-weight:800;white-space:nowrap}
+    .mini-btn.subtle{border-color:#5b5144;background:#332c24;color:#e1bd96}
+    .mini-btn:hover{filter:brightness(1.15)}
+    .list-empty{padding:27px 22px;color:#99a594;font-size:13px}
+    .admin-top-buttons{display:flex;gap:8px}
+    .modal-backdrop{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:16px;backdrop-filter:blur(7px)}
+    .modal-backdrop[hidden],.pin-output[hidden]{display:none}
+    .modal-card{background:#1d231b;border:1px solid #5b704b;border-radius:22px;padding:28px;width:min(440px,100%);box-shadow:0 30px 100px rgba(0,0,0,.5)}
+    .modal-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.modal-head small{color:var(--lime);font-size:10px;font-weight:800;letter-spacing:.18em}.modal-head h2{font:700 24px var(--display);letter-spacing:-.05em;margin:6px 0 10px}.modal-close{background:transparent;border:0;color:#aab6a2;font-size:28px;line-height:1}
+    .pin-output{border:1px solid #7b9a50;border-radius:14px;background:#2d3a25;padding:17px;margin-top:20px;display:grid;gap:10px}.pin-output small{color:#bbd5a7}.pin-output strong{font:700 23px var(--display);color:var(--lime);letter-spacing:.11em;word-break:break-all}
+    @media(max-width:520px){.dash-row{align-items:start}.row-side{max-width:48%}.row-reason{font-size:11px}.admin-top-buttons{width:100%}.admin-top-buttons .ghost-btn{flex:1}}
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="#consultar" data-go="consultar" aria-label="Radar da Tropa, ir para consulta">
+          <span class="brand-mark" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-5 4.3 10L16 12h5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="brand-name">RADAR<span>.</span>TROPA</span><span class="brand-tag">Comunidade de lives</span>
+        </a>
+        <nav class="nav" aria-label="Navegação principal">
+          <button class="nav-btn active" type="button" data-go="consultar">Consultar @</button>
+          <button class="nav-btn" type="button" data-go="relatar">Enviar relato</button>
+          <button class="nav-btn" type="button" data-go="admin">Administrador</button>
+        </nav>
+        <button class="top-action" type="button" data-go="relatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg> Acesso streamer</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="consultar" class="view active" aria-label="Consulta de arrobas">
+        <div class="container hero">
+          <div class="hero-content">
+            <div class="eyebrow"><span class="eyebrow-line"></span> Informação para quem faz live</div>
+            <h1>Antes da próxima rodada, <em>confere o @.</em></h1>
+            <p class="hero-copy">Consulte relatos da comunidade de streamers. Busque um arroba inteiro, parte do nome ou uma variação com números, como Jo4o e Mar1ana.</p>
+            <form id="search-form" class="search-box" role="search">
+              <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
+              <input id="search-input" aria-label="Buscar arroba" autocomplete="off" placeholder="Buscar arroba, ex: @joao" maxlength="40">
+              <button class="primary-btn" type="submit">Buscar <span aria-hidden="true">↗</span></button>
+            </form>
+            <div class="popular"><span>Experimente buscar:</span><button type="button" data-search="joao">@joao</button><button type="button" data-search="mar1ana">@mar1ana</button><button type="button" data-search="j04o">@j04o</button></div>
+          </div>
+          <div class="visual" aria-hidden="true">
+            <span class="orbit-dot one"></span><span class="orbit-dot two"></span>
+            <div class="dice-wrap">
+              <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="face" x1="36" x2="213" y1="22" y2="238" gradientUnits="userSpaceOnUse"><stop stop-color="#edffb3"/><stop offset=".5" stop-color="#d5fb69"/><stop offset="1" stop-color="#91b832"/></linearGradient><linearGradient id="side" x1="162" x2="242" y1="104" y2="174" gradientUnits="userSpaceOnUse"><stop stop-color="#99c038"/><stop offset="1" stop-color="#56771d"/></linearGradient></defs>
+                <path d="M25 68 129 16l105 55-104 55L25 68Z" fill="#efffc0"/><path d="M25 68v117l105 58V126L25 68Z" fill="url(#face)"/><path d="M234 71v117l-104 55V126L234 71Z" fill="url(#side)"/><path d="M25 68 129 16l105 55-104 55L25 68Z" stroke="#fdffe1" stroke-width="4" stroke-linejoin="round"/><path d="M25 68v117l105 58 104-55V71" stroke="#668c25" stroke-width="3" stroke-linejoin="round"/><path d="M130 126v117" stroke="#71982d" stroke-width="3"/>
+                <ellipse cx="129" cy="55" rx="9" ry="5" fill="#3a4f17" transform="rotate(-3 129 55)"/><ellipse cx="91" cy="75" rx="9" ry="5" fill="#3a4f17" transform="rotate(-3 91 75)"/><ellipse cx="165" cy="75" rx="9" ry="5" fill="#3a4f17" transform="rotate(-3 165 75)"/>
+                <ellipse cx="55" cy="115" rx="8" ry="11" fill="#394d18" transform="rotate(-25 55 115)"/><ellipse cx="96" cy="138" rx="8" ry="11" fill="#394d18" transform="rotate(-25 96 138)"/><ellipse cx="53" cy="170" rx="8" ry="11" fill="#394d18" transform="rotate(-25 53 170)"/><ellipse cx="98" cy="194" rx="8" ry="11" fill="#394d18" transform="rotate(-25 98 194)"/>
+                <ellipse cx="162" cy="157" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 162 157)"/><ellipse cx="205" cy="129" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 205 129)"/><ellipse cx="162" cy="208" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 162 208)"/><ellipse cx="205" cy="181" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 205 181)"/>
+              </svg>
+            </div>
+            <div class="floating-card top"><div class="card-overline">Consulta rápida</div><div class="floating-row"><span class="floating-main">@joao / @jo4o</span><span class="signal"><span></span><span></span><span></span></span></div><div class="floating-sub">Variações de nome na mesma busca</div></div>
+            <div class="floating-card bottom"><div class="card-overline">Comunidade conectada</div><div class="floating-row"><span class="avatars"><i>A</i><i>J</i><i>M</i></span><span class="small-verified">EM TEMPO REAL</span></div><div class="floating-sub">Criado para quem vive a live.</div></div>
+          </div>
+        </div>
+
+        <div class="proof-strip"><div class="container proof-inner">
+          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><span><strong>Busca parcial</strong><small>João também encontra Jo4o</small></span></div>
+          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><strong>Acesso por PIN</strong><small>Acesso exclusivo para streamers</small></span></div>
+          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 16v-5m5 5V7m5 9v-3"/></svg></span><span><strong>Painel central</strong><small>Visão de relatos e acessos</small></span></div>
+        </div></div>
+
+        <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Digite um arroba para consultar os relatos publicados.</p></div><span class="result-count"><b id="result-number">0</b> relatos encontrados</span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Pronto para consultar</strong><p>Digite pelo menos dois caracteres para iniciar a busca.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
+        <div class="container"><div class="cta"><div><small>Você faz parte da comunidade?</small><h2>Viu algo suspeito na live?</h2><p>Entre com seu PIN e envie o ocorrido para análise.</p></div><button type="button" class="dark-btn" data-go="relatar">Acessar área do streamer <span aria-hidden="true">↗</span></button></div></div>
+      </section>
+
+      <section id="relatar" class="view" aria-label="Área do streamer">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Área do streamer <span class="eyebrow-line"></span></div><h1>Seu relato pode <em>ajudar a tropa.</em></h1><p>Registre o arroba e descreva o ocorrido. O administrador analisa cada relato antes que ele apareça na consulta.</p></div>
+          <div class="access-layout">
+            <div>
+              <div id="pin-panel" class="glass-card">
+                <div class="card-topline"><span class="circle-icon" aria-hidden="true">⌁</span><span><h2>Acessar com PIN</h2><small>Identificação do streamer</small></span></div>
+                <label class="field"><span>Seu código de acesso</span><input id="pin-input" class="pin-input" type="text" inputmode="text" autocomplete="off" maxlength="17" placeholder="ABCD EFGH 1234" aria-describedby="pin-help"></label>
+                <button class="primary-btn full" id="pin-preview" type="button">Validar PIN <span aria-hidden="true">→</span></button>
+                <p class="helper" id="pin-help">Código de 12 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p>
+              </div>
+              <div id="report-panel" class="glass-card form-panel">
+                <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
+                <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
+                <form id="report-form"><label class="field"><span>Arroba da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
+                <p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
+              </div>
+            </div>
+            <aside class="side-panel"><div><small>Como funciona</small><h3>Direto ao ponto, sem complicar.</h3><p>O PIN identifica o streamer. Depois do envio, o relato passa pela revisão do administrador antes de ficar público.</p></div><div class="step-list"><div class="step"><b>01</b> Entre com seu PIN</div><div class="step"><b>02</b> Informe o arroba e o motivo</div><div class="step"><b>03</b> Aguarde a análise</div></div></aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin" class="view" aria-label="Área de administrador">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Controle central <span class="eyebrow-line"></span></div><h1>Um lugar para <em>comandar tudo.</em></h1><p>Crie acessos dos streamers, acompanhe os relatos e decida o que será publicado na consulta.</p></div>
+          <div class="admin-layout">
+            <div id="admin-login" class="admin-login"><div class="glass-card">
+              <span class="admin-badge">✦ Acesso administrativo</span>
+              <div class="card-topline" style="margin-top:22px"><span><h2>Entrar no painel</h2><small>Área reservada ao administrador</small></span></div>
+              <div id="admin-login-fields">
+                <label class="field"><span>E-mail</span><input id="admin-email" type="email" autocomplete="username" value="radaradmin@admin.com" placeholder="seu@email.com"></label>
+                <label class="field"><span>Senha</span><input id="admin-password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+                <button type="button" class="primary-btn full" id="show-dashboard">Entrar no painel <span aria-hidden="true">→</span></button>
+                <button type="button" class="back-link" id="admin-recover">Criar ou recuperar senha</button>
+                <p class="helper">O acesso é liberado somente para o administrador cadastrado.</p>
+              </div>
+              <div id="admin-setup-fields" hidden>
+                <p class="helper">Crie sua senha para ativar o acesso administrativo.</p>
+                <form id="admin-setup-form">
+                  <label class="field"><span>Nova senha</span><input id="admin-setup-password" type="password" autocomplete="new-password" minlength="8" required placeholder="Pelo menos 8 caracteres"></label>
+                  <label class="field"><span>Confirme a senha</span><input id="admin-setup-confirm" type="password" autocomplete="new-password" minlength="8" required placeholder="Repita a senha"></label>
+                  <button type="submit" class="primary-btn full">Salvar senha e entrar <span aria-hidden="true">→</span></button>
+                </form>
+              </div>
+            </div></div>
+            <div id="admin-dashboard" class="admin-dash">
+              <div class="admin-top"><div><span class="admin-badge">● Visão geral</span><h2>Painel da tropa</h2><p>Gerencie relatos e acessos em tempo real.</p></div><div class="admin-top-buttons"><button class="ghost-btn" id="refresh-dashboard" type="button">Atualizar</button><button class="ghost-btn" id="close-dashboard" type="button">Sair</button></div></div>
+              <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div></div>
+              <div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
+              <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><div class="container footer-inner"><strong>RADAR<span>.</span>TROPA</strong><span>Feito para a comunidade de lives. Relatos sujeitos à análise.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Área streamer</a><a href="#admin" data-go="admin">Administrador</a></div></div></footer>
+    <div class="modal-backdrop" id="admin-modal" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-head"><div><small>NOVO ACESSO</small><h2 id="modal-title">Gerar PIN para streamer</h2></div><button type="button" class="modal-close" id="create-streamer-close" aria-label="Fechar">×</button></div>
+        <form id="new-streamer-form"><label class="field"><span>Nome do streamer</span><input id="new-streamer-name" required minlength="2" maxlength="60" placeholder="Ex.: Lucas Live"></label><button type="submit" class="primary-btn full">Gerar PIN</button></form>
+        <div id="pin-output" class="pin-output" hidden><small>PIN de <b id="pin-owner"></b> · mostrado uma única vez</small><strong id="pin-code"></strong><button type="button" class="ghost-btn" id="copy-pin">Copiar PIN</button></div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script>
+// Front-end único. A chave abaixo é PUBLICÁVEL; nenhuma chave secreta fica no navegador.
+const SUPABASE_URL = 'https://wcbixbwekbtqgreitodh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bmrK4p15Bi45HzDGro5hyA_WDbHwdzY';
+const AUTH_REDIRECT_URL = location.protocol === 'https:'
+  ? location.origin + location.pathname
+  : 'https://jose-sites.github.io/radar-da-tropa/';
+const SESSION_KEY = 'radar_tropa_admin_session';
+const views = [...document.querySelectorAll('.view')];
+const navButtons = [...document.querySelectorAll('.nav-btn')];
+const resultsGrid = document.getElementById('results-grid');
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let toastTimer, searchTimer, searchSerial = 0;
+let streamerPin = null;
+let adminSession = null;
+let dashboard = { reports: [], streamers: [] };
+let setupSession = null;
+
+function toast(message, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.classList.toggle('error', isError);
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 4200);
+}
+function showView(name, scroll = true) {
+  if (!document.getElementById(name)?.classList.contains('view')) return;
+  views.forEach(view => view.classList.toggle('active', view.id === name));
+  navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
+  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.replaceState(null, '', '#' + name);
+  if (name === 'admin' && adminSession) loadDashboard();
+}
+document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', event => {
+  event.preventDefault(); showView(el.dataset.go);
+}));
+
+async function parseResponse(response) {
+  const raw = await response.text();
+  let data;
+  try { data = raw ? JSON.parse(raw) : null; } catch { data = null; }
+  if (!response.ok) {
+    const authMessages = {
+      invalid_credentials: 'E-mail ou senha incorretos. Se ainda não criou sua senha, clique em “Criar ou recuperar senha”.',
+      email_not_confirmed: 'Confirme seu e-mail pelo link recebido antes de entrar.',
+      otp_expired: 'O link expirou. Solicite outro em “Criar ou recuperar senha”.',
+      over_email_send_rate_limit: 'Limite de e-mails atingido. Use o link de recuperação já enviado ou tente mais tarde.',
+      over_request_rate_limit: 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.'
+    };
+    throw new Error(authMessages[data?.error_code] || data?.message || data?.error_description || data?.msg || data?.error || `Não foi possível concluir a operação (${response.status}).`);
+  }
+  return data;
+}
+async function authRequest(grantType, payload) {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=${grantType}`, {
+    method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await parseResponse(response);
+  return { ...data, expires_at: Date.now() + (data.expires_in || 3600) * 1000 };
+}
+function saveSession(session) {
+  adminSession = session;
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+async function ensureAdminToken() {
+  if (!adminSession) throw new Error('Entre no painel novamente.');
+  if (adminSession.expires_at > Date.now() + 60000) return adminSession.access_token;
+  const refreshed = await authRequest('refresh_token', { refresh_token: adminSession.refresh_token });
+  saveSession(refreshed);
+  return refreshed.access_token;
+}
+async function rpc(name, args = {}, admin = false) {
+  const headers = { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' };
+  if (admin) headers.Authorization = `Bearer ${await ensureAdminToken()}`;
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST', headers, body: JSON.stringify(args)
+  });
+  return parseResponse(response);
+}
+function busy(button, on, text) {
+  if (on) { button.dataset.oldText = button.innerHTML; button.disabled = true; button.textContent = text; }
+  else { button.disabled = false; button.innerHTML = button.dataset.oldText || button.innerHTML; }
+}
+function formattedDate(value) {
+  if (!value) return '';
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+}
+function foldHandle(value) {
+  return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[4013578]/g, c => ({'4':'a','0':'o','1':'i','3':'e','5':'s','7':'t','8':'b'}[c]))
+    .replace(/[^a-z0-9]/g, '');
+}
+function renderReports(reports, query, message = '') {
+  const normalized = foldHandle(query);
+  document.getElementById('results-title').textContent = normalized ? `Resultados para “${query.trim()}”` : 'Olho no radar.';
+  document.getElementById('results-subtitle').textContent = normalized
+    ? 'A busca considera trechos, acentos e trocas comuns de letras por números.'
+    : 'Digite um arroba para consultar os relatos publicados.';
+  document.getElementById('result-number').textContent = reports.length;
+  const empty = document.getElementById('empty-state');
+  empty.style.display = reports.length ? 'none' : 'block';
+  empty.querySelector('strong').textContent = message || (normalized ? 'Nenhum relato publicado encontrado' : 'Pronto para consultar');
+  empty.querySelector('p').textContent = normalized ? 'Tente outro trecho do arroba. A ausência de relato não comprova a identidade de alguém.' : 'Digite pelo menos dois caracteres para iniciar a busca.';
+  resultsGrid.style.display = reports.length ? 'grid' : 'none';
+  resultsGrid.innerHTML = reports.map(item => {
+    const handle = item.handle.startsWith('@') ? item.handle : '@' + item.handle;
+    return `<article class="result-card"><div class="result-card-head"><span class="handle-avatar">${escapeHtml(handle.slice(1,2).toUpperCase())}</span><span class="status-pill">RELATO</span></div><h3>${escapeHtml(handle)}</h3><p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>Relato publicado</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div></article>`;
+  }).join('');
+}
+async function searchReports(query, scroll = false) {
+  const serial = ++searchSerial;
+  if (foldHandle(query).length < 2) {
+    renderReports([], '');
+    if (query.trim()) toast('Digite pelo menos dois caracteres para buscar.', true);
+    return;
+  }
+  document.getElementById('results-title').textContent = 'Consultando o radar...';
+  try {
+    const reports = await rpc('radar_search_reports', { p_query: query.trim() });
+    if (serial !== searchSerial) return;
+    renderReports(Array.isArray(reports) ? reports : [], query);
+    if (scroll) document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (error) {
+    if (serial !== searchSerial) return;
+    renderReports([], query, 'Não foi possível carregar os relatos');
+    toast(error.message, true);
+  }
+}
+document.getElementById('search-form').addEventListener('submit', event => {
+  event.preventDefault(); clearTimeout(searchTimer);
+  searchReports(document.getElementById('search-input').value, true);
+});
+document.getElementById('search-input').addEventListener('input', event => {
+  clearTimeout(searchTimer);
+  const value = event.target.value;
+  searchTimer = setTimeout(() => searchReports(value), 350);
+});
+document.querySelectorAll('[data-search]').forEach(button => button.addEventListener('click', () => {
+  const value = button.dataset.search;
+  document.getElementById('search-input').value = '@' + value;
+  searchReports(value, true);
+}));
+
+document.getElementById('pin-preview').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  const pin = document.getElementById('pin-input').value.toUpperCase().replace(/[^0-9A-F]/g, '');
+  if (!/^[0-9A-F]{12}$/.test(pin)) return toast('O PIN deve ter 12 caracteres.', true);
+  busy(button, true, 'Validando PIN...');
+  try {
+    const streamer = await rpc('radar_verify_pin', { p_pin: pin });
+    if (!streamer?.id) throw new Error('PIN inválido ou inativo.');
+    streamerPin = pin;
+    document.getElementById('streamer-name').textContent = `Acesso de ${streamer.name}`;
+    document.getElementById('pin-panel').style.display = 'none';
+    document.getElementById('report-panel').classList.add('show');
+    document.getElementById('report-handle').focus();
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
+});
+document.getElementById('back-to-pin').addEventListener('click', () => {
+  streamerPin = null;
+  document.getElementById('pin-input').value = '';
+  document.getElementById('report-panel').classList.remove('show');
+  document.getElementById('report-preview').classList.remove('show');
+  document.getElementById('pin-panel').style.display = 'block';
+  document.getElementById('pin-input').focus();
+});
+document.getElementById('report-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!streamerPin) return toast('Entre com seu PIN primeiro.', true);
+  const handle = document.getElementById('report-handle').value.trim();
+  const reason = document.getElementById('report-reason').value.trim();
+  if (reason.length < 15) return toast('Descreva o motivo em pelo menos 15 caracteres.', true);
+  const button = event.target.querySelector('button[type=submit]');
+  busy(button, true, 'Enviando...');
+  try {
+    await rpc('radar_submit_report', { p_pin: streamerPin, p_handle: handle, p_reason: reason });
+    document.getElementById('preview-handle').textContent = handle.startsWith('@') ? handle : '@' + handle;
+    document.getElementById('preview-reason').textContent = 'Relato recebido. O administrador vai analisar antes de publicar.';
+    document.getElementById('report-preview').classList.add('show');
+    event.target.reset();
+    toast('Relato enviado para análise.');
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
+});
+
+async function loadDashboard() {
+  try {
+    dashboard = await rpc('radar_admin_dashboard', {}, true);
+    renderDashboard();
+  } catch (error) { toast(error.message, true); }
+}
+function renderDashboard() {
+  const reports = dashboard.reports || [];
+  const streamers = dashboard.streamers || [];
+  document.getElementById('metric-reports').textContent = reports.length;
+  document.getElementById('metric-streamers').textContent = streamers.filter(s => s.active).length;
+  document.getElementById('metric-pending').textContent = reports.filter(r => r.status === 'pending').length;
+  const reportsList = document.getElementById('reports-list');
+  reportsList.innerHTML = reports.length ? reports.map(r => {
+    const statusLabel = {pending:'Em análise',published:'Publicado',rejected:'Rejeitado'}[r.status] || r.status;
+    return `<div class="dash-row"><div class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))}</small><p class="row-reason">${escapeHtml(r.reason)}</p></div><div class="row-side"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></div>`;
+  }).join('') : '<div class="list-empty">Nenhum relato recebido ainda.</div>';
+  const streamersList = document.getElementById('streamers-list');
+  streamersList.innerHTML = streamers.length ? streamers.map(s => `<div class="dash-row"><div class="dash-row-main"><strong>${escapeHtml(s.name)}</strong><small>${s.active ? 'Ativo' : 'Suspenso'} · criado em ${escapeHtml(formattedDate(s.created_at))}</small></div><div class="row-side"><span class="code">•••• ${escapeHtml(s.last4)}</span><div class="row-buttons"><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></div>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
+}
+function openDashboard() {
+  document.getElementById('admin-login').style.display = 'none';
+  document.getElementById('admin-dashboard').classList.add('show');
+  loadDashboard();
+}
+function showPasswordSetup(session) {
+  setupSession = session;
+  document.getElementById('admin-login-fields').hidden = true;
+  document.getElementById('admin-setup-fields').hidden = false;
+  document.getElementById('admin-setup-password').focus();
+  showView('admin', false);
+}
+document.getElementById('admin-setup-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!setupSession) return toast('Este link expirou. Peça um novo link de acesso.', true);
+  const password = document.getElementById('admin-setup-password').value;
+  const confirmation = document.getElementById('admin-setup-confirm').value;
+  if (password.length < 8) return toast('Use uma senha com pelo menos 8 caracteres.', true);
+  if (password !== confirmation) return toast('As senhas não coincidem.', true);
+  const button = event.target.querySelector('button[type=submit]');
+  busy(button, true, 'Salvando...');
+  try {
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${setupSession.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    await parseResponse(response);
+    saveSession(setupSession);
+    const allowed = await rpc('radar_is_admin', {}, true);
+    if (!allowed) throw new Error('Esta conta não tem acesso ao painel.');
+    setupSession = null;
+    event.target.reset();
+    document.getElementById('admin-setup-fields').hidden = true;
+    document.getElementById('admin-login-fields').hidden = false;
+    openDashboard();
+    toast('Senha criada. Seu painel está pronto.');
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
+});
+document.getElementById('admin-recover').addEventListener('click', async event => {
+  const email = document.getElementById('admin-email').value.trim();
+  if (!email) return toast('Informe seu e-mail para receber o link.', true);
+  const button = event.currentTarget;
+  busy(button, true, 'Enviando...');
+  try {
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(AUTH_REDIRECT_URL)}`, {
+      method: 'POST', headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+    });
+    await parseResponse(response);
+    toast('Se o e-mail estiver cadastrado, enviaremos um link para criar a senha.');
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
+});
+document.getElementById('show-dashboard').addEventListener('click', async event => {
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  if (!email || !password) return toast('Informe e-mail e senha.', true);
+  const button = event.currentTarget;
+  busy(button, true, 'Entrando...');
+  try {
+    const session = await authRequest('password', { email, password });
+    saveSession(session);
+    const allowed = await rpc('radar_is_admin', {}, true);
+    if (!allowed) throw new Error('Este usuário não é o administrador do Radar.');
+    document.getElementById('admin-password').value = '';
+    openDashboard();
+  } catch (error) {
+    adminSession = null; sessionStorage.removeItem(SESSION_KEY);
+    toast(error.message, true);
+  } finally { busy(button, false); }
+});
+document.getElementById('admin-password').addEventListener('keydown', event => {
+  if (event.key === 'Enter') document.getElementById('show-dashboard').click();
+});
+document.getElementById('close-dashboard').addEventListener('click', async () => {
+  const token = adminSession?.access_token;
+  adminSession = null; sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('admin-dashboard').classList.remove('show');
+  document.getElementById('admin-login').style.display = 'block';
+  if (token) fetch(`${SUPABASE_URL}/auth/v1/logout`, { method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${token}`} }).catch(() => {});
+});
+document.getElementById('refresh-dashboard').addEventListener('click', loadDashboard);
+document.getElementById('reports-list').addEventListener('click', async event => {
+  const button = event.target.closest('[data-report]');
+  if (!button) return;
+  const status = button.dataset.status;
+  busy(button, true, '...');
+  try {
+    await rpc('radar_admin_set_report_status', { p_report_id: button.dataset.report, p_status: status }, true);
+    await loadDashboard();
+    toast(status === 'published' ? 'Relato publicado.' : 'Relato retirado da consulta.');
+  } catch (error) { toast(error.message, true); busy(button, false); }
+});
+document.getElementById('streamers-list').addEventListener('click', async event => {
+  const button = event.target.closest('[data-streamer]');
+  if (!button) return;
+  const streamer = dashboard.streamers.find(s => s.id === button.dataset.streamer);
+  if (!streamer) return;
+  busy(button, true, '...');
+  try {
+    if (button.dataset.action === 'rotate') {
+      const data = await rpc('radar_admin_rotate_pin', { p_streamer_id: streamer.id }, true);
+      showPin(data.name, data.pin);
+    } else {
+      await rpc('radar_admin_set_streamer_active', { p_streamer_id: streamer.id, p_active: !streamer.active }, true);
+      toast(streamer.active ? 'Acesso suspenso.' : 'Acesso reativado.');
+    }
+    await loadDashboard();
+  } catch (error) { toast(error.message, true); busy(button, false); }
+});
+const modal = document.getElementById('admin-modal');
+function openModal() { modal.hidden = false; document.getElementById('new-streamer-name').focus(); }
+function closeModal() { modal.hidden = true; document.getElementById('new-streamer-name').value = ''; document.getElementById('pin-output').hidden = true; }
+document.getElementById('create-streamer-open').addEventListener('click', openModal);
+document.getElementById('create-streamer-close').addEventListener('click', closeModal);
+modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
+document.getElementById('new-streamer-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = event.target.querySelector('button[type=submit]');
+  busy(button, true, 'Gerando PIN...');
+  try {
+    const data = await rpc('radar_admin_create_streamer', { p_name: document.getElementById('new-streamer-name').value.trim() }, true);
+    showPin(data.name, data.pin);
+    await loadDashboard();
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
+});
+function showPin(name, pin) {
+  modal.hidden = false;
+  document.getElementById('pin-output').hidden = false;
+  document.getElementById('pin-owner').textContent = name;
+  document.getElementById('pin-code').textContent = pin.match(/.{1,4}/g).join('-');
+  document.getElementById('new-streamer-name').value = '';
+  toast('PIN gerado. Copie agora: ele não será mostrado novamente.');
+}
+document.getElementById('copy-pin').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(document.getElementById('pin-code').textContent); toast('PIN copiado.'); }
+  catch { toast('Selecione e copie o PIN exibido.', true); }
+});
+
+const authFragment = new URLSearchParams(location.hash.slice(1));
+if (authFragment.has('access_token') && ['invite', 'recovery'].includes(authFragment.get('type'))) {
+  const access_token = authFragment.get('access_token');
+  const refresh_token = authFragment.get('refresh_token');
+  const expires_in = Number(authFragment.get('expires_in')) || 3600;
+  history.replaceState(null, '', location.pathname + '#admin');
+  showPasswordSetup({ access_token, refresh_token, expires_at: Date.now() + expires_in * 1000 });
+} else if (authFragment.has('error_description')) {
+  const message = authFragment.get('error_description');
+  history.replaceState(null, '', location.pathname + '#admin');
+  showView('admin', false);
+  toast(message || 'Link inválido ou expirado.', true);
+}
+try {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (saved && !setupSession) {
+    adminSession = JSON.parse(saved);
+    ensureAdminToken().then(() => rpc('radar_is_admin', {}, true)).then(allowed => {
+      if (allowed) openDashboard(); else { adminSession = null; sessionStorage.removeItem(SESSION_KEY); }
+    }).catch(() => { adminSession = null; sessionStorage.removeItem(SESSION_KEY); });
+  }
+} catch { sessionStorage.removeItem(SESSION_KEY); }
+renderReports([], '');
+const initialView = location.hash.replace('#','');
+if (['consultar','relatar','admin'].includes(initialView)) showView(initialView, false);
+  </script>
+</body>
+</html>
+
