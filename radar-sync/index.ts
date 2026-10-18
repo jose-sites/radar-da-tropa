@@ -197,7 +197,11 @@ Deno.serve(async (request) => {
   if (!projectUrl || !adminKey || !publicKey) return response({ error: 'server_unavailable' }, 503, origin);
   if (request.headers.get('x-radar-sync-token') === syncToken && syncToken.length >= 48) {
     try { return response(await scheduledSync(), 200, origin); }
-    catch { return response({ error: 'sync_failed' }, 500, origin); }
+    catch (error) {
+      const code = error instanceof Error ? error.message : 'sync_failed';
+      console.error('scheduled sync failed:', code);
+      return response({ error: code }, 500, origin);
+    }
   }
   if (!origin || !allowedOrigins.has(origin)) return response({ error: 'origin_not_allowed' }, 403, origin);
   let body: any;
