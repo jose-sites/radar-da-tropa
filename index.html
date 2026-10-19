@@ -114,7 +114,7 @@
           </div>
         </div>
 
-        <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Digite um arroba para consultar os relatos publicados.</p></div><span class="result-count"><b id="result-number">0</b> relatos encontrados</span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Pronto para consultar</strong><p>Digite pelo menos dois caracteres para iniciar a busca.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
+        <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Últimos relatos aprovados pela moderação.</p></div><span class="result-count"><b id="result-number">0</b> <span id="result-count-label">relatos aprovados</span></span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Carregando relatos...</strong><p>A lista mostra somente relatos aprovados.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
       </section>
 
       <section id="perfil" class="view" aria-label="Detalhes do relato">
@@ -359,12 +359,17 @@ function profilePhoto(path, label, extraClass = '') {
 function tiktokProfileLink(handle) {
   return /^[A-Za-z0-9._]{2,40}$/.test(handle || '') ? `https://www.tiktok.com/@${encodeURIComponent(handle)}` : '';
 }
-async function loadRecentReports() {
+async function loadRecentReports(expectedSerial = searchSerial) {
   const target = document.getElementById('quick-handles');
   try {
-    const rows = await rpc('radar_recent_reports');
-    target.textContent = rows?.length ? rows.map(row => '@' + row.handle).join(' · ') : 'Nenhum relato publicado';
-  } catch { target.textContent = 'Consulte os relatos abaixo'; }
+    const rows = await rpc('radar_recent_approved_reports');
+    const approved = Array.isArray(rows) ? rows : [];
+    target.textContent = approved.length ? approved.slice(0, 3).map(row => '@' + row.handle).join(' · ') : 'Nenhum relato aprovado';
+    if (expectedSerial === searchSerial && !document.getElementById('search-input').value.trim()) renderReports(approved, '');
+  } catch {
+    target.textContent = 'Consulte os relatos abaixo';
+    if (expectedSerial === searchSerial && !document.getElementById('search-input').value.trim()) renderReports([], '', 'Não foi possível carregar os relatos');
+  }
 }
 async function openProfile(id, push = true) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
@@ -391,12 +396,15 @@ function renderReports(reports, query, message = '') {
   document.getElementById('results-title').textContent = normalized ? `Resultados para “${query.trim()}”` : 'Olho no radar.';
   document.getElementById('results-subtitle').textContent = normalized
     ? 'A busca considera trechos, acentos e trocas comuns de letras por números.'
-    : 'Digite um arroba para consultar os relatos publicados.';
+    : 'Últimos relatos aprovados pela moderação.';
   document.getElementById('result-number').textContent = reports.length;
+  document.getElementById('result-count-label').textContent = normalized
+    ? (reports.length === 1 ? 'relato encontrado' : 'relatos encontrados')
+    : (reports.length === 1 ? 'relato aprovado' : 'relatos aprovados');
   const empty = document.getElementById('empty-state');
   empty.style.display = reports.length ? 'none' : 'block';
-  empty.querySelector('strong').textContent = message || (normalized ? 'Nenhum relato publicado encontrado' : 'Pronto para consultar');
-  empty.querySelector('p').textContent = normalized ? 'Tente outro trecho do arroba. A ausência de relato não comprova a identidade de alguém.' : 'Digite pelo menos dois caracteres para iniciar a busca.';
+  empty.querySelector('strong').textContent = message || (normalized ? 'Nenhum relato publicado encontrado' : 'Nenhum relato aprovado ainda');
+  empty.querySelector('p').textContent = normalized ? 'Tente outro trecho do arroba. A ausência de relato não comprova a identidade de alguém.' : 'Os relatos aparecerão aqui após aprovação pela moderação.';
   resultsGrid.style.display = reports.length ? 'grid' : 'none';
   resultsGrid.innerHTML = reports.map(item => {
     const handle = item.handle.startsWith('@') ? item.handle : '@' + item.handle;
@@ -410,8 +418,12 @@ function renderReports(reports, query, message = '') {
 async function searchReports(query, scroll = false) {
   const serial = ++searchSerial;
   if (foldHandle(query).length < 2) {
-    renderReports([], '');
-    if (query.trim()) toast('Digite pelo menos dois caracteres para buscar.', true);
+    if (query.trim()) {
+      renderReports([], query, 'Digite pelo menos dois caracteres');
+    } else {
+      renderReports([], '', 'Carregando relatos...');
+      loadRecentReports(serial);
+    }
     return;
   }
   document.getElementById('results-title').textContent = 'Consultando o radar...';
@@ -963,7 +975,6 @@ try {
     }).catch(() => { adminSession = null; sessionStorage.removeItem(SESSION_KEY); });
   }
 } catch { sessionStorage.removeItem(SESSION_KEY); }
-renderReports([], '');
 loadRecentReports();
 const initialProfile = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i);
 const initialView = location.hash.replace('#','');
