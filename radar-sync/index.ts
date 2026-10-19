@@ -4,6 +4,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const allowedOrigins = new Set([
   'https://jose-sites.github.io',
   'https://radar-da-tropa.joseantoniooliveir18.chatgpt.site',
+  'https://radardatropa.pages.dev',
 ]);
 const handlePattern = /^[A-Za-z0-9._]{2,40}$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
