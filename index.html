@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10110f">
   <meta name="description" content="Radar da Tropa — consulte relatos da comunidade de streamers e encontre variações de arrobas.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Radar da Tropa — Consulte antes da próxima rodada">
+  <meta property="og:description" content="Consulte relatos analisados e encontre o arroba atual de perfis do TikTok.">
+  <meta property="og:url" content="https://radardatropa.pages.dev/">
+  <meta property="og:image" content="https://radardatropa.pages.dev/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310110f'/%3E%3Cpath d='M8 34h12l7-15 12 29 7-14h10' fill='none' stroke='%23d5fb69' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>Radar da Tropa — Consulte antes da próxima rodada</title>
   <style>
     :root{color-scheme:dark;--bg:#10110f;--panel:#191b18;--panel2:#20231e;--line:#34382f;--text:#f3f4ed;--muted:#9ea497;--lime:#d5fb69;--lime2:#b5d94b;--orange:#f8ac74;--display:'Segoe UI',Arial,sans-serif;--body:Inter,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;--radius:22px}
@@ -48,6 +58,13 @@
     @media(max-width:1000px){.metric-grid{grid-template-columns:repeat(2,1fr)}.lower-admin{grid-template-columns:1fr}.feature-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:760px){.appeal-layout{grid-template-columns:1fr}.feature-grid{grid-template-columns:1fr}.nav{overflow-x:auto;flex-wrap:nowrap}.nav-btn{white-space:nowrap;min-width:max-content}.hero-facts{gap:7px}}
     @media(max-width:520px){.metric-grid{grid-template-columns:repeat(2,1fr)}.metric:last-child{grid-column:auto}.review-row{flex-direction:column}.review-row .row-side{max-width:none;align-items:flex-start}.search-tools{align-items:start;flex-direction:column}.search-category{max-width:none;width:100%}}
+    .hero-hint{margin:15px 0 0;color:#aebbaa;font-size:12px}.floating-main{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .detail-layout{margin:26px auto 80px;max-width:1000px}.detail-hero{background:linear-gradient(145deg,#273221,#171d17);border:1px solid #657c48;border-radius:25px;padding:clamp(25px,5vw,52px)}.detail-head{display:flex;align-items:center;gap:20px;flex-wrap:wrap}.detail-head .profile-photo,.detail-head .handle-avatar{width:82px;height:82px;border-radius:21px;font-size:35px}.detail-eyebrow{color:var(--lime);font-size:11px;text-transform:uppercase;letter-spacing:.18em;font-weight:800}.detail-hero h1{font:800 clamp(36px,6vw,66px)/1 var(--display);letter-spacing:-.06em;margin:8px 0}.detail-hero p{color:#c7d2bf;line-height:1.7}.detail-columns{display:grid;grid-template-columns:1.4fr .6fr;gap:18px;margin-top:18px}.detail-columns .glass-card{padding:26px}.detail-columns h2{margin-top:0;font:700 23px var(--display)}.detail-meta{display:flex;gap:10px;flex-wrap:wrap;margin:17px 0}.detail-meta span{border:1px solid #526344;border-radius:999px;padding:7px 11px;color:#d5e5c9;font-size:12px}.detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.proof-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.proof-gallery img{width:100%;height:260px;object-fit:contain;background:#121612;border:1px solid #475341;border-radius:14px}.proof-gallery a{color:var(--lime);font-size:12px}.policy-copy{max-width:830px;margin:28px auto 80px}.policy-copy .glass-card{margin-bottom:14px}.policy-copy h2{font:700 23px var(--display);margin:0 0 10px}.policy-copy p,.policy-copy li{color:#bdc9b5;line-height:1.7}.policy-copy a{color:var(--lime);text-decoration:underline}.privacy-request{display:grid;gap:14px}.privacy-request textarea{min-height:120px}.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .notice-strong{border:1px solid #a9794b;background:#3c2c20;color:#fbe6d3;border-radius:13px;padding:15px;font-size:13px;line-height:1.5}.notice-strong strong{color:#ffcc9c}.modal-backdrop:not([hidden]){display:grid}.modal-backdrop[hidden]{display:none}
+    .detail-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:18px}.detail-main,.detail-proofs{height:max-content}.detail-head h1{font:800 clamp(30px,5vw,52px)/1 var(--display);letter-spacing:-.05em;margin:8px 0 16px}.detail-main h2,.detail-proofs h2{font:750 22px var(--display);margin:18px 0 10px}.detail-main .detail-reason{font-size:16px;line-height:1.7;color:#ecf5e5}.detail-proofs img{display:block;width:100%;max-height:290px;object-fit:contain;border-radius:12px;background:#11170f;margin:15px 0}.detail-proofs .note{margin-top:24px}.video-warning{border-color:#b68250;background:#33271d;color:#ffddb8}.video-warning strong{color:#ffc68b}.footer-links{flex-wrap:wrap}@media(max-width:720px){.detail-layout{grid-template-columns:1fr}}
+    #identity-panel{margin:16px 0}#identity-panel p{line-height:1.6}#identity-code{display:block;width:max-content;max-width:100%;padding:10px 14px;border-radius:10px;background:#111810;color:var(--lime);font:800 18px var(--display);letter-spacing:.08em;margin:12px 0}
+    button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+    @media(max-width:760px){.detail-columns{grid-template-columns:1fr}.proof-gallery{grid-template-columns:1fr}.detail-head .profile-photo,.detail-head .handle-avatar{width:68px;height:68px}}
   </style>
 </head>
 <body>
@@ -73,15 +90,13 @@
           <div class="hero-content">
             <div class="eyebrow"><span class="eyebrow-line"></span> Informação para quem faz live</div>
             <h1>Antes da próxima rodada, <em>confere o @.</em></h1>
-            <p class="hero-copy">Consulte relatos da comunidade de streamers. Busque um arroba inteiro, parte do nome ou uma variação com números, como Jo4o e Mar1ana.</p>
+            <p class="hero-copy">Consulte os relatos analisados pela comunidade de streamers. Busque o @ inteiro ou só um trecho; variações como João e Jo4o entram na mesma busca.</p>
             <form id="search-form" class="search-box" role="search">
               <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
               <input id="search-input" aria-label="Buscar arroba" autocomplete="off" placeholder="Buscar arroba, ex: @joao" maxlength="40">
               <button class="primary-btn" type="submit">Buscar <span aria-hidden="true">↗</span></button>
             </form>
-            <div class="search-tools"><label for="search-category">Filtrar por tipo:</label><select id="search-category" class="search-category"><option value="">Todos os relatos</option><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></div>
-            <div class="popular"><span>Experimente buscar:</span><button type="button" data-search="joao">@joao</button><button type="button" data-search="mar1ana">@mar1ana</button><button type="button" data-search="j04o">@j04o</button></div>
-            <div class="hero-facts"><span><b>01</b> Busca flexível</span><span><b>02</b> Revisão humana</span><span><b>03</b> Direito de recorrer</span></div>
+            <p class="hero-hint">Relatos publicados após revisão · Identidade do perfil conferida quando disponível</p>
           </div>
           <div class="visual" aria-hidden="true">
             <span class="orbit-dot one"></span><span class="orbit-dot two"></span>
@@ -94,19 +109,19 @@
                 <ellipse cx="162" cy="157" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 162 157)"/><ellipse cx="205" cy="129" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 205 129)"/><ellipse cx="162" cy="208" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 162 208)"/><ellipse cx="205" cy="181" rx="7" ry="10" fill="#d7f57f" transform="rotate(23 205 181)"/>
               </svg>
             </div>
-            <div class="floating-card top"><div class="card-overline">Consulta rápida</div><div class="floating-row"><span class="floating-main">@joao / @jo4o</span><span class="signal"><span></span><span></span><span></span></span></div><div class="floating-sub">Variações de nome na mesma busca</div></div>
+            <div class="floating-card top"><div class="card-overline">Na consulta agora</div><div class="floating-row"><span class="floating-main" id="quick-handles">Carregando relatos...</span><span class="signal"><span></span><span></span><span></span></span></div><div class="floating-sub">Somente arrobas de relatos publicados</div></div>
             <div class="floating-card bottom"><div class="card-overline">Comunidade conectada</div><div class="floating-row"><span class="avatars"><i>A</i><i>J</i><i>M</i></span><span class="small-verified">ATUALIZAÇÃO PERIÓDICA</span></div><div class="floating-sub">Criado para quem vive a live.</div></div>
           </div>
         </div>
 
-        <div class="proof-strip"><div class="container proof-inner">
-          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span><span><strong>Busca parcial</strong><small>João também encontra Jo4o</small></span></div>
-          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><strong>Acesso por PIN</strong><small>Acesso exclusivo para streamers</small></span></div>
-          <div class="proof-item"><span class="proof-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 16v-5m5 5V7m5 9v-3"/></svg></span><span><strong>Painel central</strong><small>Visão de relatos e acessos</small></span></div>
-        </div></div>
-
         <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Digite um arroba para consultar os relatos publicados.</p></div><span class="result-count"><b id="result-number">0</b> relatos encontrados</span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Pronto para consultar</strong><p>Digite pelo menos dois caracteres para iniciar a busca.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
-        <div class="container feature-grid"><article class="feature-card"><span class="number">CAMADA 01</span><h3>Encontre variações</h3><p>Busque partes do arroba, com acentos ou números no lugar das letras.</p></article><article class="feature-card"><span class="number">CAMADA 02</span><h3>Provas reservadas</h3><p>Fotos e vídeos ficam em área privada para revisão do administrador.</p></article><article class="feature-card"><span class="number">CAMADA 03</span><h3>Recurso com protocolo</h3><p>Quem discordar de um relato publicado pode apresentar contexto e acompanhar a análise.</p></article></div>
+      </section>
+
+      <section id="perfil" class="view" aria-label="Detalhes do relato">
+        <div class="container inner-page">
+          <button class="back-link" type="button" data-go="consultar">← Voltar à consulta</button>
+          <div id="profile-detail" class="detail-layout" aria-live="polite"><div class="glass-card">Carregando relato...</div></div>
+        </div>
       </section>
 
       <section id="relatar" class="view" aria-label="Área do streamer">
@@ -123,7 +138,7 @@
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
-                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. O perfil, a foto e futuras trocas de nome serão consultados automaticamente.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. O perfil, a foto e futuras trocas de nome serão consultados automaticamente.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
                 <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
                 <p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
               </div>
@@ -137,18 +152,19 @@
         <div class="container inner-page">
           <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Direito de resposta <span class="eyebrow-line"></span></div><h1>Seu lado também <em>faz parte.</em></h1><p>Conteste um relato publicado, envie provas e acompanhe a revisão pelo seu protocolo privado.</p></div>
           <div class="appeal-layout">
-            <div class="glass-card"><div class="card-topline"><span class="circle-icon">↺</span><span><h2>Apresentar recurso</h2><small>Escolha um relato publicado</small></span></div>
+            <div class="glass-card"><div class="card-topline"><span class="circle-icon" aria-hidden="true">↺</span><span><h2>Apresentar recurso</h2><small>Escolha um relato publicado</small></span></div>
               <form id="appeal-search-form" class="search-box"><input id="appeal-search" aria-label="Buscar relato para recorrer" placeholder="Busque o arroba do relato" maxlength="40"><button class="primary-btn" type="submit">Buscar</button></form>
               <div id="appeal-matches" class="appeal-matches"></div>
               <p id="selected-case" class="selected-case" hidden></p>
-              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
+              <div id="identity-panel" class="privacy-panel" hidden><strong>Confirme o perfil pelo TikTok</strong><p>Opcional: gere um código, coloque-o temporariamente na bio do perfil citado e clique em verificar. O administrador verá que você controla a conta. Você também pode enviar o recurso sem essa confirmação.</p><button class="ghost-btn" id="identity-start" type="button">Gerar código para bio</button><div id="identity-code-box" hidden><p>Coloque este código na bio do TikTok:</p><code id="identity-code"></code><p class="helper">Depois de salvar a bio, aguarde alguns minutos e verifique. O código vale por 30 minutos.</p><button class="ghost-btn" id="identity-verify" type="button">Verificar minha bio</button></div><p id="identity-result" role="status"></p></div>
+              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
               <div id="appeal-confirmation" class="appeal-confirmation" hidden><strong>Recurso recebido</strong><span>Guarde este protocolo. Ele aparece só agora:</span><code id="appeal-protocol"></code><span id="appeal-upload-status"></span></div>
             </div>
             <div><div class="side-panel"><div><small>Processo justo</small><h3>Uma revisão feita por gente.</h3><p>Seu recurso não aparece na busca pública. O administrador vê o texto e as provas e pode retirar o relato da consulta.</p></div><div class="step-list"><div class="step"><b>01</b> Escolha o relato</div><div class="step"><b>02</b> Envie contexto e provas</div><div class="step"><b>03</b> Guarde o protocolo</div></div></div>
-              <div class="glass-card" style="margin-top:18px"><h2>Consultar recurso</h2><p class="helper">O protocolo identifica o recurso. Sem ele, não é possível acompanhar o resultado.</p><form id="appeal-status-form"><label class="field"><span>Seu protocolo</span><input id="status-protocol" maxlength="40" placeholder="Cole o protocolo recebido" required></label><button class="ghost-btn" type="submit">Ver andamento ↗</button></form><div id="appeal-status-result" class="status-box" hidden></div></div>
+              <div class="glass-card" style="margin-top:18px"><h2>Consultar recurso</h2><p class="helper">Guarde o protocolo para ver o andamento. Se perdeu, use o <a href="#privacidade" data-go="privacidade" class="credit-link">canal de privacidade</a> e informe o e-mail de contato e o arroba do relato para atendimento manual.</p><form id="appeal-status-form"><label class="field"><span>Seu protocolo</span><input id="status-protocol" maxlength="40" placeholder="Cole o protocolo recebido" required></label><button class="ghost-btn" type="submit">Ver andamento ↗</button></form><div id="appeal-status-result" class="status-box" hidden></div></div>
             </div>
           </div>
-          <div class="privacy-panel"><strong>Privacidade das provas</strong>Fotos são recriadas antes do envio para retirar metadados comuns da câmera. Vídeos e arquivos passam pelo servidor de armazenamento; evite incluir dados pessoais na imagem ou no áudio. O limite de 30 segundos é verificado no navegador e conferido pelo administrador.</div>
+          <div class="privacy-panel video-warning"><strong>⚠ Atenção aos vídeos</strong>Vídeos podem conter localização, aparelho e outros metadados. Ainda não removemos esses dados automaticamente: antes de enviar, exporte uma cópia sem metadados e não mostre informações pessoais na imagem ou no áudio. Fotos são recriadas antes do envio.</div>
         </div>
       </section>
 
@@ -157,10 +173,10 @@
           <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Controle central <span class="eyebrow-line"></span></div><h1>Um lugar para <em>comandar tudo.</em></h1><p>Crie acessos dos streamers, acompanhe os relatos e decida o que será publicado na consulta.</p></div>
           <div class="admin-layout">
             <div id="admin-login" class="admin-login"><div class="glass-card">
-              <span class="admin-badge">✦ Acesso administrativo</span>
+              <span class="admin-badge"><span aria-hidden="true">✦</span> Acesso administrativo</span>
               <div class="card-topline" style="margin-top:22px"><span><h2>Entrar no painel</h2><small>Área reservada ao administrador</small></span></div>
               <div id="admin-login-fields">
-                <label class="field"><span>E-mail</span><input id="admin-email" type="email" autocomplete="username" value="radaradmin@admin.com" placeholder="seu@email.com"></label>
+                <label class="field"><span>E-mail</span><input id="admin-email" type="email" autocomplete="username" placeholder="seu@email.com"></label>
                 <label class="field"><span>Senha</span><input id="admin-password" type="password" autocomplete="current-password" placeholder="••••••••"></label>
                 <button type="button" class="primary-btn full" id="show-dashboard">Entrar no painel <span aria-hidden="true">→</span></button>
                 <button type="button" class="back-link" id="admin-recover">Criar ou recuperar senha</button>
@@ -180,16 +196,48 @@
               <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div><div class="metric"><small>Recursos abertos</small><strong id="metric-appeals">0</strong><span>Aguardando decisão</span></div></div>
               <div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
               <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
+              <div class="dashboard-card" style="margin-top:18px"><div class="dashboard-head"><h3>Pedidos de privacidade</h3><span>ACESSO, CORREÇÃO E REMOÇÃO</span></div><div id="privacy-list"></div></div>
               <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
             </div>
           </div>
         </div>
       </section>
+      <section id="privacidade" class="view" aria-label="Privacidade e pedidos de dados">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow">Transparência</div><h1>Privacidade <em>e seus dados.</em></h1><p>Entenda o que aparece na consulta e como pedir correção, acesso ou remoção.</p></div>
+          <div class="policy-copy">
+            <div class="glass-card"><h2>O que é publicado</h2><p>Após revisão humana, exibimos arroba, relato, categoria, data informada, histórico de arrobas confirmado e foto pública do perfil do TikTok quando disponível. Um relato é uma alegação de quem o enviou; não é uma conclusão definitiva sobre a pessoa. Provas só aparecem publicamente quando o administrador selecionar uma cópia revisada.</p></div>
+            <div class="glass-card"><h2>O que fica reservado</h2><p>PINs são guardados como hashes. Arquivos originais, recursos, contatos opcionais, protocolos e registros de administração ficam em áreas privadas do Supabase. Endereços IP não aparecem nas fichas públicas; Cloudflare e Supabase podem processar dados de conexão para prestar e proteger o serviço. O serviço consulta dados públicos do TikTok para acompanhar a identidade do perfil.</p></div>
+            <div class="glass-card"><h2>Prazo de guarda</h2><p>Relatos publicados ficam visíveis até revisão ou retirada. Provas e recursos podem permanecer guardados para análise e contestação; ainda não há exclusão automática por prazo. Se quiser retirar ou corrigir dados, envie um pedido abaixo. O administrador avalia a solicitação e registra a resposta.</p></div>
+            <div class="glass-card"><h2>Peça revisão ou remoção</h2><p>Use este canal para solicitar acesso, correção, retirada ou informações sobre seus dados. O contato é opcional: sem ele, guarde o protocolo para acompanhar a resposta. Não envie documentos, telefone ou endereço de terceiros.</p>
+              <form id="privacy-request-form" class="privacy-request">
+                <input id="privacy-report-id" type="hidden">
+                <label class="field"><span>Contato para resposta (opcional)</span><input id="privacy-contact" maxlength="150" autocomplete="email" placeholder="Seu e-mail ou outro contato"></label>
+                <label class="field"><span>Explique seu pedido</span><textarea id="privacy-message" required minlength="20" maxlength="1500" placeholder="Conte qual relato ou dado você quer revisar"></textarea></label>
+                <button class="primary-btn" type="submit">Enviar pedido ↗</button>
+              </form>
+              <div id="privacy-confirmation" class="appeal-confirmation" hidden></div>
+              <form id="privacy-status-form" style="margin-top:22px"><label class="field"><span>Consultar pelo protocolo</span><input id="privacy-status-protocol" maxlength="40" required></label><button class="ghost-btn" type="submit">Ver resposta</button></form>
+              <div id="privacy-status-result" class="status-box" hidden></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="termos" class="view" aria-label="Termos de uso">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow">Regras da comunidade</div><h1>Termos <em>de uso.</em></h1><p>Regras para enviar relatos, consultar informações e apresentar recursos.</p></div>
+          <div class="policy-copy">
+            <div class="glass-card"><h2>Relatos responsáveis</h2><p>Envie apenas situações que você presenciou ou pode documentar, com o contexto necessário. Não publique dados privados, ameaças, insultos, conteúdo manipulado ou acusações que saiba serem falsas. O administrador pode pedir esclarecimentos, rejeitar ou retirar conteúdo.</p></div>
+            <div class="glass-card"><h2>Revisão e direito de resposta</h2><p>Relatos passam por análise antes de entrar na consulta. A pessoa mencionada pode recorrer e solicitar correção ou remoção. A verificação por código na bio do TikTok indica controle daquela conta no momento da checagem; recursos sem essa verificação ainda podem ser enviados e serão identificados como não verificados.</p></div>
+            <div class="glass-card"><h2>Provas e decisões</h2><p>Provas originais são privadas. Somente uma cópia escolhida pelo administrador pode ser exibida na página pública do relato. Não use a consulta como única base para punir, bloquear ou expor alguém. Se uma informação estiver incorreta, use o recurso ou o <a href="#privacidade" data-go="privacidade">canal de privacidade</a>.</p></div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Idealizado e criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Streamer</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#admin" data-go="admin">Admin</a></div></div></footer>
+    <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Idealizado e criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Streamer</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#privacidade" data-go="privacidade">Privacidade</a><a href="#termos" data-go="termos">Termos</a><a href="#admin" data-go="admin">Admin</a></div></div></footer>
     <dialog id="evidence-dialog" class="media-dialog" aria-label="Prova privada"><button id="evidence-close" class="ghost-btn" type="button">Fechar ×</button><div id="evidence-content"></div></dialog>
-    <div class="modal-backdrop" id="admin-modal" hidden>
+    <div class="modal-backdrop" id="admin-modal" hidden aria-hidden="true">
       <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-head"><div><small>NOVO ACESSO</small><h2 id="modal-title">Gerar PIN para streamer</h2></div><button type="button" class="modal-close" id="create-streamer-close" aria-label="Fechar">×</button></div>
         <form id="new-streamer-form"><label class="field"><span>Nome do streamer</span><input id="new-streamer-name" required minlength="2" maxlength="60" placeholder="Ex.: Lucas Live"></label><button type="submit" class="primary-btn full">Gerar PIN</button></form>
@@ -215,6 +263,7 @@ let streamerPin = null;
 let adminSession = null;
 let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
 let selectedAppealReport = null;
+let identityChallengeId = null, verifiedChallengeId = null;
 let setupSession = null;
 const categoryLabels = { nao_pagamento:'Não pagamento', falsidade:'Identidade falsa', abuso:'Abuso', outro:'Outro' };
 
@@ -232,7 +281,7 @@ function showView(name, scroll = true) {
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
-  history.replaceState(null, '', '#' + name);
+  history.replaceState(null, '', location.pathname.startsWith('/perfil/') && name !== 'perfil' ? '/#' + name : '#' + name);
   if (name === 'admin' && adminSession) loadDashboard();
 }
 function clearStreamerAccess() {
@@ -253,9 +302,9 @@ async function parseResponse(response) {
   try { data = raw ? JSON.parse(raw) : null; } catch { data = null; }
   if (!response.ok) {
     const authMessages = {
-      invalid_credentials: 'E-mail ou senha incorretos. Se ainda não criou sua senha, clique em “Criar ou recuperar senha”.',
-      email_not_confirmed: 'Confirme seu e-mail pelo link recebido antes de entrar.',
-      otp_expired: 'O link expirou. Solicite outro em “Criar ou recuperar senha”.',
+      invalid_credentials: 'Não foi possível entrar. Confira os dados ou tente recuperar o acesso.',
+      email_not_confirmed: 'Não foi possível entrar. Confira os dados ou tente recuperar o acesso.',
+      otp_expired: 'Não foi possível entrar. Solicite outro link se precisar.',
       over_email_send_rate_limit: 'Limite de e-mails atingido. Use o link de recuperação já enviado ou tente mais tarde.',
       over_request_rate_limit: 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.'
     };
@@ -304,11 +353,38 @@ function foldHandle(value) {
     .replace(/[^a-z0-9]/g, '');
 }
 function profilePhoto(path, label, extraClass = '') {
-  if (!/^[0-9a-f-]{36}\.(jpg|png|webp)$/.test(path || '')) return `<span class="handle-avatar ${extraClass}">${escapeHtml(label.slice(0,1).toUpperCase())}</span>`;
+  if (!/^[0-9a-f-]{36}\.(jpg|png|webp)$/.test(path || '')) return `<span class="handle-avatar ${extraClass}">${escapeHtml(label.replace(/^@/,'').slice(0,1).toUpperCase())}</span>`;
   return `<img class="profile-photo ${extraClass}" src="${SUPABASE_URL}/storage/v1/object/public/radar-avatars/${encodeURIComponent(path)}" alt="Foto do perfil ${escapeHtml(label)}" loading="lazy" referrerpolicy="no-referrer">`;
 }
 function tiktokProfileLink(handle) {
   return /^[A-Za-z0-9._]{2,40}$/.test(handle || '') ? `https://www.tiktok.com/@${encodeURIComponent(handle)}` : '';
+}
+async function loadRecentReports() {
+  const target = document.getElementById('quick-handles');
+  try {
+    const rows = await rpc('radar_recent_reports');
+    target.textContent = rows?.length ? rows.map(row => '@' + row.handle).join(' · ') : 'Nenhum relato publicado';
+  } catch { target.textContent = 'Consulte os relatos abaixo'; }
+}
+async function openProfile(id, push = true) {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
+  showView('perfil');
+  if (push) history.pushState({profileId:id}, '', '/perfil/' + id);
+  const target = document.getElementById('profile-detail');
+  target.innerHTML = '<div class="glass-card">Carregando relato...</div>';
+  try {
+    const report = await rpc('radar_report_detail', {p_id:id});
+    if (!report) throw new Error('Relato indisponível.');
+    const handle = '@' + report.handle.replace(/^@/,'');
+    const aliases = Array.isArray(report.old_handles) ? report.old_handles : [];
+    const proofs = Array.isArray(report.proofs) ? report.proofs : [];
+    const profileUrl = report.profile_verified ? tiktokProfileLink(report.handle) : '';
+    target.innerHTML = `<div class="detail-main glass-card"><div class="detail-head">${profilePhoto(report.avatar_path,handle,'detail-avatar')}<div><div class="section-kicker">Relato publicado</div><h1>${escapeHtml(handle)}</h1><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span></div></div><div class="detail-meta">${report.event_date ? `Ocorrido em ${escapeHtml(report.event_date)} · ` : ''}Publicado em ${escapeHtml(formattedDate(report.created_at))}</div><h2>O que foi relatado</h2><p class="detail-reason">${escapeHtml(report.reason)}</p>${aliases.length ? `<p class="profile-meta">Arrobas anteriores: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-check">${report.profile_verified ? 'Perfil identificado no TikTok. Confira o arroba atual antes de agir.' : 'Identidade do perfil aguardando conferência automática.'}</p>${profileUrl ? `<a class="ghost-btn" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir TikTok ↗</a>` : ''}<div class="detail-actions"><button class="ghost-btn" type="button" id="detail-appeal">Recorrer deste relato</button><button class="ghost-btn" type="button" id="detail-privacy">Pedir revisão de dados</button></div></div><aside class="glass-card detail-proofs"><div class="section-kicker">Anexos revisados</div><h2>Provas públicas</h2>${proofs.length ? proofs.map(proof=>`<a href="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" target="_blank" rel="noopener noreferrer"><img src="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" alt="Prova revisada do relato" loading="lazy"></a>`).join('') : '<p>Nenhuma prova foi liberada para publicação. Os anexos originais são privados e podem ser analisados pelo administrador.</p>'}<p class="note">Relatos são alegações e podem ser contestados. Confira o contexto antes de tomar decisões.</p></aside>`;
+    document.getElementById('detail-appeal').addEventListener('click',()=>selectAppealReport(id,handle));
+    document.getElementById('detail-privacy').addEventListener('click',()=>{
+      document.getElementById('privacy-report-id').value=id; showView('privacidade');
+    });
+  } catch(error) { target.innerHTML = `<div class="glass-card">${escapeHtml(error.message)}</div>`; }
 }
 function renderReports(reports, query, message = '') {
   const normalized = foldHandle(query);
@@ -327,8 +403,8 @@ function renderReports(reports, query, message = '') {
     const category = categoryLabels[item.category] || 'Outro';
     const aliases = Array.isArray(item.old_handles) ? item.old_handles.filter(x => x && x.toLowerCase() !== handle.slice(1).toLowerCase()) : [];
     const fresh = item.last_checked_at && Date.now() - new Date(item.last_checked_at).getTime() < 24 * 60 * 60 * 1000;
-    const profileUrl = item.profile_verified ? tiktokProfileLink(handle.slice(1)) : '';
-    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path, handle)}<span class="status-pill">${escapeHtml(category)}</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<div class="profile-meta">Antes: <b>${aliases.map(x => '@' + escapeHtml(x)).join(', ')}</b></div>` : ''}<p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>${escapeHtml(item.event_date || 'Relato publicado')}</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div>${profileUrl ? `<a class="profile-link" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<div class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Última conferência antiga; confirme o @ no TikTok') : 'Identidade do perfil aguardando conferência automática'}</div><button class="case-link" type="button" data-appeal-report="${escapeHtml(item.id)}" data-appeal-handle="${escapeHtml(handle)}">Contestar este relato ↗</button></article>`;
+  const profileUrl = item.profile_verified ? tiktokProfileLink(handle.slice(1)) : '';
+    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path, handle)}<span class="status-pill">${escapeHtml(category)}</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<div class="profile-meta">Antes: <b>${aliases.map(x => '@' + escapeHtml(x)).join(', ')}</b></div>` : ''}<p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>${escapeHtml(item.event_date || 'Relato publicado')}</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div>${profileUrl ? `<a class="profile-link" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<div class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Última conferência antiga; confirme o @ no TikTok') : 'Identidade do perfil aguardando conferência automática'}</div><a class="case-link" href="/perfil/${escapeHtml(item.id)}" data-profile-id="${escapeHtml(item.id)}">Ver detalhes e provas ↗</a></article>`;
   }).join('');
 }
 async function searchReports(query, scroll = false) {
@@ -340,7 +416,7 @@ async function searchReports(query, scroll = false) {
   }
   document.getElementById('results-title').textContent = 'Consultando o radar...';
   try {
-    const reports = await rpc('radar_search_reports_v2', { p_query: query.trim(), p_category: document.getElementById('search-category').value || null });
+    const reports = await rpc('radar_search_reports_v2', { p_query: query.trim(), p_category: null });
     if (serial !== searchSerial) return;
     renderReports(Array.isArray(reports) ? reports : [], query);
     if (scroll) document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -359,10 +435,9 @@ document.getElementById('search-input').addEventListener('input', event => {
   const value = event.target.value;
   searchTimer = setTimeout(() => searchReports(value), 350);
 });
-document.getElementById('search-category').addEventListener('change', () => searchReports(document.getElementById('search-input').value));
 resultsGrid.addEventListener('click', event => {
-  const button = event.target.closest('[data-appeal-report]');
-  if (button) selectAppealReport(button.dataset.appealReport, button.dataset.appealHandle);
+  const link = event.target.closest('[data-profile-id]');
+  if (link) { event.preventDefault(); openProfile(link.dataset.profileId); }
 });
 document.querySelectorAll('[data-search]').forEach(button => button.addEventListener('click', () => {
   const value = button.dataset.search;
@@ -425,9 +500,9 @@ document.getElementById('report-form').addEventListener('submit', async event =>
 
 async function validateFiles(files) {
   if (files.length > 3) throw new Error('Envie no máximo três arquivos.');
-  const allowed = ['image/jpeg','image/png','image/webp','video/mp4','video/webm'];
+  const allowed = ['image/jpeg','image/png','image/webp','video/mp4'];
   for (const file of files) {
-    if (!allowed.includes(file.type)) throw new Error('Use JPG, PNG, WebP, MP4 ou WebM.');
+    if (!allowed.includes(file.type)) throw new Error('Use JPG, PNG, WebP ou MP4.');
     if (file.size > 20 * 1024 * 1024) throw new Error('Cada arquivo deve ter até 20 MB.');
     if (file.type.startsWith('video/')) {
       const url = URL.createObjectURL(file);
@@ -465,16 +540,51 @@ async function uploadEvidence(context,targetId,secret,file) {
     method:'POST', headers:{ apikey:SUPABASE_KEY, 'Content-Type':file.type, 'x-upsert':'false' }, body
   });
   await parseResponse(response);
+  const checked = await fetch(`${SUPABASE_URL}/functions/v1/radar-upload-check`,{
+    method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({path,secret})
+  });
+  await parseResponse(checked);
 }
 
 function selectAppealReport(id,handle) {
   selectedAppealReport = id;
+  identityChallengeId = null; verifiedChallengeId = null;
+  document.getElementById('identity-panel').hidden=false;
+  document.getElementById('identity-code-box').hidden=true;
+  document.getElementById('identity-result').textContent='';
   document.getElementById('selected-case').hidden = false;
   document.getElementById('selected-case').textContent = `Relato selecionado: ${handle}`;
   document.getElementById('appeal-handle').value = handle;
   showView('recorrer');
   document.getElementById('appeal-message').focus();
 }
+async function identityAction(action, payload) {
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/radar-appeal-identity`,{
+    method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({action,...payload})});
+  return parseResponse(response);
+}
+document.getElementById('identity-start').addEventListener('click',async event=>{
+  if(!selectedAppealReport) return toast('Escolha um relato primeiro.',true);
+  const button=event.currentTarget; busy(button,true,'Gerando...');
+  try {
+    const result=await identityAction('start',{reportId:selectedAppealReport});
+    identityChallengeId=result.id; verifiedChallengeId=null;
+    document.getElementById('identity-code').textContent=result.code;
+    document.getElementById('identity-code-box').hidden=false;
+    document.getElementById('identity-result').textContent='Código criado. Inclua na bio do perfil citado.';
+  } catch(error){toast(error.message,true)} finally{busy(button,false)}
+});
+document.getElementById('identity-verify').addEventListener('click',async event=>{
+  if(!identityChallengeId) return;
+  const button=event.currentTarget; busy(button,true,'Conferindo...');
+  try {
+    const result=await identityAction('verify',{challengeId:identityChallengeId});
+    if(result.verified){verifiedChallengeId=identityChallengeId; document.getElementById('identity-result').textContent='Perfil confirmado. Seu recurso será marcado como verificado.';}
+    else document.getElementById('identity-result').textContent='Código ainda não encontrado na bio. Confira o perfil e tente novamente.';
+  } catch(error){toast(error.message,true)} finally{busy(button,false)}
+});
 document.getElementById('appeal-search-form').addEventListener('submit', async event => {
   event.preventDefault();
   const query = document.getElementById('appeal-search').value.trim();
@@ -499,6 +609,9 @@ document.getElementById('appeal-form').addEventListener('submit',async event => 
     await validateFiles(files);
     const created = await rpc('radar_create_appeal',{p_report_id:selectedAppealReport,
       p_handle:document.getElementById('appeal-handle').value.trim(),p_message:document.getElementById('appeal-message').value.trim()});
+    const appealEmail = document.getElementById('appeal-email').value.trim();
+    if (appealEmail) await rpc('radar_set_appeal_contact',{p_appeal_id:created.id,p_protocol:created.protocol,p_email:appealEmail});
+    if (verifiedChallengeId) await rpc('radar_bind_appeal_identity',{p_appeal_id:created.id,p_protocol:created.protocol,p_challenge_id:verifiedChallengeId});
     let failures=0;
     for(const file of files) { try { await uploadEvidence('appeal',created.id,created.protocol,file); } catch { failures++; } }
     const output = document.getElementById('appeal-confirmation');
@@ -521,9 +634,32 @@ document.getElementById('appeal-status-form').addEventListener('submit',async ev
   } catch(error) { toast(error.message,true); }
 });
 
+document.getElementById('privacy-request-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const button=event.target.querySelector('[type=submit]'); busy(button,true,'Enviando...');
+  try {
+    const created=await rpc('radar_create_privacy_request',{
+      p_report_id:document.getElementById('privacy-report-id').value || null,
+      p_contact:document.getElementById('privacy-contact').value.trim() || null,
+      p_message:document.getElementById('privacy-message').value.trim()});
+    const box=document.getElementById('privacy-confirmation');
+    box.hidden=false; box.innerHTML=`<strong>Pedido recebido</strong><span>Guarde este protocolo para acompanhar:</span><code>${escapeHtml(created.protocol)}</code>`;
+    event.target.reset(); toast('Pedido registrado. Guarde o protocolo.');
+  } catch(error) { toast(error.message,true); }
+  finally { busy(button,false); }
+});
+document.getElementById('privacy-status-form').addEventListener('submit',async event => {
+  event.preventDefault();
+  try {
+    const result=await rpc('radar_privacy_request_status',{p_protocol:document.getElementById('privacy-status-protocol').value.trim()});
+    const box=document.getElementById('privacy-status-result'); box.hidden=false;
+    box.textContent=result ? `${result.status==='resolved'?'Respondido':'Em análise'}. ${result.admin_note || ''}` : 'Protocolo não encontrado.';
+  } catch(error) { toast(error.message,true); }
+});
+
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard_v2', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v3', {}, true);
     renderDashboard();
   } catch (error) { toast(error.message, true); }
 }
@@ -543,10 +679,53 @@ function renderDashboard() {
   const streamersList = document.getElementById('streamers-list');
   streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><div class="row-buttons"><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
   document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<details class="dash-row dash-fold review-row" data-appeal-id="${escapeHtml(a.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small></span><span class="fold-right"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></details>`).join('') : '<div class="list-empty">Nenhum recurso recebido ainda.</div>';
+  const contacts=new Map((dashboard.appeal_contacts||[]).map(c=>[c.id,c]));
+  document.querySelectorAll('[data-appeal-id]').forEach(row=>{
+    const contact=contacts.get(row.dataset.appealId);
+    if(contact) {
+      const line=document.createElement('p'); line.className='dash-detail-note';
+      line.textContent=`Contato privado: ${contact.recovery_email || 'não informado'} · Identidade ${contact.identity_status==='verified'?'verificada':'não verificada'}`;
+      row.querySelector('.dash-details').prepend(line);
+    }
+  });
+  document.getElementById('privacy-list').innerHTML=(dashboard.privacy_requests||[]).length ? dashboard.privacy_requests.map(q=>`<details class="dash-row dash-fold" data-privacy-id="${escapeHtml(q.id)}"><summary><span class="dash-row-main"><strong>Pedido ${escapeHtml(q.status==='resolved'?'respondido':'em análise')}</strong><small>${escapeHtml(formattedDate(q.created_at))}${q.report_id?' · Relato vinculado':''}</small></span><span class="eye-toggle" aria-hidden="true">◉</span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(q.message)}</p><p class="dash-detail-note">Contato privado: ${escapeHtml(q.contact || 'não informado')}</p><label class="review-label">Resposta ao pedido <textarea maxlength="500">${escapeHtml(q.admin_note || '')}</textarea></label>${q.status==='pending'?`<button class="mini-btn" data-privacy-review="${escapeHtml(q.id)}">Registrar resposta</button>`:''}</div></details>`).join('') : '<div class="list-empty">Nenhum pedido recebido.</div>';
   document.getElementById('audit-list').innerHTML = (dashboard.audit || []).length ? dashboard.audit.map(a => `<div class="audit-item"><span>${escapeHtml(a.action.replaceAll('_',' '))}</span><time>${escapeHtml(formattedDate(a.created_at))}</time></div>`).join('') : '<p class="list-empty">Sem ações recentes.</p>';
 }
 function evidenceButtons(paths) {
-  return paths?.length ? `<div class="evidence-buttons">${paths.map((path,index) => `<button type="button" data-evidence="${escapeHtml(path)}">Ver prova ${index+1} ↗</button>`).join('')}</div>` : '<small class="no-evidence">Sem prova anexada</small>';
+  return paths?.length ? `<div class="evidence-buttons">${paths.map((path,index) => `<button type="button" data-evidence="${escapeHtml(path)}">Ver prova ${index+1} ↗</button>${/^reports\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/.test(path)?`<button type="button" data-public-evidence="${escapeHtml(path)}">Publicar foto revisada</button>`:''}`).join('')}</div>` : '<small class="no-evidence">Sem prova anexada</small>';
+}
+async function publishEvidence(path) {
+  const reportId=path.split('/')[1];
+  const original=await fetch(`${SUPABASE_URL}/storage/v1/object/authenticated/radar-evidence/${path}`,{
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`}});
+  if(!original.ok) throw new Error('Não foi possível abrir a prova privada.');
+  const source=await original.blob();
+  if(!['image/jpeg','image/png','image/webp'].includes(source.type)) throw new Error('Só fotos podem ser publicadas.');
+  const clean=await imageWithoutMetadata(source);
+  if(clean.size>20*1024*1024) throw new Error('A imagem preparada excede 20 MB.');
+  const extension=path.split('.').pop();
+  const publicPath=`reports/${reportId}/${crypto.randomUUID()}.${extension}`;
+  const uploaded=await fetch(`${SUPABASE_URL}/storage/v1/object/radar-public-evidence/${publicPath}`,{
+    method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':source.type,'x-upsert':'false'},body:clean});
+  await parseResponse(uploaded);
+  try { await rpc('radar_admin_approve_public_evidence',{
+    p_report_id:reportId,p_source_path:path,p_public_path:publicPath,p_mime:source.type},true); }
+  catch(error) {
+    fetch(`${SUPABASE_URL}/storage/v1/object/radar-public-evidence`,{
+      method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':'application/json'},
+      body:JSON.stringify({prefixes:[publicPath]})}).catch(()=>{});
+    throw error;
+  }
+}
+async function removePublicEvidence(reportId) {
+  const report=await rpc('radar_report_detail',{p_id:reportId});
+  for(const proof of report?.proofs || []) {
+    const deleted=await fetch(`${SUPABASE_URL}/storage/v1/object/radar-public-evidence`,{
+      method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':'application/json'},
+      body:JSON.stringify({prefixes:[proof.path]})});
+    await parseResponse(deleted);
+    await rpc('radar_admin_revoke_public_evidence',{p_id:proof.id},true);
+  }
 }
 async function openEvidence(path) {
   const dialog = document.getElementById('evidence-dialog');
@@ -569,6 +748,13 @@ async function openEvidence(path) {
 document.getElementById('admin-dashboard').addEventListener('click',event => {
   const button=event.target.closest('[data-evidence]');
   if(button) openEvidence(button.dataset.evidence);
+  const publish=event.target.closest('[data-public-evidence]');
+  if(publish) {
+    busy(publish,true,'Preparando...');
+    publishEvidence(publish.dataset.publicEvidence).then(()=>{
+      toast('Foto revisada publicada na ficha.'); publish.textContent='Foto publicada';
+    }).catch(error=>{toast(error.message,true);busy(publish,false)});
+  }
 });
 document.getElementById('evidence-close').addEventListener('click',() => document.getElementById('evidence-dialog').close());
 document.getElementById('evidence-dialog').addEventListener('close',event => {
@@ -645,7 +831,7 @@ document.getElementById('show-dashboard').addEventListener('click', async event 
     openDashboard();
   } catch (error) {
     adminSession = null; sessionStorage.removeItem(SESSION_KEY);
-    toast(error.message, true);
+    toast('Não foi possível entrar. Confira os dados ou tente recuperar o acesso.', true);
   } finally { busy(button, false); }
 });
 document.getElementById('admin-password').addEventListener('keydown', event => {
@@ -670,6 +856,7 @@ document.getElementById('reports-list').addEventListener('click', async event =>
   busy(button, true, '...');
   try {
     const note=button.closest('.review-row').querySelector('textarea').value.trim();
+    if(status==='rejected') await removePublicEvidence(button.dataset.report);
     await rpc('radar_admin_review_report', { p_report_id: button.dataset.report, p_status: status, p_note: note || null }, true);
     await loadDashboard();
     toast(status === 'published' ? 'Relato publicado.' : 'Relato retirado da consulta.');
@@ -681,10 +868,22 @@ document.getElementById('appeals-list').addEventListener('click',async event => 
   busy(button,true,'...');
   try {
     const note=button.closest('.review-row').querySelector('textarea').value.trim();
+    if(button.dataset.status==='accepted') {
+      const appeal=(dashboard.appeals||[]).find(a=>a.id===button.dataset.appeal);
+      if(appeal) await removePublicEvidence(appeal.report_id);
+    }
     await rpc('radar_admin_review_appeal',{p_appeal_id:button.dataset.appeal,p_status:button.dataset.status,p_note:note || null},true);
     await loadDashboard();
     toast(button.dataset.status==='accepted' ? 'Recurso aceito. Relato retirado da consulta.' : 'Recurso negado.');
   } catch(error) { toast(error.message,true); busy(button,false); }
+});
+document.getElementById('privacy-list').addEventListener('click',async event=>{
+  const button=event.target.closest('[data-privacy-review]'); if(!button) return;
+  const note=button.closest('.dash-details').querySelector('textarea').value.trim();
+  if(!note) return toast('Escreva uma resposta antes de concluir.',true);
+  busy(button,true,'Salvando...');
+  try { await rpc('radar_admin_review_privacy_request',{p_id:button.dataset.privacyReview,p_note:note},true); await loadDashboard(); toast('Resposta registrada.'); }
+  catch(error){ toast(error.message,true); busy(button,false); }
 });
 document.getElementById('streamers-list').addEventListener('click', async event => {
   const button = event.target.closest('[data-streamer]');
@@ -704,12 +903,20 @@ document.getElementById('streamers-list').addEventListener('click', async event 
   } catch (error) { toast(error.message, true); busy(button, false); }
 });
 const modal = document.getElementById('admin-modal');
-function openModal() { modal.hidden = false; document.getElementById('new-streamer-name').focus(); }
-function closeModal() { modal.hidden = true; document.getElementById('new-streamer-name').value = ''; document.getElementById('pin-output').hidden = true; document.getElementById('pin-code').textContent = ''; document.getElementById('pin-owner').textContent = ''; }
+let modalReturnFocus=null;
+function openModal() { modalReturnFocus=document.activeElement; modal.hidden=false; modal.removeAttribute('aria-hidden'); document.getElementById('new-streamer-name').focus(); }
+function closeModal() { modal.hidden=true; modal.setAttribute('aria-hidden','true'); document.getElementById('new-streamer-name').value=''; document.getElementById('pin-output').hidden=true; document.getElementById('pin-code').textContent=''; document.getElementById('pin-owner').textContent=''; modalReturnFocus?.focus(); }
 document.getElementById('create-streamer-open').addEventListener('click', openModal);
 document.getElementById('create-streamer-close').addEventListener('click', closeModal);
 modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.hidden) closeModal(); });
+modal.addEventListener('keydown',event=>{
+  if(event.key!=='Tab') return;
+  const focusables=[...modal.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(el=>el.offsetParent!==null);
+  const first=focusables[0], last=focusables.at(-1);
+  if(event.shiftKey && document.activeElement===first){ event.preventDefault(); last.focus(); }
+  else if(!event.shiftKey && document.activeElement===last){ event.preventDefault(); first.focus(); }
+});
 document.getElementById('new-streamer-form').addEventListener('submit', async event => {
   event.preventDefault();
   const button = event.target.querySelector('button[type=submit]');
@@ -757,8 +964,16 @@ try {
   }
 } catch { sessionStorage.removeItem(SESSION_KEY); }
 renderReports([], '');
+loadRecentReports();
+const initialProfile = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i);
 const initialView = location.hash.replace('#','');
-if (['consultar','relatar','recorrer','admin'].includes(initialView)) showView(initialView, false);
+if (initialProfile) openProfile(initialProfile[1], false);
+else if (['consultar','relatar','recorrer','admin','privacidade','termos'].includes(initialView)) showView(initialView, false);
+window.addEventListener('popstate', () => {
+  const match = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i);
+  if (match) openProfile(match[1], false);
+  else showView(location.hash.slice(1) || 'consultar', false);
+});
   </script>
 </body>
 </html>
