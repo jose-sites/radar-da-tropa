@@ -14,7 +14,7 @@ const stage=process.argv[2] || 'photos';
  try {
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
- const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0};
+ const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[]};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(request.isNavigationRequest() && url.startsWith('https://radardatropa.pages.dev/')) return route.fulfill({status:200,contentType:'text/html',body:html});
@@ -23,13 +23,14 @@ const stage=process.argv[2] || 'photos';
   if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*'}});
   const rpc=url.split('/rpc/')[1];
   if(rpc==='radar_public_stats')return reply({published_reports:2,reported_profiles:1,active_streamers:1,verified_streamers:0,whatsapp_number:'5527981325470'});
-  if(rpc==='radar_public_groups')return reply({groups:[group],total_profiles:1});
+  if(rpc==='radar_public_groups')return reply({groups:[{...group,reports:group.reports.map(row=>({...row,resolution_status:state.resolution,resolution_note:state.resolutionNote}))}],total_profiles:1});
   if(rpc==='radar_profile_dossier') {const args=request.postDataJSON();return reply({profile:{...report,profile_verified:true,last_checked_at:report.created_at},aliases:[{handle:'anterior',first_seen_at:report.created_at}],total_reports:2,streamer_count:1,reports:[{...report,id:args.p_offset?secondId:reportId,reason:'<script>unsafe</script>',proofs:[]}]});}
-  if(rpc==='radar_report_detail_v2')return reply({...report,id:request.postDataJSON().p_id,proofs:stage==='owned'?[{path:`reports/${reportId}/${secondId}.mp4`,mime:'video/mp4'},{path:`reports/${reportId}/${secondId}.jpg`,mime:'image/jpeg'}]:[]});
+  if(rpc==='radar_report_detail_v2')return reply({...report,resolution_status:state.resolution,resolution_note:state.resolutionNote,resolution_history:state.resolutionHistory,profile_verified:stage==='community',old_handles:stage==='community'?['anterior']:[],id:request.postDataJSON().p_id,proofs:stage==='owned'?[{path:`reports/${reportId}/${secondId}.mp4`,mime:'video/mp4'},{path:`reports/${reportId}/${secondId}.jpg`,mime:'image/jpeg'}]:[]});
   if(rpc==='radar_submit_pin_request') {const args=request.postDataJSON();state.pinAttempts++;if(state.pinProtocol)assert.equal(args.p_protocol,state.pinProtocol);state.pinProtocol=args.p_protocol;if(state.pinAttempts===1)return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"message":"Conexão temporariamente indisponível"}'});return reply({id:secondId,name:args.p_name,handle:args.p_handle,context:args.p_context,status:'received',created_at:report.created_at});}
   if(rpc==='radar_pin_request_status')return reply(request.postDataJSON().p_protocol===state.pinProtocol?{handle:'streamer_teste',status:state.pinStatus,reply:state.pinReply,updated_at:report.created_at}:null);
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
-  if(rpc==='radar_admin_dashboard_v6')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
+  if(rpc==='radar_admin_resolve_report'){const args=request.postDataJSON();state.resolution=args.p_status;state.resolutionNote=args.p_note;state.resolutionHistory.push({status:args.p_status,note:args.p_note,created_at:report.created_at});return reply(null);}
+  if(rpc==='radar_admin_dashboard_v7')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
   if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:stage==='owned'});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
   if(rpc==='radar_create_upload_ticket'){state.tickets++;return reply(`reports/${secondId}/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.jpg`);}
@@ -40,6 +41,22 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='community') {
+  const sample={...group,profile_verified:true,old_handles:['anterior'],handle:'perfil_atual'};
+  await page.evaluate(sample=>renderReports([sample],''),sample);assert.match(await page.locator('.handle-change-notice').textContent(),/Antes @anterior.*agora @perfil_atual/);
+  await page.evaluate(sample=>renderReports([{...sample,profile_verified:false}],''),sample);assert.equal(await page.locator('.handle-change-notice').count(),0);
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});await page.waitForSelector('[data-resolution-report]',{state:'attached'});
+  await page.locator('[data-review-id]').last().locator('summary').click();await page.locator('[data-resolution-report]').click();
+  await page.locator('#resolution-note').fill('Pagamento confirmado pelas partes.');await page.locator('#resolution-form button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('resolution-dialog').open);
+  assert.equal(state.resolution,'resolved');assert.equal(state.resolutionHistory.length,1);
+  await page.evaluate(id=>openProfile(id),secondId);await page.waitForSelector('.detail-main .case-resolution.is-resolved');assert.match(await page.locator('.detail-main .case-resolution').textContent(),/Pagamento confirmado/);
+  await page.locator('.detail-main .case-resolution summary').click();assert.equal(await page.locator('.detail-main .case-resolution li').count(),1);
+  await page.evaluate(()=>showView('admin',false));await page.waitForSelector('[data-resolution-report]',{state:'attached'});await page.locator('[data-resolution-report]').click();
+  assert.equal(await page.locator('#resolution-status').inputValue(),'open');await page.locator('#resolution-note').fill('Acordo ainda depende de confirmação.');await page.locator('#resolution-form button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('resolution-dialog').open);
+  assert.equal(state.resolution,'open');assert.equal(state.resolutionHistory.length,2);
+  await page.evaluate(id=>openProfile(id),secondId);await page.waitForSelector('.detail-main .case-resolution.is-reopened');assert.equal(await page.locator('.detail-main .case-resolution li').count(),2);
+  console.log('PASS community: confirmed-handle notice, unconfirmed identity exclusion, resolve/reopen, public note and retained history');
+ }
  if(stage==='static') {
   await page.locator('.nav-btn[data-go=relatar]').click();
   assert.equal(await page.locator('#relatar').evaluate(el=>getComputedStyle(el).animationName),'none');

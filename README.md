@@ -255,3 +255,15 @@ publica relatos antigos nem comprova automaticamente a identidade no TikTok.
 
 Testes adicionais: `tests/owned-publication.test.mjs`, a transação revertida
 `tests/owned-publication.sql` e `node tests/browser-smoke.cjs owned`.
+
+### Histórico de arroba e resolução de casos
+
+As fichas e cartões destacam arrobas anteriores somente quando vinculados à mesma
+identidade confirmada do TikTok. A administração pode marcar um relato publicado
+como resolvido ou reaberto, com explicação pública. A alegação original permanece,
+e cada alteração tem histórico com data; identificadores privados do administrador
+não são expostos. A tabela de eventos é privada e a RPC de alteração exige admin.
+`tests/report-resolution.sql` usa uma transação revertida para verificar os limites.
+
+A interface é estática: sem animações, transições ou rolagem suave; os controles
+continuam respondendo ao usuário e arquivos continuam sendo enviados normalmente.
