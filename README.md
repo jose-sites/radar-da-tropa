@@ -193,3 +193,12 @@ O painel permite combinar busca, situação, categoria, identidade e estado dos
 anexos, com ordenação e filtro de recursos. Os totais permanecem globais; rascunhos
 de revisão são mantidos ao alternar filtros na mesma sessão. A RPC v5 continua
 exclusiva da administração e informa anexos com verificação pendente.
+
+### Ficha completa
+
+`/ficha/<relato-publicado>` reúne os relatos publicados da mesma conta, com
+paginação, provas públicas revisadas e primeira observação dos arrobas. Datas
+de observação não são apresentadas como datas exatas de mudança. Contas com
+identidade confirmada são agrupadas pelo ID estável; as demais, por arroba exato.
+Cada relato mantém seu próprio link, recurso e pedido de revisão de dados.
+`tests/dossier.sql` verifica o contrato com fixtures integralmente revertidas.

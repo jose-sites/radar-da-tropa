@@ -24,6 +24,8 @@ const stage=process.argv[2] || 'photos';
   const rpc=url.split('/rpc/')[1];
   if(rpc==='radar_public_stats')return reply({published_reports:2,reported_profiles:1,active_streamers:1,verified_streamers:0,whatsapp_number:'5527981325470'});
   if(rpc==='radar_public_groups')return reply({groups:[group],total_profiles:1});
+  if(rpc==='radar_profile_dossier') {const args=request.postDataJSON();return reply({profile:{...report,profile_verified:true,last_checked_at:report.created_at},aliases:[{handle:'anterior',first_seen_at:report.created_at}],total_reports:2,streamer_count:1,reports:[{...report,id:args.p_offset?secondId:reportId,reason:'<script>unsafe</script>',proofs:[]}]});}
+  if(rpc==='radar_report_detail_v2')return reply({...report,id:request.postDataJSON().p_id,proofs:[]});
   if(rpc==='radar_admin_dashboard_v5')return reply({reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
   if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste'});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
@@ -46,6 +48,17 @@ const stage=process.argv[2] || 'photos';
   assert.equal(await page.locator('.attachment-item progress').evaluate(el=>el.value),100);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);
   await page.locator('#back-to-pin').click();assert.equal(await page.locator('.attachment-item').count(),0);
   console.log('PASS photos: preview, escaped filename, measured upload, failure message, preserved retry, no duplicate report or ticket, preview cleanup');
+ }
+ if(stage==='dossier') {
+  await page.locator('[data-dossier-id]').click();await page.waitForSelector('#dossier-timeline article');
+  assert.match(page.url(),/\/ficha\//);assert.equal(await page.locator('#dossier-timeline article').count(),1);
+  assert.match(await page.locator('.dossier-aliases').textContent(),/@anterior/);assert.equal(await page.locator('#dossier-timeline script').count(),0);
+  await page.locator('#dossier-more').click();await page.waitForFunction(()=>document.querySelectorAll('#dossier-timeline article').length===2);
+  assert.equal(await page.locator('#dossier-more').isVisible(),false);
+  await page.reload();await page.waitForSelector('#dossier-timeline article');
+  await page.locator('#dossier-timeline [data-profile-id]').click();await page.waitForSelector('#detail-appeal');
+  assert.match(page.url(),/\/perfil\//);await page.locator('#detail-appeal').click();assert.equal(await page.evaluate(()=>selectedAppealReport),reportId);
+  console.log('PASS dossier: full history, safe text, pagination, deep-link reload and individual appeal');
  }
  if(stage==='panel') {
   await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});

@@ -264,6 +264,7 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'
 let toastTimer, searchTimer, searchSerial = 0;
 let streamerPin = null;
 let pendingReport = null, pendingAppeal = null;
+let dossierSerial=0;
 let publicGroups = [], publicTotal = 0, publicQuery = '', whatsappNumber = '';
 const uploadedFiles = new WeakMap();
 const uploadReservations = new WeakMap();
@@ -292,8 +293,9 @@ function showView(name, scroll = true) {
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
-  if (name !== 'perfil' && new URLSearchParams(location.search).has('relato')) history.replaceState(null,'',location.pathname+'#'+name);
-  else history.replaceState(null, '', location.pathname.startsWith('/perfil/') && name !== 'perfil' ? '/#' + name : '#' + name);
+  const routeParams=new URLSearchParams(location.search);
+  if(name!=='perfil' && (routeParams.has('relato') || routeParams.has('ficha') || /^\/(perfil|ficha)\//.test(location.pathname))) history.replaceState(null,'','/#'+name);
+  else history.replaceState(null,'','#'+name);
   if (name === 'admin' && adminSession) loadDashboard();
 }
 function clearStreamerAccess() {
@@ -453,6 +455,7 @@ async function loadRecentReports(expectedSerial = searchSerial) {
   }
 }
 async function openProfile(id, push = true) {
+  const serial=++dossierSerial;
   if (!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
   showView('perfil');
   if (push) history.pushState({profileId:id}, '', profileHref(id));
@@ -460,6 +463,7 @@ async function openProfile(id, push = true) {
   target.innerHTML = '<div class="glass-card">Carregando relato...</div>';
   try {
     const report = await rpc('radar_report_detail_v2', {p_id:id});
+    if(serial!==dossierSerial)return;
     if (!report) throw new Error('Relato indisponível.');
     const handle = '@' + report.handle.replace(/^@/,'');
     const aliases = Array.isArray(report.old_handles) ? report.old_handles : [];
@@ -470,7 +474,7 @@ async function openProfile(id, push = true) {
     document.getElementById('detail-privacy').addEventListener('click',()=>{
       document.getElementById('privacy-report-id').value=id; showView('privacidade');
     });
-  } catch(error) { target.innerHTML = `<div class="glass-card">${escapeHtml(error.message)}</div>`; }
+  } catch(error) { if(serial===dossierSerial) target.innerHTML = `<div class="glass-card">${escapeHtml(error.message)}</div>`; }
 }
 function renderReports(reports, query, message = '') {
   const normalized = foldHandle(query);
@@ -489,8 +493,46 @@ function renderReports(reports, query, message = '') {
     const aliases = Array.isArray(item.old_handles) ? item.old_handles : [];
     const fresh = item.last_checked_at && Date.now() - new Date(item.last_checked_at).getTime() < 24*60*60*1000;
     const children = item.reports || [item];
-    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path,handle)}<span class="status-pill">${Number(item.report_count || 1)} relato(s)</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<p class="profile-meta">Antes: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-meta">${Number(item.streamer_count || 1)} streamer(s) · relatos revisados</p><p class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Conferência antiga; confira o arroba atual') : 'Identidade do perfil ainda não confirmada'}</p>${item.profile_verified ? `<a class="profile-link" href="${tiktokProfileLink(item.handle)}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<div class="group-reports">${children.map(report=>`<div class="group-report"><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span><p>${escapeHtml(report.reason)}</p><p class="profile-meta">${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><small>${escapeHtml(formattedDate(report.created_at))}${report.event_date ? ' · Ocorrido em '+escapeHtml(report.event_date) : ''}</small><a class="case-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Ver relato e provas ↗</a></div>`).join('')}</div>${Number(item.report_count || 1)>children.length ? '<p class="helper">Exibindo os 50 relatos mais recentes deste perfil.</p>' : ''}</article>`;
+    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path,handle)}<span class="status-pill">${Number(item.report_count || 1)} relato(s)</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<p class="profile-meta">Antes: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-meta">${Number(item.streamer_count || 1)} streamer(s) · relatos revisados</p><p class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Conferência antiga; confira o arroba atual') : 'Identidade do perfil ainda não confirmada'}</p>${item.profile_verified ? `<a class="profile-link" href="${tiktokProfileLink(item.handle)}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<a class="case-link" href="${dossierHref(item.id)}" data-dossier-id="${escapeHtml(item.id)}">Ver ficha completa e histórico ↗</a><div class="group-reports">${children.map(report=>`<div class="group-report"><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span><p>${escapeHtml(report.reason)}</p><p class="profile-meta">${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><small>${escapeHtml(formattedDate(report.created_at))}${report.event_date ? ' · Ocorrido em '+escapeHtml(report.event_date) : ''}</small><a class="case-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Ver relato e provas ↗</a></div>`).join('')}</div>${Number(item.report_count || 1)>children.length ? '<p class="helper">Abra a ficha completa para carregar os demais relatos.</p>' : ''}</article>`;
   }).join('');
+}
+function dossierHref(id) {
+  return location.hostname.endsWith('github.io') ? `?ficha=${encodeURIComponent(id)}#perfil` : `/ficha/${encodeURIComponent(id)}`;
+}
+function publicProofs(proofs) {
+  return (Array.isArray(proofs)?proofs:[]).filter(proof=>/^reports\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/.test(proof.path)).map(proof=>{
+    const url=`${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}`;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer"><img src="${url}" alt="Prova pública revisada" loading="lazy"></a>`;
+  }).join('');
+}
+function dossierReport(report) {
+  return `<article data-dossier-report="${escapeHtml(report.id)}"><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span><p class="profile-meta">Publicado em ${escapeHtml(formattedDate(report.created_at))}${report.event_date?' · Ocorrido em '+escapeHtml(report.event_date):''}</p><p>Relatado por ${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><p class="detail-reason">${escapeHtml(report.reason)}</p><div class="proof-gallery">${publicProofs(report.proofs)}</div><a class="case-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Abrir relato, provas e recurso ↗</a></article>`;
+}
+async function openDossier(id,push=true) {
+  if(!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
+  const serial=++dossierSerial;showView('perfil');
+  if(push) history.pushState({dossierId:id},'',dossierHref(id));
+  const target=document.getElementById('profile-detail');target.innerHTML='<div class="glass-card dossier-full">Carregando ficha...</div>';
+  let offset=0,seen=new Set();
+  async function loadPage(first=false) {
+    const data=await rpc('radar_profile_dossier',{p_report_id:id,p_limit:20,p_offset:offset});
+    if(serial!==dossierSerial)return;
+    if(!data)throw new Error('Ficha indisponível. O relato pode ter sido retirado.');
+    if(first) {
+      const profile=data.profile;
+      target.innerHTML=`<div class="glass-card dossier-full"><div class="detail-head">${profilePhoto(profile.avatar_path,'@'+profile.handle,'detail-avatar')}<div><div class="section-kicker">Ficha do perfil</div><h1>@${escapeHtml(profile.handle)}</h1></div></div><p><strong>${Number(data.total_reports)} relatos publicados</strong> · ${Number(data.streamer_count)} streamer(s)</p><p class="profile-check">${profile.profile_verified?'Identidade vinculada ao TikTok. Última conferência: '+escapeHtml(formattedDate(profile.last_checked_at)):'Identidade ainda não confirmada. Agrupamento pelo mesmo arroba informado.'}</p><p class="note">Relatos são alegações revisadas e podem ser contestados. Identificar a conta ou reunir relatos não comprova uma acusação.</p><h2>Histórico de arrobas</h2><p class="helper">Datas indicam a primeira observação no Radar, não o momento exato da mudança.</p>${data.aliases?.length?`<ul class="dossier-aliases">${data.aliases.map(alias=>`<li>@${escapeHtml(alias.handle)} · observado em ${escapeHtml(formattedDate(alias.first_seen_at))}</li>`).join('')}</ul>`:'<p>Sem histórico de mudanças confirmado.</p>'}${profile.profile_verified?`<a class="ghost-btn" href="${tiktokProfileLink(profile.handle)}" target="_blank" rel="noopener noreferrer">Abrir TikTok ↗</a>`:''}</div><div class="glass-card dossier-full"><h2>Linha do tempo dos relatos</h2><div id="dossier-timeline" class="dossier-timeline"></div><p id="dossier-count" class="helper" role="status"></p><button id="dossier-more" class="ghost-btn" type="button">Carregar mais relatos</button><p id="dossier-error" role="status"></p></div>`;
+      document.getElementById('dossier-more').addEventListener('click',async event=>{
+        const button=event.currentTarget;busy(button,true,'Carregando...');document.getElementById('dossier-error').textContent='';
+        try{await loadPage();}catch(error){if(serial===dossierSerial)document.getElementById('dossier-error').textContent=error.message;}
+        finally{busy(button,false);}
+      });
+    }
+    const rows=data.reports || [];offset+=rows.length;
+    document.getElementById('dossier-timeline').insertAdjacentHTML('beforeend',rows.filter(row=>{if(seen.has(row.id))return false;seen.add(row.id);return true;}).map(dossierReport).join(''));
+    document.getElementById('dossier-count').textContent=`Exibindo ${seen.size} de ${Number(data.total_reports)} relatos`;
+    document.getElementById('dossier-more').hidden=offset>=Number(data.total_reports) || !rows.length;
+  }
+  try{await loadPage(true);}catch(error){if(serial===dossierSerial)target.innerHTML=`<div class="glass-card dossier-full">${escapeHtml(error.message)}</div>`;}
 }
 function profileHref(id) {
   // GitHub Pages serves under a repository prefix; Cloudflare supports /perfil/<id>.
@@ -549,6 +591,8 @@ document.getElementById('search-input').addEventListener('input', event => {
   searchTimer = setTimeout(() => searchReports(value), 350);
 });
 resultsGrid.addEventListener('click', event => {
+  const dossier=event.target.closest('[data-dossier-id]');
+  if(dossier){event.preventDefault();openDossier(dossier.dataset.dossierId);return;}
   const link = event.target.closest('[data-profile-id]');
   if (link) { event.preventDefault(); openProfile(link.dataset.profileId); }
 });
@@ -1239,17 +1283,20 @@ try {
 } catch { sessionStorage.removeItem(SESSION_KEY); }
 loadRecentReports();
 loadPublicStats();
-const queryProfile = new URLSearchParams(location.search).get('relato');
-const initialProfile = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i) || (/^[0-9a-f-]{36}$/i.test(queryProfile || '') ? [null,queryProfile] : null);
-const initialView = location.hash.replace('#','');
-if (initialProfile) openProfile(initialProfile[1], false);
-else if (['consultar','relatar','recorrer','admin','privacidade','termos'].includes(initialView)) showView(initialView, false);
-window.addEventListener('popstate', () => {
-  const qp = new URLSearchParams(location.search).get('relato');
-  const match = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i) || (/^[0-9a-f-]{36}$/i.test(qp || '') ? [null,qp] : null);
-  if (match) openProfile(match[1], false);
-  else showView(location.hash.slice(1) || 'consultar', false);
-});
+function profileRoute() {
+  const params=new URLSearchParams(location.search);
+  const match=location.pathname.match(/^\/(perfil|ficha)\/([0-9a-f-]{36})\/?$/i);
+  if(match)return {kind:match[1],id:match[2]};
+  for(const [key,kind] of [['ficha','ficha'],['relato','perfil']]) if(/^[0-9a-f-]{36}$/i.test(params.get(key) || ''))return {kind,id:params.get(key)};
+  return null;
+}
+function openCurrentRoute() {
+  const route=profileRoute();
+  if(route) {if(route.kind==='ficha')openDossier(route.id,false);else openProfile(route.id,false);}
+  else {++dossierSerial;showView(location.hash.slice(1) || 'consultar',false);}
+}
+openCurrentRoute();
+window.addEventListener('popstate',openCurrentRoute);
   </script>
 </body>
 </html>
