@@ -37,7 +37,8 @@ def tiktokpy_document(document):
     user = detail.get('userInfo', {}).get('user', {})
     status = detail.get('statusCode')
     if status != 0 and not (status == 10222 and user.get('privateAccount') is True):
-        raise LookupFailure('profile_unavailable')
+        code = f'tiktok_status_{status}' if isinstance(status, int) and 0 <= status <= 999999999 else 'profile_unavailable'
+        raise LookupFailure(code)
     handle = user.get('uniqueId')
     if not isinstance(handle, str) or not HANDLE.fullmatch(handle):
         raise LookupFailure('invalid_identity')
@@ -59,6 +60,10 @@ def launch_options():
 async def tiktok_api(handle):
     from TikTokApi import TikTokApi
     options = launch_options()
+    if 'executable_path' not in options:
+        from playwright.async_api import async_playwright
+        async with async_playwright() as playwright:
+            options['executable_path'] = playwright.chromium.executable_path
     class SingleRequestApi(TikTokApi):
         async def make_request(self, *args, **kwargs):
             kwargs['retries'] = 1
@@ -103,7 +108,7 @@ async def tiktok_py(handle):
             self.profile_document = json.loads(data)
             return super()._extract_and_dump_data(data, model)
     async with CaptureProfileApi(headless=True, navigation_timeout=15, navigation_retries=0,
-                                 **launch_options()) as api:
+                                 channel='chromium', **launch_options()) as api:
         user = await api.user(handle, video_limit=0)
         # TikTokPy closes its page before returning and omits avatar from its
         # model. Capture its original SIGI_STATE document, preserving string IDs.
@@ -117,7 +122,7 @@ async def tiktok_py(handle):
 async def lookup(handle, providers=None, pause=asyncio.sleep, timeout=35):
     if not isinstance(handle, str) or not HANDLE.fullmatch(handle):
         raise LookupFailure('invalid_handle')
-    providers = providers or [('tiktok-api', tiktok_api), ('tiktokpy', tiktok_py)]
+    providers = providers or [('tiktokpy', tiktok_py), ('tiktok-api', tiktok_api)]
     failures = []
     for index, (name, provider) in enumerate(providers):
         if index:
@@ -126,7 +131,7 @@ async def lookup(handle, providers=None, pause=asyncio.sleep, timeout=35):
             profile = normalize(await asyncio.wait_for(provider(handle), timeout=timeout), handle)
             return {'profile': profile, 'provider': name}
         except LookupFailure as error:
-            if str(error) in ('identity_mismatch', 'blocked', 'rate_limited'):
+            if str(error) in ('identity_mismatch', 'blocked', 'rate_limited') or re.fullmatch(r'tiktok_status_[0-9]{1,9}', str(error)):
                 raise
             failures.append(f'{name}:unavailable')
         except Exception as error:

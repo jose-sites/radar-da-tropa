@@ -85,12 +85,13 @@ export async function collectorRequest(request: Request, admin: any, saveProfile
       catch { return json({ error: 'identity_mismatch' }, 400); }
       profileId = await saveProfile(profile, report.handle);
     } else {
-      failure = ['blocked', 'rate_limited', 'identity_mismatch'].includes(body.error) ? body.error : 'browser_profile_unavailable';
+      failure = typeof body.error === 'string' && (['blocked', 'rate_limited', 'identity_mismatch'].includes(body.error) || /^tiktok_status_[0-9]{1,9}$/.test(body.error)) ? body.error : 'browser_profile_unavailable';
     }
     const changes: Record<string, unknown> = {
       browser_lease: null, browser_error: failure,
       browser_next_at: profileId ? null : new Date(Date.now() + collectorDelay(report.browser_attempts)).toISOString(),
     };
+    if (failure) changes.profile_resolution_error = failure;
     if (profileId) { changes.profile_id = profileId; changes.profile_resolution_error = null; }
     const { data: saved, error: saveError } = await admin.from('radar_reports').update(changes)
       .eq('id', report.id).eq('browser_lease', body.lease).eq('status', 'published').is('profile_id', null)

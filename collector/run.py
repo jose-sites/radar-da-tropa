@@ -3,6 +3,7 @@ import argparse
 import contextlib
 import io
 import warnings
+import re
 import asyncio
 import json
 import logging
@@ -49,7 +50,7 @@ async def collect(jobs, api=call_api, finder=lookup, pause=asyncio.sleep):
             with contextlib.redirect_stderr(io.StringIO()):
                 result.update(await finder(job['handle']))
         except LookupFailure as error:
-            result['error'] = str(error) if str(error) in ('blocked', 'rate_limited', 'identity_mismatch') else 'unavailable'
+            result['error'] = str(error) if str(error) in ('blocked', 'rate_limited', 'identity_mismatch') or re.fullmatch(r'tiktok_status_[0-9]{1,9}', str(error)) else 'unavailable'
         response = await asyncio.to_thread(api, result)
         summary['checked'] += 1
         summary['identified' if response.get('profileVerified') is True else 'unavailable'] += 1
@@ -81,6 +82,6 @@ if __name__ == '__main__':
     except Exception as error:
         # Error class and HTTP status are safe; exception text/headers are not.
         status = error.code if isinstance(error, urllib.error.HTTPError) else None
-        code = str(error) if isinstance(error, RuntimeError) and __import__('re').fullmatch(r'(oidc|bridge)_http_[0-9]{3}', str(error)) else None
+        code = str(error) if isinstance(error, RuntimeError) and re.fullmatch(r'(oidc|bridge)_http_[0-9]{3}', str(error)) else None
         print(json.dumps({'collector_error': type(error).__name__, 'http_status': status, 'code': code}))
         raise SystemExit(1)

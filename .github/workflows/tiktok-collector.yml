@@ -41,3 +41,6 @@ jobs:
       - name: Consultar e salvar somente identidades válidas
         if: steps.queue.outputs.has_jobs == 'true'
         run: python collector/run.py --jobs "$RUNNER_TEMP/radar-collector-jobs.json"
+      - name: Comparar resposta real com perfil de controle
+        if: github.event_name == 'push' && steps.queue.outputs.has_jobs == 'true'
+        run: python collector/diagnose.py

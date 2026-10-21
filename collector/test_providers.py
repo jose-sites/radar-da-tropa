@@ -90,3 +90,16 @@ class DocumentTests(unittest.TestCase):
     def test_legacy_document_is_preserved(self):
         document={'UserModule':{'users':{'example':PROFILE}}}
         self.assertIs(tiktokpy_document(document),document)
+
+class SiteStatusTests(unittest.IsolatedAsyncioTestCase):
+    async def test_tiktok_status_without_identity_is_recorded_and_stops_retries(self):
+        second=AsyncMock()
+        with self.assertRaisesRegex(LookupFailure,'tiktok_status_209002'):
+            await lookup('example',[('first',AsyncMock(side_effect=LookupFailure('tiktok_status_209002'))),('second',second)])
+        second.assert_not_called()
+
+    async def test_worker_preserves_only_safe_numeric_tiktok_status(self):
+        submitted=[]
+        def api(body):submitted.append(body);return {'profileVerified':False}
+        await collect([{'reportId':'id','lease':'lease','handle':'example'}],api=api,finder=AsyncMock(side_effect=LookupFailure('tiktok_status_209002')))
+        self.assertEqual(submitted[0]['error'],'tiktok_status_209002')

@@ -1,7 +1,7 @@
 # Radar Coletor
 
-Coletor separado do site, usando **TikTok-Api 7.3.3** como primeira opção e
-**TikTokPy 0.2.4.post2** como alternativa. As duas bibliotecas estão instaladas;
+Coletor separado do site, usando **TikTokPy 0.2.4.post2** como primeira opção e
+**TikTok-Api 7.3.3** como alternativa. As duas bibliotecas estão instaladas;
 a segunda só consulta quando a primeira falha. Um bloqueio explícito, CAPTCHA,
 HTTP 429 ou identidade diferente interrompe as alternativas. Nenhuma biblioteca
 é API oficial do TikTok e nenhuma garante acesso.
@@ -61,3 +61,9 @@ TikTok. Verifique os números da execução no GitHub e `browser_error` no banco
 Se ambas as bibliotecas falharem, o perfil permanece pendente. O plano atual usa
 GitHub-hosted Actions em repositório público; conferir limites/custos antes de
 migrar para repositório privado, runners pagos ou aumentar a frequência.
+
+Os dois provedores usam o Chromium completo, inclusive no GitHub, para manter o
+mesmo navegador validado no ambiente de desenvolvimento. Em push com pendências,
+um diagnóstico somente de leitura compara um perfil de controle e um pendente;
+registra tipos/códigos de erros, sem corpos de páginas ou cookies. Respostas
+TikTok sem identidade preservam o código numérico em `browser_error`.

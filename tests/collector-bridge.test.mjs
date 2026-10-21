@@ -61,3 +61,10 @@ test('wrong usernames, rounded numeric IDs and unknown providers cannot link pro
 test('browser retry delay grows from fifteen minutes and caps at one day',()=>{
  const {context}=app();assert.equal(context.collectorDelay(1),15*60000);assert.equal(context.collectorDelay(2),30*60000);assert.equal(context.collectorDelay(3),60*60000);assert.equal(context.collectorDelay(100),24*60*60000);
 });
+
+test('numeric TikTok error codes are preserved without linking an identity',async()=>{
+ const server=app();const result=await server.request({action:'complete',reportId:id,lease,error:'tiktok_status_209002'});
+ assert.equal(result.body.error,'tiktok_status_209002');assert.equal(result.body.profileVerified,false);
+ assert.equal(server.calls.find(x=>x[0]==='update')[1].profile_resolution_error,'tiktok_status_209002');
+ assert.equal(server.profileCalls,0);
+});
