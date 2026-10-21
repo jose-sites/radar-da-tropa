@@ -40,6 +40,15 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='static') {
+  await page.locator('.nav-btn[data-go=relatar]').click();
+  assert.equal(await page.locator('#relatar').evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.equal(await page.locator('#pin-preview').evaluate(el=>getComputedStyle(el).transitionDuration),'0s');
+  assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).scrollBehavior),'auto');
+  await page.locator('#pin-preview').hover();assert.equal(await page.locator('#pin-preview').evaluate(el=>getComputedStyle(el).transform),'none');
+  assert.equal(await page.evaluate(()=>document.getAnimations().length),0);
+  console.log('PASS static: no entrance animation, hover movement, smooth scrolling or running animations');
+ }
  if(stage==='cards') {
   await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}'});
   const sample={...report,category:'nao_pagamento',status:'published',streamer_name:'admin',profile_verified:true,last_checked_at:new Date().toISOString(),report_count:1,reports:[{...report,category:'nao_pagamento',streamer_name:'admin'}]};
