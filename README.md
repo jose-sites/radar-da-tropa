@@ -202,3 +202,30 @@ de observação não são apresentadas como datas exatas de mudança. Contas com
 identidade confirmada são agrupadas pelo ID estável; as demais, por arroba exato.
 Cada relato mantém seu próprio link, recurso e pedido de revisão de dados.
 `tests/dossier.sql` verifica o contrato com fixtures integralmente revertidas.
+
+### Pedidos de PIN com acompanhamento
+
+A solicitação gratuita é registrada no Supabase antes de abrir o WhatsApp. O
+solicitante recebe um protocolo privado, conserva a tentativa no sessionStorage
+para repetir após falhas e pode consultar recebido/em análise/respondido.
+O WhatsApp apenas abre uma mensagem preparada; o solicitante escolhe enviá-la.
+O protocolo não é incluído nessa mensagem e seu hash é o único valor persistido
+no banco. O pedido não cria um streamer, PIN ou selo automaticamente.
+
+No painel, a administração filtra pedidos, abre o contato opcional e salva uma
+resposta de acompanhamento separada da nota interna. O telefone não aparece na
+consulta por protocolo. Há controle de repetição por arroba (10 minutos) e cinco
+novos pedidos por endereço encaminhado pelo gateway por hora; esse controle de
+conexão é adicional e depende dos cabeçalhos do gateway. Não há leitura direta
+nas tabelas por clientes, e as ações administrativas exigem um administrador.
+`tests/pin-requests.sql` verifica privacidade, autorização, limite e repetição
+segura dentro de uma transação integralmente revertida.
+
+Testes de navegador móvel, com API simulada e sem mensagens ou gravações reais:
+
+```sh
+RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs photos
+RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs panel
+RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs dossier
+RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs pin
+```

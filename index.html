@@ -136,7 +136,7 @@
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">⌁</span><span><h2>Acessar com PIN</h2><small>Identificação do streamer</small></span></div>
                 <label class="field"><span>Seu código de acesso</span><input id="pin-input" class="pin-input" type="text" inputmode="text" autocomplete="off" maxlength="29" placeholder="Seu PIN privado" aria-describedby="pin-help"></label>
                 <button class="primary-btn full" id="pin-preview" type="button">Validar PIN <span aria-hidden="true">→</span></button>
-                <p class="helper" id="pin-help">Código de 12 ou 20 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p><details class="pin-request"><summary>Sou streamer e quero solicitar um PIN</summary><form id="pin-request-form"><label class="field"><span>Seu nome de streamer</span><input id="pin-request-name" required minlength="2" maxlength="60" autocomplete="name"></label><label class="field"><span>Seu arroba no TikTok</span><input id="pin-request-handle" required maxlength="40" placeholder="@seuperfil" autocapitalize="none" autocomplete="off"></label><label class="field"><span>Como você participa das lives?</span><textarea id="pin-request-context" required minlength="10" maxlength="400"></textarea></label><p class="helper">Abriremos o WhatsApp com a mensagem pronta. Você revisa e envia; o PIN depende da aprovação do administrador.</p><button type="submit" class="ghost-btn full" id="pin-request-submit" disabled>Solicitar PIN pelo WhatsApp ↗</button><p class="helper" id="pin-request-status" role="status">Carregando contato...</p></form></details>
+                <p class="helper" id="pin-help">Código de 12 ou 20 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p><details class="pin-request"><summary>Sou streamer e quero solicitar um PIN</summary><form id="pin-request-form"><label class="field"><span>Seu nome de streamer</span><input id="pin-request-name" required minlength="2" maxlength="60" autocomplete="name"></label><label class="field"><span>Seu arroba no TikTok</span><input id="pin-request-handle" required maxlength="40" placeholder="@seuperfil" autocapitalize="none" autocomplete="off"></label><label class="field"><span>Como você participa das lives?</span><textarea id="pin-request-context" required minlength="10" maxlength="400"></textarea></label><label class="field"><span>Seu WhatsApp (opcional, com país e DDD)</span><input id="pin-request-contact" inputmode="tel" maxlength="20" placeholder="5527999999999" autocomplete="tel"></label><p class="helper">Seu pedido fica reservado à administração. Guarde o protocolo para acompanhar. Depois você pode abrir o WhatsApp e enviar a mensagem; o acesso depende de aprovação.</p><button type="submit" class="ghost-btn full" id="pin-request-submit">Registrar solicitação de PIN</button><p class="helper" id="pin-request-status" role="status">Solicitação gratuita.</p></form><div id="pin-request-receipt" hidden><p><strong>Guarde seu protocolo privado:</strong></p><code id="pin-request-protocol" class="pin-protocol"></code><button type="button" class="mini-btn" id="pin-request-copy">Copiar protocolo</button><p class="helper">Este protocolo acompanha o pedido; ele não é um PIN de acesso.</p><a id="pin-request-whatsapp" class="ghost-btn full" target="_blank" rel="noopener noreferrer" hidden>Abrir WhatsApp com a mensagem ↗</a></div><button type="button" id="pin-request-new" class="mini-btn subtle" hidden>Editar ou iniciar outro pedido</button></details><details class="pin-request"><summary>Acompanhar minha solicitação de PIN</summary><form id="pin-tracking-form"><label class="field"><span>Protocolo privado de 32 caracteres</span><input id="pin-tracking-protocol" required maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false"></label><button type="submit" class="ghost-btn">Consultar andamento</button><p id="pin-tracking-result" role="status" class="helper"></p></form></details>
               </div>
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
@@ -197,7 +197,7 @@
             <div id="admin-dashboard" class="admin-dash">
               <div class="admin-top"><div><span class="admin-badge">● Visão geral</span><h2>Painel da tropa</h2><p>Gerencie relatos e acessos num só lugar.</p></div><div class="admin-top-buttons"><button class="ghost-btn" id="refresh-dashboard" type="button">Atualizar</button><button class="ghost-btn" id="close-dashboard" type="button">Sair</button></div></div>
               <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div><div class="metric"><small>Recursos abertos</small><strong id="metric-appeals">0</strong><span>Aguardando decisão</span></div></div>
-              <details class="glass-card"><summary>Contato para solicitações de PIN</summary><form id="whatsapp-settings-form"><label class="field"><span>WhatsApp com código do país e DDD</span><input id="whatsapp-settings-number" inputmode="tel" required maxlength="20" placeholder="5527999999999"></label><button class="ghost-btn" type="submit">Salvar WhatsApp</button></form></details><div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div class="admin-filter-grid"><label class="field"><span>Buscar denúncia</span><input id="admin-report-query" type="search" maxlength="100" placeholder="Arroba, streamer ou descrição"></label><label class="field"><span>Situação</span><select id="admin-report-status"><option value="all">Todas</option><option value="pending">Em análise</option><option value="published">Publicadas</option><option value="rejected">Rejeitadas</option></select></label><label class="field"><span>Categoria</span><select id="admin-report-category"><option value="all">Todas</option><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Identidade do perfil</span><select id="admin-report-identity"><option value="all">Todas</option><option value="verified">Identificada</option><option value="unverified">Não confirmada</option></select></label><label class="field"><span>Anexos</span><select id="admin-report-attachments"><option value="all">Todos</option><option value="issues">Pendentes de verificação</option><option value="with">Com arquivos</option><option value="without">Sem arquivos</option></select></label><label class="field"><span>Ordenação</span><select id="admin-report-sort"><option value="newest">Mais recentes</option><option value="pending">Em análise primeiro</option><option value="oldest">Mais antigos</option></select></label></div><div class="admin-filter-foot"><small id="admin-report-count" role="status"></small><button class="mini-btn subtle" id="admin-report-clear" type="button">Limpar filtros</button></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
+              <div class="dashboard-card"><div class="dashboard-head"><h3>Solicitações de PIN</h3><span>ACESSO SOB ANÁLISE</span></div><label class="field"><span>Andamento do pedido</span><select id="admin-pin-status"><option value="all">Todos</option><option value="received">Recebidos</option><option value="in_analysis">Em análise</option><option value="responded">Respondidos</option></select></label><p id="admin-pin-count" class="helper" role="status"></p><div id="pin-requests-list"></div><p class="helper">Pedido recebido não concede acesso nem selo. Confira a identidade antes de criar um PIN. Envie o PIN apenas por contato privado.</p></div><details class="glass-card"><summary>Contato para solicitações de PIN</summary><form id="whatsapp-settings-form"><label class="field"><span>WhatsApp com código do país e DDD</span><input id="whatsapp-settings-number" inputmode="tel" required maxlength="20" placeholder="5527999999999"></label><button class="ghost-btn" type="submit">Salvar WhatsApp</button></form></details><div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div class="admin-filter-grid"><label class="field"><span>Buscar denúncia</span><input id="admin-report-query" type="search" maxlength="100" placeholder="Arroba, streamer ou descrição"></label><label class="field"><span>Situação</span><select id="admin-report-status"><option value="all">Todas</option><option value="pending">Em análise</option><option value="published">Publicadas</option><option value="rejected">Rejeitadas</option></select></label><label class="field"><span>Categoria</span><select id="admin-report-category"><option value="all">Todas</option><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Identidade do perfil</span><select id="admin-report-identity"><option value="all">Todas</option><option value="verified">Identificada</option><option value="unverified">Não confirmada</option></select></label><label class="field"><span>Anexos</span><select id="admin-report-attachments"><option value="all">Todos</option><option value="issues">Pendentes de verificação</option><option value="with">Com arquivos</option><option value="without">Sem arquivos</option></select></label><label class="field"><span>Ordenação</span><select id="admin-report-sort"><option value="newest">Mais recentes</option><option value="pending">Em análise primeiro</option><option value="oldest">Mais antigos</option></select></label></div><div class="admin-filter-foot"><small id="admin-report-count" role="status"></small><button class="mini-btn subtle" id="admin-report-clear" type="button">Limpar filtros</button></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
               <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><label class="field"><span>Andamento do recurso</span><select id="admin-appeal-status"><option value="all">Todos</option><option value="pending">Em análise</option><option value="accepted">Aceitos</option><option value="denied">Negados</option></select></label><small id="admin-appeal-count" role="status"></small><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
               <div class="dashboard-card" style="margin-top:18px"><div class="dashboard-head"><h3>Pedidos de privacidade</h3><span>ACESSO, CORREÇÃO E REMOÇÃO</span></div><div id="privacy-list"></div></div>
               <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
@@ -210,7 +210,7 @@
           <div class="page-intro"><div class="eyebrow">Transparência</div><h1>Privacidade <em>e seus dados.</em></h1><p>Entenda o que aparece na consulta e como pedir correção, acesso ou remoção.</p></div>
           <div class="policy-copy">
             <div class="glass-card"><h2>O que é publicado</h2><p>Após revisão humana, exibimos arroba, relato, categoria, data informada, histórico de arrobas confirmado e foto pública do perfil do TikTok quando disponível. Um relato é uma alegação de quem o enviou; não é uma conclusão definitiva sobre a pessoa. Provas só aparecem publicamente quando o administrador selecionar uma cópia revisada.</p></div>
-            <div class="glass-card"><h2>O que fica reservado</h2><p>PINs são guardados como hashes. Arquivos originais, recursos, contatos opcionais, protocolos e registros de administração ficam em áreas privadas do Supabase. Endereços IP não aparecem nas fichas públicas; Cloudflare e Supabase podem processar dados de conexão para prestar e proteger o serviço. O serviço consulta dados públicos do TikTok para acompanhar a identidade do perfil.</p></div>
+            <div class="glass-card"><h2>O que fica reservado</h2><p>PINs são guardados como hashes. Arquivos originais, recursos, solicitações de PIN, contatos opcionais e registros de administração ficam em áreas privadas do Supabase. Protocolos de solicitação de PIN são armazenados como hashes; quem possui o protocolo pode consultar a situação e a resposta do próprio pedido. O navegador guarda a tentativa somente durante a sessão para permitir novas tentativas sem duplicação. Endereços IP não aparecem nas fichas públicas; Cloudflare e Supabase podem processar dados de conexão para prestar e proteger o serviço. O serviço consulta dados públicos do TikTok para acompanhar a identidade do perfil.</p></div>
             <div class="glass-card"><h2>Prazo de guarda</h2><p>Relatos publicados ficam visíveis até revisão ou retirada. Provas e recursos podem permanecer guardados para análise e contestação; ainda não há exclusão automática por prazo. Se quiser retirar ou corrigir dados, envie um pedido abaixo. O administrador avalia a solicitação e registra a resposta.</p></div>
             <div class="glass-card"><h2>Peça revisão ou remoção</h2><p>Use este canal para solicitar acesso, correção, retirada ou informações sobre seus dados. O contato é opcional: sem ele, guarde o protocolo para acompanhar a resposta. Não envie documentos, telefone ou endereço de terceiros.</p>
               <form id="privacy-request-form" class="privacy-request">
@@ -265,6 +265,9 @@ let toastTimer, searchTimer, searchSerial = 0;
 let streamerPin = null;
 let pendingReport = null, pendingAppeal = null;
 let dossierSerial=0;
+let pinRequestDraft=null;
+const PIN_REQUEST_KEY='radar_pin_request_draft';
+const pinStatusLabels={received:'Recebido',in_analysis:'Em análise',responded:'Respondido'};
 let publicGroups = [], publicTotal = 0, publicQuery = '', whatsappNumber = '';
 const uploadedFiles = new WeakMap();
 const uploadReservations = new WeakMap();
@@ -430,9 +433,9 @@ async function loadPublicStats() {
     for (const [id,key] of Object.entries({'stat-reports':'published_reports','stat-profiles':'reported_profiles','stat-streamers':'active_streamers','stat-verified':'verified_streamers'}))
       document.getElementById(id).textContent = Number(stats[key] || 0).toLocaleString('pt-BR');
     whatsappNumber = /^[1-9][0-9]{9,14}$/.test(stats.whatsapp_number || '') ? stats.whatsapp_number : '';
-    document.getElementById('pin-request-submit').disabled = !whatsappNumber;
-    document.getElementById('pin-request-status').textContent = whatsappNumber ? 'Solicitação gratuita. Não compartilhe seu PIN publicamente.' : 'O contato está temporariamente indisponível.';
-  } catch { document.getElementById('pin-request-status').textContent = 'Não foi possível carregar o contato. Atualize a página para tentar novamente.'; }
+    if(pinRequestDraft?.receipt) renderPinReceipt();
+    if(!pinRequestDraft) document.getElementById('pin-request-status').textContent='Solicitação gratuita. O pedido pode ser registrado aqui.';
+  } catch { if(!pinRequestDraft)document.getElementById('pin-request-status').textContent='Você pode registrar o pedido aqui. O WhatsApp está temporariamente indisponível.'; }
 }
 async function loadGroups(query, serial, append = false) {
   const data = await rpc('radar_public_groups', { p_query: query, p_limit: 24, p_offset: append ? publicGroups.length : 0 });
@@ -560,18 +563,63 @@ async function searchReports(query, scroll = false) {
     toast(error.message, true);
   }
 }
-document.getElementById('pin-request-form').addEventListener('submit', event => {
-  event.preventDefault();
-  const handle = document.getElementById('pin-request-handle').value.trim().replace(/^@+/,'');
-  if (!/^[A-Za-z0-9._]{2,40}$/.test(handle)) return toast('Informe um arroba válido.',true);
-  if (!whatsappNumber) return toast('Contato indisponível. Tente mais tarde.',true);
-  const message = ['Olá! Quero solicitar um PIN do Radar da Tropa.',
-    'Nome: '+document.getElementById('pin-request-name').value.trim(),
-    'TikTok: https://www.tiktok.com/@'+handle,
-    'Participação nas lives: '+document.getElementById('pin-request-context').value.trim(),
-    'Entendo que o acesso depende da análise do administrador.'].join('\n');
-  window.location.href = 'https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(message);
+function pinRequestPayload() {
+  const name=document.getElementById('pin-request-name').value.trim(),handle=document.getElementById('pin-request-handle').value.trim().replace(/^@+/,''),context=document.getElementById('pin-request-context').value.trim(),contact=document.getElementById('pin-request-contact').value.replace(/\D/g,'');
+  if(name.length<2 || name.length>60 || !/^[A-Za-z0-9._]{2,40}$/.test(handle) || context.length<10 || context.length>400 || (contact && !/^[1-9][0-9]{9,14}$/.test(contact))) throw new Error('Confira o nome, arroba, descrição e WhatsApp com país e DDD.');
+  return {p_name:name,p_handle:handle,p_context:context,p_contact:contact || null};
+}
+function persistPinDraft() {
+  try{if(pinRequestDraft)sessionStorage.setItem(PIN_REQUEST_KEY,JSON.stringify(pinRequestDraft));else sessionStorage.removeItem(PIN_REQUEST_KEY);}catch{}
+}
+function lockPinRequest(locked) {
+  for(const id of ['pin-request-name','pin-request-handle','pin-request-context','pin-request-contact'])document.getElementById(id).readOnly=locked;
+  document.getElementById('pin-request-new').hidden=!locked;
+}
+function renderPinReceipt() {
+  const draft=pinRequestDraft;if(!draft?.receipt)return;
+  document.getElementById('pin-request-receipt').hidden=false;
+  document.getElementById('pin-request-protocol').textContent=draft.protocol;
+  document.getElementById('pin-tracking-protocol').value=draft.protocol;
+  const receipt=draft.receipt;
+  const message=['Olá! Registrei uma solicitação de PIN no Radar da Tropa.','Referência: '+receipt.id,'Nome: '+receipt.name,'TikTok: https://www.tiktok.com/@'+receipt.handle,'Participação nas lives: '+receipt.context,'Entendo que o acesso depende da análise do administrador.'].join('\n');
+  const link=document.getElementById('pin-request-whatsapp');link.hidden=!whatsappNumber;
+  if(whatsappNumber)link.href='https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(message);
+  document.getElementById('pin-request-status').textContent='Pedido registrado. Guarde o protocolo; abrir o WhatsApp não envia a mensagem automaticamente.';
+  document.getElementById('pin-request-submit').disabled=true;lockPinRequest(true);
+}
+document.getElementById('pin-request-form').addEventListener('submit',async event=>{
+  event.preventDefault();const button=document.getElementById('pin-request-submit');
+  try{
+    if(!pinRequestDraft){pinRequestDraft={protocol:crypto.randomUUID().replaceAll('-','').toUpperCase(),payload:pinRequestPayload()};persistPinDraft();}
+    lockPinRequest(true);busy(button,true,'Registrando...');
+    const receipt=await rpc('radar_submit_pin_request',{p_protocol:pinRequestDraft.protocol,...pinRequestDraft.payload});
+    if(!receipt?.id)throw new Error('Não foi possível confirmar o registro. Tente novamente com os dados preservados.');
+    pinRequestDraft.receipt=receipt;persistPinDraft();busy(button,false);renderPinReceipt();
+  }catch(error){busy(button,false);document.getElementById('pin-request-status').textContent=error.message+' Seus dados foram preservados para tentar novamente.';toast(error.message,true);}
 });
+document.getElementById('pin-request-new').addEventListener('click',()=>{
+  pinRequestDraft=null;persistPinDraft();lockPinRequest(false);document.getElementById('pin-request-submit').disabled=false;document.getElementById('pin-request-receipt').hidden=true;document.getElementById('pin-request-status').textContent='Edite os dados e registre o pedido. Pedidos anteriores continuam disponíveis pelo protocolo salvo.';
+});
+document.getElementById('pin-request-copy').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(pinRequestDraft.protocol);toast('Protocolo copiado. Guarde em local privado.');}catch{toast('Selecione o protocolo acima e copie.');}
+});
+document.getElementById('pin-tracking-form').addEventListener('submit',async event=>{
+  event.preventDefault();const button=event.target.querySelector('button'),target=document.getElementById('pin-tracking-result');busy(button,true,'Consultando...');
+  try{
+    const protocol=document.getElementById('pin-tracking-protocol').value.trim();
+    if(!/^[0-9a-f]{32}$/i.test(protocol))throw new Error('Informe o protocolo de 32 caracteres.');
+    const result=await rpc('radar_pin_request_status',{p_protocol:protocol});
+    target.textContent=result?`@${result.handle} · ${pinStatusLabels[result.status] || 'Recebido'} · Atualizado em ${formattedDate(result.updated_at)}. ${result.reply || ''}`:'Protocolo não encontrado. Confira os 32 caracteres.';
+  }catch(error){target.textContent=error.message;}finally{busy(button,false);}
+});
+try{
+  const saved=JSON.parse(sessionStorage.getItem(PIN_REQUEST_KEY) || 'null');
+  if(saved && /^[0-9A-F]{32}$/.test(saved.protocol) && saved.payload){
+    pinRequestDraft=saved;
+    for(const [id,key] of [['pin-request-name','p_name'],['pin-request-handle','p_handle'],['pin-request-context','p_context'],['pin-request-contact','p_contact']])document.getElementById(id).value=saved.payload[key] || '';
+    lockPinRequest(true);if(saved.receipt)renderPinReceipt();else document.getElementById('pin-request-status').textContent='Dados da tentativa anterior preservados. Clique em registrar para confirmar sem duplicar o pedido.';
+  }
+}catch{}
 document.getElementById('whatsapp-settings-form').addEventListener('submit', async event => {
   event.preventDefault(); const button = event.target.querySelector('button'); busy(button,true,'Salvando...');
   try { await rpc('radar_admin_set_whatsapp',{p_number:document.getElementById('whatsapp-settings-number').value.replace(/\D/g,'')},true); await loadPublicStats(); toast('Contato atualizado.'); }
@@ -919,7 +967,7 @@ document.getElementById('privacy-status-form').addEventListener('submit',async e
 
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard_v5', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v6', {}, true);
     document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
     renderDashboard();
     loadPublicStats();
@@ -957,8 +1005,22 @@ function renderDashboard() {
   });
   document.getElementById('privacy-list').innerHTML=(dashboard.privacy_requests||[]).length ? dashboard.privacy_requests.map(q=>`<details class="dash-row dash-fold" data-privacy-id="${escapeHtml(q.id)}"><summary><span class="dash-row-main"><strong>Pedido ${escapeHtml(q.status==='resolved'?'respondido':'em análise')}</strong><small>${escapeHtml(formattedDate(q.created_at))}${q.report_id?' · Relato vinculado':''}</small></span><span class="eye-toggle" aria-hidden="true">◉</span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(q.message)}</p><p class="dash-detail-note">Contato privado: ${escapeHtml(q.contact || 'não informado')}</p><label class="review-label">Resposta ao pedido <textarea maxlength="500">${escapeHtml(q.admin_note || '')}</textarea></label>${q.status==='pending'?`<button class="mini-btn" data-privacy-review="${escapeHtml(q.id)}">Registrar resposta</button>`:''}</div></details>`).join('') : '<div class="list-empty">Nenhum pedido recebido.</div>';
   document.getElementById('audit-list').innerHTML = (dashboard.audit || []).length ? dashboard.audit.map(a => `<div class="audit-item"><span>${escapeHtml(a.action.replaceAll('_',' '))}</span><time>${escapeHtml(formattedDate(a.created_at))}</time></div>`).join('') : '<p class="list-empty">Sem ações recentes.</p>';
+  renderPinRequests();
   restoreAdminDrafts();
 }
+function renderPinRequests() {
+  const all=dashboard.pin_requests || [],status=document.getElementById('admin-pin-status').value;
+  const rows=all.filter(row=>status==='all' || row.status===status);
+  document.getElementById('admin-pin-count').textContent=`Exibindo ${rows.length} de ${all.length} pedidos`;
+  document.getElementById('pin-requests-list').innerHTML=rows.length?rows.map(row=>`<details class="dash-row dash-fold pin-track-row" data-pin-request="${escapeHtml(row.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(row.name)} · @${escapeHtml(row.handle)}</strong><small>${escapeHtml(formattedDate(row.created_at))} · Ref. ${escapeHtml(row.id)}</small></span><span class="dash-status">${escapeHtml(pinStatusLabels[row.status] || row.status)}</span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(row.context)}</p><p class="helper">Contato privado: ${escapeHtml(row.contact || 'não informado')}</p>${/^[1-9][0-9]{9,14}$/.test(row.contact || '')?`<a class="mini-btn" href="https://wa.me/${row.contact}" target="_blank" rel="noopener noreferrer">Abrir contato no WhatsApp ↗</a>`:''}<label class="field"><span>Andamento</span><select data-pin-state>${Object.entries(pinStatusLabels).map(([value,label])=>`<option value="${value}" ${row.status===value?'selected':''}>${label}</option>`).join('')}</select></label><label class="field"><span>Resposta visível para quem tem o protocolo</span><textarea data-pin-reply maxlength="500">${escapeHtml(row.public_reply || '')}</textarea><small class="helper">Não escreva o PIN aqui. Envie-o apenas por contato privado.</small></label><label class="field"><span>Nota interna (somente administração)</span><textarea data-pin-note maxlength="500">${escapeHtml(row.admin_note || '')}</textarea></label><button type="button" class="mini-btn" data-pin-save="${escapeHtml(row.id)}">Salvar andamento</button></div></details>`).join(''):'<div class="list-empty">Nenhum pedido corresponde ao filtro.</div>';
+}
+document.getElementById('admin-pin-status').addEventListener('change',renderDashboard);
+document.getElementById('pin-requests-list').addEventListener('click',async event=>{
+  const button=event.target.closest('[data-pin-save]');if(!button)return;
+  const row=button.closest('[data-pin-request]');busy(button,true,'Salvando...');
+  try{await rpc('radar_admin_update_pin_request',{p_id:button.dataset.pinSave,p_status:row.querySelector('[data-pin-state]').value,p_reply:row.querySelector('[data-pin-reply]').value.trim(),p_note:row.querySelector('[data-pin-note]').value.trim()},true);await loadDashboard();toast('Andamento atualizado.');}
+  catch(error){toast(error.message,true);busy(button,false);}
+});
 function normalizeAdminSearch(value) {
   return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/^@/,'');
 }
@@ -981,12 +1043,14 @@ function filterAdminAppeals(appeals,status) {
   return appeals.filter(appeal=>!status || status==='all' || appeal.status===status);
 }
 function captureAdminDrafts() {
+  for(const row of document.querySelectorAll('[data-pin-request]'))adminDrafts.set('pin:'+row.dataset.pinRequest,{open:row.open,status:row.querySelector('[data-pin-state]').value,reply:row.querySelector('[data-pin-reply]').value,note:row.querySelector('[data-pin-note]').value});
   for(const [attribute,prefix] of [['data-review-id','report'],['data-appeal-id','appeal'],['data-privacy-id','privacy']])
     for(const row of document.querySelectorAll('['+attribute+']')) {
       const input=row.querySelector('textarea');if(input) adminDrafts.set(prefix+':'+row.getAttribute(attribute),{text:input.value,open:row.open});
     }
 }
 function restoreAdminDrafts() {
+  for(const row of document.querySelectorAll('[data-pin-request]')){const draft=adminDrafts.get('pin:'+row.dataset.pinRequest);if(draft){row.open=draft.open;row.querySelector('[data-pin-state]').value=draft.status;row.querySelector('[data-pin-reply]').value=draft.reply;row.querySelector('[data-pin-note]').value=draft.note;}}
   for(const [attribute,prefix] of [['data-review-id','report'],['data-appeal-id','appeal'],['data-privacy-id','privacy']])
     for(const row of document.querySelectorAll('['+attribute+']')) {
       const draft=adminDrafts.get(prefix+':'+row.getAttribute(attribute)),input=row.querySelector('textarea');
