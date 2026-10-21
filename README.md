@@ -186,3 +186,10 @@ anexos: preparando, enviando (percentual medido pelo navegador), verificando,
 concluído ou erro detalhado. Uma falha preserva o arquivo para nova tentativa.
 URLs de prévia são liberadas ao trocar a seleção ou sair da área do streamer.
 O progresso de upload usa XMLHttpRequest; os dados e segredos não vão para URLs.
+
+### Filtros no painel
+
+O painel permite combinar busca, situação, categoria, identidade e estado dos
+anexos, com ordenação e filtro de recursos. Os totais permanecem globais; rascunhos
+de revisão são mantidos ao alternar filtros na mesma sessão. A RPC v5 continua
+exclusiva da administração e informa anexos com verificação pendente.

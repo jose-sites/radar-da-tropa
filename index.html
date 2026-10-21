@@ -67,6 +67,7 @@
     @media(max-width:760px){.detail-columns{grid-template-columns:1fr}.proof-gallery{grid-template-columns:1fr}.detail-head .profile-photo,.detail-head .handle-avatar{width:68px;height:68px}}
   .public-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}.public-stats>div{border:1px solid var(--border,#34382b);border-radius:18px;padding:20px;background:#1b1e17}.public-stats strong{display:block;font-size:30px;color:#d5fb69}.public-stats span{font-size:13px;color:#b2b8aa}.streamer-badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#263d2c;color:#a5e6b1;font-size:11px;font-weight:700}.group-report{padding:18px 0;border-top:1px solid #363a30}.group-report p{margin:10px 0}.group-report small{color:#abb19e}.pin-request{margin-top:22px}.pin-request summary{cursor:pointer;color:#d5fb69}.pin-request form{margin-top:16px}#load-more-profiles{display:block;margin:20px auto}#load-more-profiles[hidden]{display:none}@media(max-width:600px){.public-stats{grid-template-columns:repeat(2,1fr);gap:9px}.public-stats>div{padding:15px}.public-stats strong{font-size:26px}}
 .attachment-list{display:grid;gap:10px;margin-bottom:16px}.attachment-item{display:flex;gap:12px;padding:12px;border:1px solid #3b4330;border-radius:12px;min-width:0}.attachment-item>img{width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0}.attachment-info{min-width:0;flex:1}.attachment-info strong,.attachment-info small,.attachment-status{display:block;overflow-wrap:anywhere}.attachment-info strong{font-size:13px}.attachment-info small{font-size:11px;color:#afb6a6}.attachment-info progress{width:100%;height:8px;accent-color:#d5fb69}.attachment-status{font-size:12px;margin-top:5px;color:#bbc3b0}.attachment-item[data-phase=error]{border-color:#bd8076}.attachment-item[data-phase=error] .attachment-status{color:#ffb3a7}.attachment-item[data-phase=done] .attachment-status{color:#b1e78d}
+.admin-filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-filter-grid .field{margin:0}.admin-filter-grid input,.admin-filter-grid select{width:100%;min-width:0}.admin-filter-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0}.admin-filter-foot small,#admin-appeal-count{color:#b3bda7}.attachment-warning{font-size:12px;color:#f0cc86;padding:9px;border:1px solid #6c5d39;border-radius:8px}@media(max-width:380px){.admin-filter-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -196,8 +197,8 @@
             <div id="admin-dashboard" class="admin-dash">
               <div class="admin-top"><div><span class="admin-badge">● Visão geral</span><h2>Painel da tropa</h2><p>Gerencie relatos e acessos num só lugar.</p></div><div class="admin-top-buttons"><button class="ghost-btn" id="refresh-dashboard" type="button">Atualizar</button><button class="ghost-btn" id="close-dashboard" type="button">Sair</button></div></div>
               <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div><div class="metric"><small>Recursos abertos</small><strong id="metric-appeals">0</strong><span>Aguardando decisão</span></div></div>
-              <details class="glass-card"><summary>Contato para solicitações de PIN</summary><form id="whatsapp-settings-form"><label class="field"><span>WhatsApp com código do país e DDD</span><input id="whatsapp-settings-number" inputmode="tel" required maxlength="20" placeholder="5527999999999"></label><button class="ghost-btn" type="submit">Salvar WhatsApp</button></form></details><div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
-              <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
+              <details class="glass-card"><summary>Contato para solicitações de PIN</summary><form id="whatsapp-settings-form"><label class="field"><span>WhatsApp com código do país e DDD</span><input id="whatsapp-settings-number" inputmode="tel" required maxlength="20" placeholder="5527999999999"></label><button class="ghost-btn" type="submit">Salvar WhatsApp</button></form></details><div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div class="admin-filter-grid"><label class="field"><span>Buscar denúncia</span><input id="admin-report-query" type="search" maxlength="100" placeholder="Arroba, streamer ou descrição"></label><label class="field"><span>Situação</span><select id="admin-report-status"><option value="all">Todas</option><option value="pending">Em análise</option><option value="published">Publicadas</option><option value="rejected">Rejeitadas</option></select></label><label class="field"><span>Categoria</span><select id="admin-report-category"><option value="all">Todas</option><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Identidade do perfil</span><select id="admin-report-identity"><option value="all">Todas</option><option value="verified">Identificada</option><option value="unverified">Não confirmada</option></select></label><label class="field"><span>Anexos</span><select id="admin-report-attachments"><option value="all">Todos</option><option value="issues">Pendentes de verificação</option><option value="with">Com arquivos</option><option value="without">Sem arquivos</option></select></label><label class="field"><span>Ordenação</span><select id="admin-report-sort"><option value="newest">Mais recentes</option><option value="pending">Em análise primeiro</option><option value="oldest">Mais antigos</option></select></label></div><div class="admin-filter-foot"><small id="admin-report-count" role="status"></small><button class="mini-btn subtle" id="admin-report-clear" type="button">Limpar filtros</button></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
+              <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><label class="field"><span>Andamento do recurso</span><select id="admin-appeal-status"><option value="all">Todos</option><option value="pending">Em análise</option><option value="accepted">Aceitos</option><option value="denied">Negados</option></select></label><small id="admin-appeal-count" role="status"></small><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
               <div class="dashboard-card" style="margin-top:18px"><div class="dashboard-head"><h3>Pedidos de privacidade</h3><span>ACESSO, CORREÇÃO E REMOÇÃO</span></div><div id="privacy-list"></div></div>
               <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
             </div>
@@ -270,6 +271,8 @@ const attachmentViews = new Map();
 const attachmentStates = new WeakMap();
 let adminSession = null;
 let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
+const adminDrafts = new Map();
+let adminFilterTimer;
 let selectedAppealReport = null;
 let identityChallengeId = null, verifiedChallengeId = null;
 let setupSession = null;
@@ -872,28 +875,33 @@ document.getElementById('privacy-status-form').addEventListener('submit',async e
 
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard_v4', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v5', {}, true);
+    document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
     renderDashboard();
     loadPublicStats();
   } catch (error) { toast(error.message, true); }
 }
 function renderDashboard() {
-  document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
-  const reports = dashboard.reports || [];
+  captureAdminDrafts();
+  const allReports=dashboard.reports || [];
+  const reports=filterAdminReports(allReports,{query:document.getElementById('admin-report-query').value,status:document.getElementById('admin-report-status').value,category:document.getElementById('admin-report-category').value,identity:document.getElementById('admin-report-identity').value,attachments:document.getElementById('admin-report-attachments').value,sort:document.getElementById('admin-report-sort').value});
   const streamers = dashboard.streamers || [];
-  const appeals = dashboard.appeals || [];
-  document.getElementById('metric-reports').textContent = reports.length;
+  const allAppeals=dashboard.appeals || [];
+  const appeals=filterAdminAppeals(allAppeals,document.getElementById('admin-appeal-status').value);
+  document.getElementById('admin-report-count').textContent=`Exibindo ${reports.length} de ${allReports.length} denúncias`;
+  document.getElementById('admin-appeal-count').textContent=`Exibindo ${appeals.length} de ${allAppeals.length} recursos`;
+  document.getElementById('metric-reports').textContent = allReports.length;
   document.getElementById('metric-streamers').textContent = streamers.filter(s => s.active).length;
-  document.getElementById('metric-pending').textContent = reports.filter(r => r.status === 'pending').length;
-  document.getElementById('metric-appeals').textContent = appeals.filter(a => a.status === 'pending').length;
+  document.getElementById('metric-pending').textContent = allReports.filter(r => r.status === 'pending').length;
+  document.getElementById('metric-appeals').textContent = allAppeals.filter(a => a.status === 'pending').length;
   const reportsList = document.getElementById('reports-list');
   reportsList.innerHTML = reports.length ? reports.map(r => {
     const statusLabel = {pending:'Em análise',published:'Publicado',rejected:'Rejeitado'}[r.status] || r.status;
-    return `<details class="dash-row dash-fold review-row" data-review-id="${escapeHtml(r.id)}"><summary>${profilePhoto(r.avatar_path, '@' + r.handle, 'dash-avatar')}<span class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))} · ${escapeHtml(categoryLabels[r.category] || 'Outro')}</small></span><span class="fold-right"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">${r.event_date ? `Ocorrido em ${escapeHtml(r.event_date)} · ` : ''}${r.profile_verified ? 'Conta do TikTok identificada' : 'Identidade do perfil ainda não confirmada'}</p>${!r.profile_verified ? `<p class="profile-sync-feedback note" role="status"></p><button type="button" class="mini-btn subtle" data-retry-profile="${escapeHtml(r.id)}">Conferir perfil no TikTok</button>` : ''}<p class="row-reason">${escapeHtml(r.reason)}</p>${evidenceButtons(r.evidence)}<label class="review-label">Nota da revisão <textarea maxlength="500" placeholder="Contexto da decisão (opcional)">${escapeHtml(r.review_note || '')}</textarea></label><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></details>`;
-  }).join('') : '<div class="list-empty">Nenhum relato recebido ainda.</div>';
+    return `<details class="dash-row dash-fold review-row" data-review-id="${escapeHtml(r.id)}"><summary>${profilePhoto(r.avatar_path, '@' + r.handle, 'dash-avatar')}<span class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))} · ${escapeHtml(categoryLabels[r.category] || 'Outro')}</small></span><span class="fold-right"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">${r.event_date ? `Ocorrido em ${escapeHtml(r.event_date)} · ` : ''}${r.profile_verified ? 'Conta do TikTok identificada' : 'Identidade do perfil ainda não confirmada'}</p>${!r.profile_verified ? `<p class="profile-sync-feedback note" role="status"></p><button type="button" class="mini-btn subtle" data-retry-profile="${escapeHtml(r.id)}">Conferir perfil no TikTok</button>` : ''}${Number(r.upload_issues || 0)>0 ? `<p class="attachment-warning">${Number(r.upload_issues)} anexo(s) aguardam verificação. Confira com o streamer antes de publicar provas.</p>` : ''}<p class="row-reason">${escapeHtml(r.reason)}</p>${evidenceButtons(r.evidence)}<label class="review-label">Nota da revisão <textarea maxlength="500" placeholder="Contexto da decisão (opcional)">${escapeHtml(r.review_note || '')}</textarea></label><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></details>`;
+  }).join('') : '<div class="list-empty">Nenhuma denúncia corresponde aos filtros. Use Limpar filtros para ver todas.</div>';
   const streamersList = document.getElementById('streamers-list');
   streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)} ${streamerBadge(s.verified && s.active)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><div class="row-buttons"><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="verify">${s.verified ? 'Retirar selo' : 'Verificar streamer'}</button><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
-  document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<details class="dash-row dash-fold review-row" data-appeal-id="${escapeHtml(a.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small></span><span class="fold-right"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></details>`).join('') : '<div class="list-empty">Nenhum recurso recebido ainda.</div>';
+  document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<details class="dash-row dash-fold review-row" data-appeal-id="${escapeHtml(a.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small></span><span class="fold-right"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></details>`).join('') : '<div class="list-empty">Nenhum recurso corresponde ao filtro.</div>';
   const contacts=new Map((dashboard.appeal_contacts||[]).map(c=>[c.id,c]));
   document.querySelectorAll('[data-appeal-id]').forEach(row=>{
     const contact=contacts.get(row.dataset.appealId);
@@ -905,7 +913,50 @@ function renderDashboard() {
   });
   document.getElementById('privacy-list').innerHTML=(dashboard.privacy_requests||[]).length ? dashboard.privacy_requests.map(q=>`<details class="dash-row dash-fold" data-privacy-id="${escapeHtml(q.id)}"><summary><span class="dash-row-main"><strong>Pedido ${escapeHtml(q.status==='resolved'?'respondido':'em análise')}</strong><small>${escapeHtml(formattedDate(q.created_at))}${q.report_id?' · Relato vinculado':''}</small></span><span class="eye-toggle" aria-hidden="true">◉</span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(q.message)}</p><p class="dash-detail-note">Contato privado: ${escapeHtml(q.contact || 'não informado')}</p><label class="review-label">Resposta ao pedido <textarea maxlength="500">${escapeHtml(q.admin_note || '')}</textarea></label>${q.status==='pending'?`<button class="mini-btn" data-privacy-review="${escapeHtml(q.id)}">Registrar resposta</button>`:''}</div></details>`).join('') : '<div class="list-empty">Nenhum pedido recebido.</div>';
   document.getElementById('audit-list').innerHTML = (dashboard.audit || []).length ? dashboard.audit.map(a => `<div class="audit-item"><span>${escapeHtml(a.action.replaceAll('_',' '))}</span><time>${escapeHtml(formattedDate(a.created_at))}</time></div>`).join('') : '<p class="list-empty">Sem ações recentes.</p>';
+  restoreAdminDrafts();
 }
+function normalizeAdminSearch(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/^@/,'');
+}
+function filterAdminReports(reports,filters={}) {
+  const query=normalizeAdminSearch(filters.query);
+  const result=reports.filter(report=>
+    (!filters.status || filters.status==='all' || report.status===filters.status) &&
+    (!filters.category || filters.category==='all' || report.category===filters.category) &&
+    (!filters.identity || filters.identity==='all' || (filters.identity==='verified' ? report.profile_verified : !report.profile_verified)) &&
+    (!filters.attachments || filters.attachments==='all' || (filters.attachments==='issues' ? Number(report.upload_issues)>0 : filters.attachments==='with' ? (report.evidence || []).length>0 : !(report.evidence || []).length)) &&
+    (!query || normalizeAdminSearch([report.handle,report.original_handle,report.streamer_name,report.reason].join(' ')).includes(query))
+  );
+  return result.sort((a,b)=>{
+    if(filters.sort==='pending' && (a.status==='pending')!==(b.status==='pending')) return a.status==='pending' ? -1 : 1;
+    const difference=new Date(b.created_at)-new Date(a.created_at);
+    return filters.sort==='oldest' ? -difference : difference;
+  });
+}
+function filterAdminAppeals(appeals,status) {
+  return appeals.filter(appeal=>!status || status==='all' || appeal.status===status);
+}
+function captureAdminDrafts() {
+  for(const [attribute,prefix] of [['data-review-id','report'],['data-appeal-id','appeal'],['data-privacy-id','privacy']])
+    for(const row of document.querySelectorAll('['+attribute+']')) {
+      const input=row.querySelector('textarea');if(input) adminDrafts.set(prefix+':'+row.getAttribute(attribute),{text:input.value,open:row.open});
+    }
+}
+function restoreAdminDrafts() {
+  for(const [attribute,prefix] of [['data-review-id','report'],['data-appeal-id','appeal'],['data-privacy-id','privacy']])
+    for(const row of document.querySelectorAll('['+attribute+']')) {
+      const draft=adminDrafts.get(prefix+':'+row.getAttribute(attribute)),input=row.querySelector('textarea');
+      if(draft && input) {input.value=draft.text;row.open=draft.open;}
+    }
+}
+for(const id of ['admin-report-status','admin-report-category','admin-report-identity','admin-report-attachments','admin-report-sort','admin-appeal-status'])
+  document.getElementById(id).addEventListener('change',renderDashboard);
+document.getElementById('admin-report-query').addEventListener('input',()=>{clearTimeout(adminFilterTimer);adminFilterTimer=setTimeout(renderDashboard,120);});
+document.getElementById('admin-report-clear').addEventListener('click',()=>{
+  document.getElementById('admin-report-query').value='';
+  for(const id of ['admin-report-status','admin-report-category','admin-report-identity','admin-report-attachments']) document.getElementById(id).value='all';
+  document.getElementById('admin-report-sort').value='newest';renderDashboard();
+});
 function evidenceButtons(paths) {
   return paths?.length ? `<div class="evidence-buttons">${paths.map((path,index) => `<button type="button" data-evidence="${escapeHtml(path)}">Ver prova ${index+1} ↗</button>${/^reports\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/.test(path)?`<button type="button" data-public-evidence="${escapeHtml(path)}">Publicar foto revisada</button>`:''}`).join('')}</div>` : '<small class="no-evidence">Sem prova anexada</small>';
 }
@@ -1058,6 +1109,7 @@ document.getElementById('close-dashboard').addEventListener('click', async () =>
   const token = adminSession?.access_token;
   adminSession = null; sessionStorage.removeItem(SESSION_KEY);
   dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
+  adminDrafts.clear();
   for (const id of ['reports-list','streamers-list','appeals-list','audit-list']) document.getElementById(id).textContent = '';
   if (document.getElementById('evidence-dialog').open) document.getElementById('evidence-dialog').close();
   closeModal();
