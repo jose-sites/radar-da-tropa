@@ -68,6 +68,46 @@
   .public-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}.public-stats>div{border:1px solid var(--border,#34382b);border-radius:18px;padding:20px;background:#1b1e17}.public-stats strong{display:block;font-size:30px;color:#d5fb69}.public-stats span{font-size:13px;color:#b2b8aa}.streamer-badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#263d2c;color:#a5e6b1;font-size:11px;font-weight:700}.group-report{padding:18px 0;border-top:1px solid #363a30}.group-report p{margin:10px 0}.group-report small{color:#abb19e}.pin-request{margin-top:22px}.pin-request summary{cursor:pointer;color:#d5fb69}.pin-request form{margin-top:16px}#load-more-profiles{display:block;margin:20px auto}#load-more-profiles[hidden]{display:none}@media(max-width:600px){.public-stats{grid-template-columns:repeat(2,1fr);gap:9px}.public-stats>div{padding:15px}.public-stats strong{font-size:26px}}
 .attachment-list{display:grid;gap:10px;margin-bottom:16px}.attachment-item{display:flex;gap:12px;padding:12px;border:1px solid #3b4330;border-radius:12px;min-width:0}.attachment-item>img{width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0}.attachment-info{min-width:0;flex:1}.attachment-info strong,.attachment-info small,.attachment-status{display:block;overflow-wrap:anywhere}.attachment-info strong{font-size:13px}.attachment-info small{font-size:11px;color:#afb6a6}.attachment-info progress{width:100%;height:8px;accent-color:#d5fb69}.attachment-status{font-size:12px;margin-top:5px;color:#bbc3b0}.attachment-item[data-phase=error]{border-color:#bd8076}.attachment-item[data-phase=error] .attachment-status{color:#ffb3a7}.attachment-item[data-phase=done] .attachment-status{color:#b1e78d}
 .admin-filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-filter-grid .field{margin:0}.admin-filter-grid input,.admin-filter-grid select{width:100%;min-width:0}.admin-filter-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0}.admin-filter-foot small,#admin-appeal-count{color:#b3bda7}.attachment-warning{font-size:12px;color:#f0cc86;padding:9px;border:1px solid #6c5d39;border-radius:8px}@media(max-width:380px){.admin-filter-grid{grid-template-columns:1fr}}
+
+/* Public report cards: category first, separated actions and author at the bottom. */
+.results-grid{align-items:start}
+.result-card.report-card{padding:24px;border-radius:23px;background:linear-gradient(145deg,#20231b,#191c16);border-color:#3c4133;min-width:0;min-height:0}
+.report-card:hover{transform:none}
+.report-card-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.report-card .report-category{display:inline-flex;align-items:center;gap:8px;font-size:12px;line-height:1.3;padding:8px 11px;background:#392f1d;border-color:#897443;color:#f1cf8f}
+.report-category-icon{display:grid;place-items:center;flex:none;border-radius:50%;width:17px;height:17px;background:#eec771;color:#302819;font:800 12px/1 var(--body)}
+.report-total{color:#a6aca0;font-size:12px;white-space:nowrap}
+.report-profile{display:flex;align-items:center;gap:13px;min-width:0;margin-bottom:26px}
+.report-profile .report-avatar{width:54px;height:54px;flex:none;border-radius:50%;object-fit:cover;font-size:24px;background:#3a4230}
+.report-profile-copy{min-width:0;flex:1}
+.report-card h3{font:750 23px/1.2 var(--display);letter-spacing:-.04em;margin:0 0 6px;overflow-wrap:anywhere}
+.report-card .profile-check{font-size:12px;line-height:1.5;margin:0;color:#a5ae9d}
+.report-card .profile-check.warning{color:#d7ba8d}
+.report-card .report-aliases{font-size:12px;overflow-wrap:anywhere;margin:-13px 0 22px;color:#a6b49b}
+.report-card .report-case{padding:0;border:0;min-width:0}
+.report-card .report-case+.report-case{margin-top:24px;padding-top:24px;border-top:1px solid #3b4032}
+.report-case-category{display:inline-block;margin:0 0 10px;color:#e8ce9c;font-size:12px;font-weight:700}
+.report-card .report-reason{font-size:15px;line-height:1.65;color:#e4e8dd;margin:0 0 22px;white-space:pre-line;overflow-wrap:anywhere}
+.report-dates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 24px;padding-top:17px;border-top:1px solid #3b4032}
+.report-dates>div{min-width:0}
+.report-dates>div+div{border-left:1px solid #3b4032;padding-left:16px}
+.report-dates dt{font-size:11px;color:#a0a999;margin-bottom:5px}
+.report-dates dd{font-size:12px;line-height:1.65;color:#edf0e7;margin:0;font-variant-numeric:tabular-nums}
+.report-clock{display:inline-block;white-space:nowrap}
+.report-card .report-proof-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:46px;margin:0;padding:12px;border-radius:11px;background:var(--lime);color:#1c2414;font-size:13px;font-weight:800;line-height:1.4;text-align:center}
+.report-card .report-proof-link:hover{background:#defd8a;text-decoration:none}
+.report-secondary-links{display:grid;margin-top:16px}
+.report-card .report-secondary-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;margin:0;padding:12px 0;color:#c4e78b;font-size:12px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.report-secondary-links a+a{border-top:1px solid #343b2d}
+.report-secondary-links a span{flex:none;font-size:17px}
+.report-author{border-top:1px solid #3b4032;margin-top:14px;padding-top:16px}
+.report-card .report-author p{display:block;margin:0;color:#a7afa0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.report-author strong{font-weight:600;color:#c5cdbc}
+.report-card .report-author small{display:block;margin-top:3px;color:#858e7d;font-size:11px}
+.report-author .streamer-badge{font-size:10px;vertical-align:middle;margin-left:4px}
+.report-card .report-more-note{margin-top:16px;font-size:12px}
+.report-card a:focus-visible{outline:2px solid var(--lime);outline-offset:4px;border-radius:5px}
+@media(max-width:380px){.result-card.report-card{padding:20px}.report-profile{gap:10px}.report-card h3{font-size:21px}.report-dates{gap:12px}.report-dates>div+div{padding-left:12px}}
 </style>
 </head>
 <body>
@@ -492,14 +532,33 @@ function renderReports(reports, query, message = '') {
   empty.querySelector('p').textContent = 'A ausência de relato não comprova a identidade de alguém.';
   resultsGrid.style.display = reports.length ? 'grid' : 'none';
   if (!reports.length) document.getElementById('load-more-profiles').hidden = true;
-  resultsGrid.innerHTML = reports.map(item => {
-    const handle = '@' + item.handle.replace(/^@/,'');
-    const aliases = Array.isArray(item.old_handles) ? item.old_handles : [];
-    const fresh = item.last_checked_at && Date.now() - new Date(item.last_checked_at).getTime() < 24*60*60*1000;
-    const children = item.reports || [item];
-    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path,handle)}<span class="status-pill">${Number(item.report_count || 1)} relato(s)</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<p class="profile-meta">Antes: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-meta">${Number(item.streamer_count || 1)} streamer(s) · relatos publicados</p><p class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Conferência antiga; confira o arroba atual') : 'Identidade do perfil ainda não confirmada'}</p>${item.profile_verified ? `<a class="profile-link" href="${tiktokProfileLink(item.handle)}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<a class="case-link" href="${dossierHref(item.id)}" data-dossier-id="${escapeHtml(item.id)}">Ver ficha completa e histórico ↗</a><div class="group-reports">${children.map(report=>`<div class="group-report"><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span><p>${escapeHtml(report.reason)}</p><p class="profile-meta">${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><small>${escapeHtml(formattedDate(report.created_at))}${report.event_date ? ' · Ocorrido em '+escapeHtml(report.event_date) : ''}</small><a class="case-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Ver relato e provas ↗</a></div>`).join('')}</div>${Number(item.report_count || 1)>children.length ? '<p class="helper">Abra a ficha completa para carregar os demais relatos.</p>' : ''}</article>`;
-  }).join('');
+  resultsGrid.innerHTML = reports.map(reportCard).join('');
 }
+function cardEventDate(value) {
+  const match=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value || '');
+  return match?`${match[3]}/${match[2]}/${match[1]}`:'';
+}
+function cardReportDates(report) {
+  const date=new Date(report.created_at),valid=Number.isFinite(date.getTime());
+  const day=valid?new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(date):'Não informada';
+  const clock=valid?new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(date):'';
+  const occurred=cardEventDate(report.event_date);
+  return `<dl class="report-dates">${occurred?`<div><dt>Ocorrido em</dt><dd><time datetime="${escapeHtml(report.event_date)}">${occurred}</time></dd></div>`:''}<div><dt>Publicado em</dt><dd>${valid?`<time datetime="${escapeHtml(report.created_at)}">${day} <span class="report-clock">às ${clock}</span></time>`:day}</dd></div></dl>`;
+}
+function cardReportAuthor(report) {
+  return `<footer class="report-author"><p>Denunciado por <strong>${escapeHtml(report.streamer_name || 'Streamer')}</strong> ${streamerBadge(report.streamer_verified)}</p><small>Relato sujeito a contestação.</small></footer>`;
+}
+function reportCard(item) {
+  const handle='@'+item.handle.replace(/^@/,''),aliases=Array.isArray(item.old_handles)?item.old_handles:[];
+  const children=Array.isArray(item.reports) && item.reports.length?item.reports:[item];
+  const count=Number(item.report_count) || children.length,single=count===1 && children.length===1;
+  const categories=[...new Set(children.map(report=>report.category))];
+  const category=categories.length===1?(categoryLabels[categories[0]] || 'Outro'):'Múltiplas categorias';
+  const fresh=item.last_checked_at && Date.now()-new Date(item.last_checked_at).getTime()<24*60*60*1000;
+  const identity=item.profile_verified?(fresh?'Perfil identificado no TikTok':'Identidade conferida; confira o arroba atual'):'Identidade do perfil ainda não confirmada';
+  return `<article class="result-card report-card"><header class="report-card-top"><span class="status-pill report-category"><span class="report-category-icon" aria-hidden="true">!</span>${escapeHtml(category)}</span><span class="report-total">${count} ${count===1?'relato':'relatos'}</span></header><div class="report-profile">${profilePhoto(item.avatar_path,handle,'report-avatar')}<div class="report-profile-copy"><h3>${escapeHtml(handle)}</h3><p class="profile-check ${item.profile_verified?'':'warning'}">${escapeHtml(identity)}</p></div></div>${aliases.length?`<p class="report-aliases">Antes: ${aliases.map(alias=>'@'+escapeHtml(alias)).join(', ')}</p>`:''}<div class="group-reports report-cases">${children.map(report=>`<section class="group-report report-case" aria-label="Relato sobre ${escapeHtml(handle)}">${!single?`<span class="report-case-category">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span>`:''}<p class="report-reason">${escapeHtml(report.reason)}</p>${cardReportDates(report)}<a class="case-link report-proof-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Ver relato e provas <span aria-hidden="true">↗</span></a>${single?'':cardReportAuthor(report)}</section>`).join('')}</div>${count>children.length?'<p class="helper report-more-note">Abra a ficha completa para carregar os demais relatos.</p>':''}<nav class="report-secondary-links" aria-label="Mais informações sobre ${escapeHtml(handle)}"><a class="case-link" href="${dossierHref(item.id)}" data-dossier-id="${escapeHtml(item.id)}">Ficha completa e histórico <span aria-hidden="true">↗</span></a>${item.profile_verified?`<a class="profile-link" href="${tiktokProfileLink(item.handle)}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok <span aria-hidden="true">↗</span></a>`:''}</nav>${single?cardReportAuthor(children[0]):''}</article>`;
+}
+
 function dossierHref(id) {
   return location.hostname.endsWith('github.io') ? `?ficha=${encodeURIComponent(id)}#perfil` : `/ficha/${encodeURIComponent(id)}`;
 }

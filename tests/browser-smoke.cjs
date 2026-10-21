@@ -40,6 +40,35 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='cards') {
+  await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}'});
+  const sample={...report,category:'nao_pagamento',status:'published',streamer_name:'admin',profile_verified:true,last_checked_at:new Date().toISOString(),report_count:1,reports:[{...report,category:'nao_pagamento',streamer_name:'admin'}]};
+  for(const width of [320,390,430,768,1280]){
+   await page.setViewportSize({width,height:900});await page.evaluate(sample=>renderReports([sample],''),sample);
+   const card=page.locator('.report-card');
+   assert.equal(await card.locator('.report-card-top .report-category').textContent(),'!Não pagamento');
+   assert.equal(await card.locator('.report-author').count(),1);
+   assert.equal(await card.locator('.report-author').evaluate(el=>el===el.parentElement.lastElementChild),true);
+   assert.match(await card.locator('.report-author').textContent(),/Denunciado por admin/);
+   assert.match(await card.locator('.report-dates').textContent(),/Ocorrido em20\/10\/2026/);
+   const dates=await card.locator('.report-dates').boundingBox(),proof=await card.locator('.report-proof-link').boundingBox();assert.ok(proof.y-(dates.y+dates.height)>=23,JSON.stringify({width,dates,proof,styles:await card.locator('.report-dates').evaluate(el=>({margin:getComputedStyle(el).marginBottom,display:getComputedStyle(el).display}))}));
+   const links=card.locator('.report-secondary-links a');assert.equal(await links.count(),2);
+   for(let index=0;index<2;index++)assert.ok((await links.nth(index).boundingBox()).height>=44);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  }
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(sample=>renderReports([sample],''),sample);
+  if(process.env.RADAR_CARD_SCREENSHOT)await page.locator('.report-card').screenshot({path:process.env.RADAR_CARD_SCREENSHOT});
+  await page.locator('.report-proof-link').click();await page.waitForSelector('#detail-appeal');assert.match(page.url(),new RegExp('/perfil/'+reportId));
+  await page.evaluate(()=>showView('consultar',false));
+  const mixed={...sample,handle:'a'.repeat(40),report_count:2,reports:[{...report,category:'nao_pagamento',streamer_name:'<b>nome</b>',reason:'Texto com <script>não executar</script>'},{...report,id:secondId,category:'abuso',streamer_name:'Outro streamer',event_date:null}]};
+  await page.evaluate(sample=>renderReports([sample],''),mixed);
+  assert.match(await page.locator('.report-card-top').textContent(),/Múltiplas categorias/);assert.equal(await page.locator('.report-author').count(),2);assert.equal(await page.locator('.report-card script,.report-author b').count(),0);
+  assert.match(await page.locator('.report-author').first().textContent(),/<b>nome<\/b>/);assert.equal(await page.locator('.report-case').last().locator('.report-dates dt').count(),1);
+  assert.equal(await page.locator('.report-proof-link').last().getAttribute('data-profile-id'),secondId);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  console.log('PASS cards: category first, author at bottom, separate dates/actions, five widths, grouped reports, escaped text and report navigation');
+ }
  if(stage==='photos') {
   await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('#pin-input').fill('A'.repeat(20));await page.locator('#pin-preview').click();await page.waitForSelector('#report-panel.show');
   await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Teste fictício de foto sem gravar no banco de produção.');
