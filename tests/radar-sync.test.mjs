@@ -6,7 +6,7 @@ import { stripTypeScriptTypes } from 'node:module';
 
 const source = readFileSync(new URL('../radar-sync/index.ts', import.meta.url), 'utf8');
 const publicSource = readFileSync(new URL('../tiktok-profile.ts', import.meta.url), 'utf8');
-const publicScript = '{' + stripTypeScriptTypes(publicSource.replace(/^export /gm, '')) + '; globalThis.fetchPublicTikTokProfile = fetchPublicTikTokProfile; globalThis.parseTikTokProfile = parseTikTokProfile; }';
+const publicScript = '{' + stripTypeScriptTypes(publicSource.replace(/^export /gm, '')) + '; globalThis.fetchPublicTikTokProfile = fetchPublicTikTokProfile; globalThis.parseTikTokProfile = parseTikTokProfile; globalThis.fetchPublicTikTokSummary = fetchPublicTikTokSummary; }';
 const profileHtml = user => `<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__">${JSON.stringify({ __DEFAULT_SCOPE__: { 'webapp.user-detail': { statusCode: 0, userInfo: { user } } } })}</script>`;
 const reportId = 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
 function server(options = {}) {
@@ -36,9 +36,9 @@ function server(options = {}) {
   };
   const context = vm.createContext({
     Request, Response, Date, Set, JSON, String, Boolean, Error, AbortController, URL, TextDecoder,
-    setTimeout(callback, delay) { if (delay < 10000) { calls.push(`wait:${delay}`); queueMicrotask(callback); return undefined; } return setTimeout(callback, delay); }, clearTimeout, console: { error() {} },
+    setTimeout(callback, delay) { if (delay === 1000 || delay === 3000) { calls.push(`wait:${delay}`); queueMicrotask(callback); return undefined; } return setTimeout(callback, delay); }, clearTimeout, console: { error() {} },
     createClient(_url, _key, config) { return config.global ? caller : admin; },
-    fetch: async url => { calls.push('provider'); const step=options.providerSteps?.[calls.filter(x=>x==='provider').length-1]; if(step instanceof Error) throw step; if(step) return new Response(profileHtml(step.profile ?? {}), {status:step.status,headers:{'content-type':'text/html'}}); if(options.stableUnavailable && url.includes('/share/user/')) return new Response('<html>Unavailable</html>',{headers:{'content-type':'text/html'}}); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
+    fetch: async url => { if (url.includes('/oembed?')) { calls.push('summary'); return new Response(JSON.stringify(options.summary ?? {}), {status:options.summary ? 200 : 404,headers:{'content-type':'application/json'}}); } calls.push('provider'); const step=options.providerSteps?.[calls.filter(x=>x==='provider').length-1]; if(step instanceof Error) throw step; if(step) return new Response(profileHtml(step.profile ?? {}), {status:step.status,headers:{'content-type':'text/html'}}); if(options.stableUnavailable && url.includes('/share/user/')) return new Response('<html>Unavailable</html>',{headers:{'content-type':'text/html'}}); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
     Deno: { env: { get(name) { return {
       SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service',
       SUPABASE_ANON_KEY: 'public', RADAR_SYNC_TOKEN: 's'.repeat(48), FETCHLAYER_API_KEY: options.missingIntegration ? '' : 'provider-key'
@@ -312,4 +312,29 @@ test('scheduled report resolution keeps a single attempt per report',async()=>{
   assert.equal(result.status,200);assert.equal(result.body.failed,1);
   assert.equal(app.calls.filter(x=>x==='provider').length,1);
   assert.equal(app.calls.filter(x=>x.startsWith('wait:')).length,0);
+});
+
+const officialSummary={type:'rich',provider_name:'TikTok',provider_url:'https://www.tiktok.com',author_url:'https://www.tiktok.com/@example',author_name:'Example Name'};
+test('official public summary fills name without confirming a permanent identity',async()=>{
+ const app=server({providerStatus:503,summary:officialSummary});const result=await app.submit();
+ assert.equal(result.body.profileVerified,false);assert.equal(result.body.profileFound,true);
+ assert.equal(result.body.error,'public_profile_partial');assert.equal(app.report.profile_id,null);
+ assert.equal(app.report.public_profile_name,'Example Name');assert.equal(app.calls.filter(x=>x==='summary').length,1);
+});
+test('summary accepts only the exact requested TikTok author, never rounded IDs or embed handles as permanent IDs',async()=>{
+ const reader=publicReader();
+ const summary=await reader.fetchPublicTikTokSummary('example',async()=>new Response(JSON.stringify({...officialSummary,embed_product_id:'example'}),{headers:{'content-type':'application/json'}}));
+ assert.equal(summary.displayName,'Example Name');assert.equal(summary.id,undefined);
+ for(const bad of [{author_url:'https://www.tiktok.com/@someone_else'},{author_url:'https://attacker.example/@example'},{provider_name:'Other'},{author_name:''}]){
+  await assert.rejects(reader.fetchPublicTikTokSummary('example',async()=>new Response(JSON.stringify({...officialSummary,...bad}),{headers:{'content-type':'application/json'}})));
+ }
+});
+test('official summary rejects redirects and oversized responses',async()=>{
+ const reader=publicReader();
+ await assert.rejects(reader.fetchPublicTikTokSummary('example',async(_url,options)=>{
+  assert.equal(options.redirect,'error');return new Response('x'.repeat(32001),{headers:{'content-type':'application/json'}});
+ }));
+});
+test('rate limiting does not trigger an additional metadata request',async()=>{
+ const app=server({summary:officialSummary});await app.retry();assert.equal(app.calls.filter(x=>x==='summary').length,0);
 });

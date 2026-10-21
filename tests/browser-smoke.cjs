@@ -147,6 +147,11 @@ const stage=process.argv[2] || 'photos';
   assert.match(await page.locator('.report-author').first().textContent(),/<b>nome<\/b>/);assert.equal(await page.locator('.report-case').last().locator('.report-dates dt').count(),1);
   assert.equal(await page.locator('.report-proof-link').last().getAttribute('data-profile-id'),secondId);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.evaluate(sample=>renderReports([{...sample,profile_verified:false,avatar_path:null,public_profile_name:'Perfil <b>parcial</b>'}],''),sample);
+  assert.match(await page.locator('.report-card .profile-check').textContent(),/Dados parciais/);
+  assert.match(await page.locator('.report-card .profile-meta').textContent(),/Perfil <b>parcial<\/b>/);
+  assert.equal(await page.locator('.report-card .profile-meta b,.report-card img').count(),0);
+  assert.match(await page.locator('.report-card .profile-link').getAttribute('href'),/tiktok.com\/@/);
   console.log('PASS cards: category first, author at bottom, separate dates/actions, five widths, grouped reports, escaped text and report navigation');
  }
  if(stage==='photos') {

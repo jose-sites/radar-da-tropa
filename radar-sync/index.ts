@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { fetchPublicTikTokProfile } from '../tiktok-profile.ts';
+import { fetchPublicTikTokProfile, fetchPublicTikTokSummary } from '../tiktok-profile.ts';
 import { collectorRequest } from '../collector-bridge.ts';
 
 // O identificador da conta e a chave do provedor nunca saem deste servidor.
@@ -149,7 +149,15 @@ async function resolveReport(report: { id: string; handle: string; profile_id?: 
   } catch (error) {
     const code = error instanceof Error ? error.message : 'profile_lookup_failed';
     console.error('report resolution failed:', report.id, code);
-    await admin.from('radar_reports').update({ profile_resolution_error: code }).eq('id', report.id);
+    const changes: Record<string, unknown> = { profile_resolution_error: code };
+    if (['public_profile_unavailable', 'public_profile_timeout'].includes(code)) {
+      try {
+        const summary = await fetchPublicTikTokSummary(report.handle);
+        changes.public_profile_name = summary.displayName;
+        changes.public_profile_checked_at = new Date().toISOString();
+      } catch { /* Missing metadata must never confirm an account. */ }
+    }
+    await admin.from('radar_reports').update(changes).eq('id', report.id);
     return false;
   }
 }
@@ -157,12 +165,14 @@ async function resolveReport(report: { id: string; handle: string; profile_id?: 
 // Return the recorded outcome instead of hiding lookup failures behind a pending state.
 async function reportResolutionResult(reportId: string) {
   const { data, error } = await admin.from('radar_reports')
-    .select('profile_id,profile_resolution_error,profile_resolution_attempt_at')
+    .select('profile_id,profile_resolution_error,profile_resolution_attempt_at,public_profile_name,public_profile_checked_at')
     .eq('id', reportId).maybeSingle();
   if (error || !data) return { profileVerified: false, error: 'resolution_status_unavailable' };
   return {
     profileVerified: Boolean(data.profile_id),
-    error: data.profile_id ? null : data.profile_resolution_error || 'verification_pending',
+    profileFound: Boolean(data.profile_id || data.public_profile_name),
+    displayName: data.public_profile_name || null,
+    error: data.profile_id ? null : data.public_profile_name ? 'public_profile_partial' : data.profile_resolution_error || 'verification_pending',
     attemptedAt: data.profile_resolution_attempt_at,
   };
 }
@@ -191,7 +201,7 @@ async function syncProfile(profile: { id: string; tiktok_user_id: string; curren
 async function scheduledSync(retryPending = false, refreshProfiles = false) {
   let resolved = 0, updated = 0, failed = 0;
   const deadline = Date.now() + 80000;
-  const due = new Date(Date.now() - (retryPending ? 5 * 60 * 1000 : 3 * 60 * 60 * 1000)).toISOString();
+  const due = new Date(Date.now() - (retryPending ? 5 * 60 * 1000 : 30 * 60 * 1000)).toISOString();
   const refreshDue = new Date(Date.now() - (refreshProfiles ? 5 * 60 * 1000 : 24 * 60 * 60 * 1000)).toISOString();
   const { data: reports, error: reportError } = await admin.from('radar_reports')
     .select('id,handle,profile_id').is('profile_id', null).neq('status', 'rejected')

@@ -51,13 +51,13 @@ agendamento, conforme a operação. Conferir essa configuração ao publicar.
 
 A rotina `scheduledSync` depende de um agendamento externo que envie o segredo
 `RADAR_SYNC_TOKEN` no cabeçalho `x-radar-sync-token` (mínimo de 48 caracteres).
-O agendamento existente no projeto executa a cada três horas e foi verificado
-em 21/10/2026. Relatos pendentes podem ser tentados a cada três horas; perfis já
+O agendamento no Supabase executa a cada 15 minutos. Relatos pendentes respeitam
+30 minutos entre tentativas; perfis já
 vinculados são atualizados no máximo uma vez por dia. Cada execução processa
 até cinco relatos e cinco perfis, respeitando um orçamento de tempo.
 O botão administrativo permite nova tentativa sem depender do cron. Uma chamada
 interna autenticada com o token do cron pode enviar `{"retryPending":true}` para
-tentar os pendentes após cinco minutos, sem aguardar o intervalo de três horas.
+tentar os pendentes após cinco minutos, sem aguardar o intervalo de 30 minutos.
 
 O módulo `tiktok-profile.ts` lê somente os dados estruturados de páginas públicas
 em `www.tiktok.com`. Não usa login, cookies, serviços pagos ou técnicas para
@@ -308,3 +308,8 @@ confere pixels nas áreas fixas da imagem exportada e o uso da foto real.
 O worker separado em [`collector/`](collector/README.md) usa TikTok-Api e TikTokPy
 como alternativas, com fila privada e autenticação GitHub OIDC. Ele complementa
 a consulta direta existente, sem mudar a moderação ou o layout público.
+
+Quando a página não fornece ID/foto, uma consulta ao oEmbed oficial pode salvar
+somente o nome e a data. A interface informa dados parciais; `profile_verified`
+permanece falso e o agrupamento continua pelo arroba. Essa consulta básica roda
+no Supabase independentemente do agendamento do worker de navegador no GitHub.

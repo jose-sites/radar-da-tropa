@@ -67,3 +67,10 @@ mesmo navegador validado no ambiente de desenvolvimento. Em push com pendências
 um diagnóstico somente de leitura compara um perfil de controle e um pendente;
 registra tipos/códigos de erros, sem corpos de páginas ou cookies. Respostas
 TikTok sem identidade preservam o código numérico em `browser_error`.
+
+Em 21/10/2026, o agendamento GitHub não produziu novas execuções entre os
+pushes observados. A consulta básica e o fallback oficial de nome agora rodam
+no cron do Supabase a cada 15 minutos, com retentativas em 30 minutos e sem
+depender desse worker. O navegador continua complementar; não prometer prazo
+de execução para ele. Nome parcial nunca cria ID permanente nem confirma
+a identidade da conta.

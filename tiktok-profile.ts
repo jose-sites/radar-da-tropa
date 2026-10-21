@@ -77,3 +77,41 @@ export async function fetchPublicTikTokProfile(
     throw error;
   } finally { clearTimeout(timer); }
 }
+
+// Official creator oEmbed metadata is partial: a name never substitutes a user ID.
+export async function fetchPublicTikTokSummary(handle: string, fetcher: typeof fetch = fetch) {
+  if (!handlePattern.test(handle)) throw new Error('invalid_handle');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const url = new URL('https://www.tiktok.com/oembed');
+    url.searchParams.set('url', `https://www.tiktok.com/@${handle}`);
+    const result = await fetcher(url.href, { redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json' } });
+    if (!result.ok || !(result.headers.get('content-type') || '').includes('application/json')) {
+      await result.body?.cancel();
+      throw new Error(result.status === 429 ? 'public_rate_limited' : 'public_profile_unavailable');
+    }
+    const reader = result.body?.getReader();
+    if (!reader) throw new Error('public_profile_unavailable');
+    let text = '', bytes = 0;
+    const decoder = new TextDecoder();
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > 32000) { await reader.cancel(); throw new Error('public_profile_unavailable'); }
+      text += decoder.decode(value, { stream: true });
+    }
+    const data = JSON.parse(text + decoder.decode());
+    const author = new URL(data.author_url);
+    if (data.type !== 'rich' || data.provider_name !== 'TikTok' ||
+        !['https://www.tiktok.com', 'https://www.tiktok.com/'].includes(data.provider_url) ||
+        author.origin !== 'https://www.tiktok.com' || author.username || author.password ||
+        author.pathname.toLowerCase() !== `/@${handle.toLowerCase()}` ||
+        typeof data.author_name !== 'string' || !data.author_name.trim() || data.author_name.length > 100)
+      throw new Error('public_profile_unavailable');
+    const displayName = data.author_name.replace(/[\u0000-\u001f\u007f]/g, '').trim();
+    if (!displayName) throw new Error('public_profile_unavailable');
+    return { displayName };
+  } finally { clearTimeout(timer); }
+}
