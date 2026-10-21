@@ -302,3 +302,9 @@ a do perfil público vinculado; uma falha usa a inicial, sem inventar um rosto.
 Se a base não carregar, o cartão pede nova tentativa em vez de trocar de estilo.
 A publicação compara tanto o HTML quanto os bytes da arte. O teste de navegador
 confere pixels nas áreas fixas da imagem exportada e o uso da foto real.
+
+## Coletor com navegador
+
+O worker separado em [`collector/`](collector/README.md) usa TikTok-Api e TikTokPy
+como alternativas, com fila privada e autenticação GitHub OIDC. Ele complementa
+a consulta direta existente, sem mudar a moderação ou o layout público.

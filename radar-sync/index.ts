@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { fetchPublicTikTokProfile } from '../tiktok-profile.ts';
+import { collectorRequest } from '../collector-bridge.ts';
 
 // O identificador da conta e a chave do provedor nunca saem deste servidor.
 const allowedOrigins = new Set([
@@ -223,6 +224,7 @@ Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
   if (request.method !== 'POST') return response({ error: 'method_not_allowed' }, 405, origin);
   if (!projectUrl || !adminKey || !publicKey) return response({ error: 'server_unavailable' }, 503, origin);
+  if (request.headers.get('x-radar-collector') === 'v1') return collectorRequest(request, admin, saveProfile);
   if (request.headers.get('x-radar-sync-token') === syncToken && syncToken.length >= 48) {
     try {
       const options = await request.json().catch(() => ({}));
