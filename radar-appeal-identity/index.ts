@@ -1,7 +1,7 @@
+import { fetchPublicTikTokProfile } from '../tiktok-profile.ts';
 // Código temporário na bio do TikTok para identificar quem apresenta um recurso.
 const base = Deno.env.get('SUPABASE_URL') || '';
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-const fetchlayer = Deno.env.get('FETCHLAYER_API_KEY') || '';
 const auth = {apikey:service,Authorization:'Bearer '+service};
 const allowed = new Set(['https://radardatropa.pages.dev','https://jose-sites.github.io']);
 const cors = (origin:string|null) => ({
@@ -44,14 +44,11 @@ Deno.serve(async request=>{
       const row=rows?.[0];
       if(!row||Date.parse(row.expires_at)<Date.now()||row.attempts>=5) return reply(410,{error:'Código expirado. Gere outro.'},origin);
       if(row.verified_at) return reply(200,{verified:true},origin);
+      let profile;
+      try { profile = await fetchPublicTikTokProfile('username', row.handle); }
+      catch { return reply(503,{error:'Não foi possível ler a bio pública no TikTok. Tente mais tarde.'},origin); }
+      // Provider failures do not spend one of the user's code-verification attempts.
       await query('radar_appeal_challenges?id=eq.'+row.id,'PATCH',{attempts:row.attempts+1});
-      if(!fetchlayer) return reply(503,{error:'Verificação temporariamente indisponível.'},origin);
-      const response=await fetch('https://api.fetchlayer.dev/tiktok/user-profile',{
-        method:'POST',headers:{Authorization:'Bearer '+fetchlayer,'Content-Type':'application/json'},
-        body:JSON.stringify({username:row.handle,timeoutMs:25000}),
-      });
-      if(!response.ok) return reply(503,{error:'TikTok indisponível para verificação. Tente mais tarde.'},origin);
-      const profile=(await response.json())?.profile;
       const signature=String(profile?.signature||'');
       if(!signature.toUpperCase().includes(row.code.toUpperCase())) return reply(200,{verified:false},origin);
       const reports=await query('radar_reports?id=eq.'+row.report_id+'&status=eq.published&select=profile_id,handle');

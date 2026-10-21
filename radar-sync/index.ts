@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { fetchPublicTikTokProfile } from '../tiktok-profile.ts';
 
 // O identificador da conta e a chave do provedor nunca saem deste servidor.
 const allowedOrigins = new Set([
@@ -33,32 +34,11 @@ function envKey(name: string, legacy: string) {
 const projectUrl = Deno.env.get('SUPABASE_URL') || '';
 const adminKey = envKey('SUPABASE_SECRET_KEYS', 'SUPABASE_SERVICE_ROLE_KEY');
 const publicKey = envKey('SUPABASE_PUBLISHABLE_KEYS', 'SUPABASE_ANON_KEY');
-const fetchlayerKey = Deno.env.get('FETCHLAYER_API_KEY') || '';
 const syncToken = Deno.env.get('RADAR_SYNC_TOKEN') || '';
 const admin = createClient(projectUrl, adminKey, { auth: { persistSession: false } });
 const publicClient = createClient(projectUrl, publicKey, { auth: { persistSession: false } });
 
-async function fetchProfile(field: 'username' | 'userId', value: string) {
-  if (!fetchlayerKey) throw new Error('integration_unavailable');
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
-  try {
-    const result = await fetch('https://api.fetchlayer.dev/tiktok/user-profile', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${fetchlayerKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [field]: value, timeoutMs: 25000 }),
-      signal: controller.signal,
-    });
-    if (!result.ok) throw new Error(result.status === 402 || result.status === 429 ? 'quota_or_rate_limit' : 'profile_lookup_failed');
-    const body = await result.json();
-    const profile = body?.profile;
-    if (!profile || !/^\d{5,30}$/.test(String(profile.id || '')) || !handlePattern.test(String(profile.uniqueId || '')))
-      throw new Error('profile_not_found');
-    return profile;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
+const fetchProfile = fetchPublicTikTokProfile;
 
 async function cacheAvatar(source: unknown, profileId: string) {
   if (typeof source !== 'string') return null;
@@ -155,9 +135,23 @@ async function resolveReport(report: { id: string; handle: string; profile_id?: 
     return true;
   } catch (error) {
     const code = error instanceof Error ? error.message : 'profile_lookup_failed';
+    console.error('report resolution failed:', report.id, code);
     await admin.from('radar_reports').update({ profile_resolution_error: code }).eq('id', report.id);
     return false;
   }
+}
+
+// Return the recorded outcome instead of hiding lookup failures behind a pending state.
+async function reportResolutionResult(reportId: string) {
+  const { data, error } = await admin.from('radar_reports')
+    .select('profile_id,profile_resolution_error,profile_resolution_attempt_at')
+    .eq('id', reportId).maybeSingle();
+  if (error || !data) return { profileVerified: false, error: 'resolution_status_unavailable' };
+  return {
+    profileVerified: Boolean(data.profile_id),
+    error: data.profile_id ? null : data.profile_resolution_error || 'verification_pending',
+    attemptedAt: data.profile_resolution_attempt_at,
+  };
 }
 
 async function syncProfile(profile: { id: string; tiktok_user_id: string }) {
@@ -174,26 +168,34 @@ async function syncProfile(profile: { id: string; tiktok_user_id: string }) {
   }
 }
 
-async function scheduledSync() {
+async function scheduledSync(retryPending = false) {
   let resolved = 0, updated = 0, failed = 0;
-  const due = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+  const deadline = Date.now() + 80000;
+  const due = new Date(Date.now() - (retryPending ? 5 * 60 * 1000 : 3 * 60 * 60 * 1000)).toISOString();
+  const refreshDue = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data: reports, error: reportError } = await admin.from('radar_reports')
     .select('id,handle,profile_id').is('profile_id', null).neq('status', 'rejected')
     .or(`profile_resolution_attempt_at.is.null,profile_resolution_attempt_at.lt.${due}`)
-    .order('profile_resolution_attempt_at', { ascending: true, nullsFirst: true }).limit(10);
+    .order('profile_resolution_attempt_at', { ascending: true, nullsFirst: true }).limit(5);
   if (reportError) {
     console.error('report query:', reportError);
     throw new Error(`reports_unavailable_${reportError.code || 'unknown'}`);
   }
-  for (const report of reports || []) (await resolveReport(report)) ? resolved++ : failed++;
+  for (const report of reports || []) {
+    if (Date.now() >= deadline) break;
+    (await resolveReport(report)) ? resolved++ : failed++;
+  }
   const { data: profiles, error: profileError } = await admin.from('radar_profiles')
-    .select('id,tiktok_user_id').or(`last_attempt_at.is.null,last_attempt_at.lt.${due}`)
-    .order('last_attempt_at', { ascending: true, nullsFirst: true }).limit(20);
+    .select('id,tiktok_user_id').or(`last_attempt_at.is.null,last_attempt_at.lt.${refreshDue}`)
+    .order('last_attempt_at', { ascending: true, nullsFirst: true }).limit(5);
   if (profileError) {
     console.error('profile query:', profileError);
     throw new Error(`profiles_unavailable_${profileError.code || 'unknown'}`);
   }
-  for (const profile of profiles || []) (await syncProfile(profile)) ? updated++ : failed++;
+  for (const profile of profiles || []) {
+    if (Date.now() >= deadline) break;
+    (await syncProfile(profile)) ? updated++ : failed++;
+  }
   return { resolved, updated, failed };
 }
 
@@ -203,7 +205,10 @@ Deno.serve(async (request) => {
   if (request.method !== 'POST') return response({ error: 'method_not_allowed' }, 405, origin);
   if (!projectUrl || !adminKey || !publicKey) return response({ error: 'server_unavailable' }, 503, origin);
   if (request.headers.get('x-radar-sync-token') === syncToken && syncToken.length >= 48) {
-    try { return response(await scheduledSync(), 200, origin); }
+    try {
+      const options = await request.json().catch(() => ({}));
+      return response(await scheduledSync(options?.retryPending === true), 200, origin);
+    }
     catch (error) {
       const code = error instanceof Error ? error.message : 'sync_failed';
       console.error('scheduled sync failed:', code);
@@ -214,8 +219,30 @@ Deno.serve(async (request) => {
   let body: any;
   try { body = await request.json(); } catch { return response({ error: 'invalid_request' }, 400, origin); }
   const reportId = String(body?.reportId || '');
+  if (!uuidPattern.test(reportId)) return response({ error: 'invalid_request' }, 400, origin);
+  // Existing reports can be retried by a verified administrator, without sharing a PIN.
+  if (body?.action === 'retry') {
+    const authorization = request.headers.get('authorization') || '';
+    if (!/^Bearer \S+$/i.test(authorization)) return response({ error: 'access_denied' }, 403, origin);
+    const caller = createClient(projectUrl, publicKey, {
+      global: { headers: { Authorization: authorization } }, auth: { persistSession: false },
+    });
+    const { data: user, error: userError } = await caller.auth.getUser();
+    if (userError || !user.user) return response({ error: 'access_denied' }, 403, origin);
+    const { data: isAdmin, error: adminError } = await caller.rpc('radar_is_admin');
+    if (adminError || isAdmin !== true) return response({ error: 'access_denied' }, 403, origin);
+    const { data: report, error } = await admin.from('radar_reports')
+      .select('id,handle,profile_id,profile_resolution_attempt_at').eq('id', reportId).maybeSingle();
+    if (error || !report) return response({ error: 'report_not_found' }, 404, origin);
+    if (!report.profile_id) {
+      if (report.profile_resolution_attempt_at && Date.now() - new Date(report.profile_resolution_attempt_at).getTime() < 5 * 60 * 1000)
+        return response({ error: 'retry_later' }, 429, origin);
+      await resolveReport(report);
+    }
+    return response(await reportResolutionResult(reportId), 200, origin);
+  }
   const pin = String(body?.pin || '');
-  if (!uuidPattern.test(reportId) || !/^[0-9a-fA-F\s-]{12,29}$/.test(pin)) return response({ error: 'invalid_request' }, 400, origin);
+  if (!/^[0-9a-fA-F\s-]{12,29}$/.test(pin)) return response({ error: 'invalid_request' }, 400, origin);
   const { data: streamer, error: pinError } = await publicClient.rpc('radar_verify_pin', { p_pin: pin });
   if (pinError || !streamer?.id) return response({ error: 'access_denied' }, 403, origin);
   const { data: report, error: reportError } = await admin.from('radar_reports')
@@ -224,7 +251,8 @@ Deno.serve(async (request) => {
   if (reportError || !report) return response({ error: 'report_not_found' }, 404, origin);
   if (Date.now() - new Date(report.created_at).getTime() > 30 * 60 * 1000) return response({ error: 'registration_expired' }, 400, origin);
   if (report.profile_resolution_attempt_at && Date.now() - new Date(report.profile_resolution_attempt_at).getTime() < 5 * 60 * 1000)
-    return response({ profileVerified: Boolean(report.profile_id) }, 200, origin);
-  return response({ profileVerified: await resolveReport(report) }, 200, origin);
+    return response(await reportResolutionResult(reportId), 200, origin);
+  await resolveReport(report);
+  return response(await reportResolutionResult(reportId), 200, origin);
 });
 

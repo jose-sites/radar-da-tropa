@@ -1,0 +1,79 @@
+// Public TikTok pages only: no paid API, cookies, login or challenge bypass.
+const handlePattern = /^[A-Za-z0-9._]{2,40}$/;
+const idPattern = /^\d{5,30}$/;
+const MAX_BYTES = 2_000_000;
+
+export function parseTikTokProfile(html: string, field: 'username' | 'userId', expected: string) {
+  const script = /<script\b[^>]*\bid=["']__UNIVERSAL_DATA_FOR_REHYDRATION__["'][^>]*>([\s\S]*?)<\/script\s*>/i.exec(html);
+  if (!script) throw new Error('public_profile_unavailable');
+  let detail: any;
+  try {
+    detail = JSON.parse(script[1])?.__DEFAULT_SCOPE__?.['webapp.user-detail'];
+  } catch { throw new Error('public_profile_unavailable'); }
+  const user = detail?.userInfo?.user;
+  // Private profiles may still publish their account identity in the page.
+  // 10222 means private content; accept only the explicitly private user record.
+  if (!detail || !(detail.statusCode === 0 || (detail.statusCode === 10222 && user?.privateAccount === true)))
+    throw new Error('public_profile_unavailable');
+  // IDs must remain strings: JavaScript numbers lose precision for TikTok IDs.
+  if (typeof user?.id !== 'string' || !idPattern.test(user.id) ||
+      typeof user.uniqueId !== 'string' || !handlePattern.test(user.uniqueId))
+    throw new Error('public_profile_unavailable');
+  if (field === 'userId' ? user.id !== expected : user.uniqueId.toLowerCase() !== expected.toLowerCase())
+    throw new Error('identity_mismatch');
+  return {
+    id: user.id, uniqueId: user.uniqueId,
+    secUid: typeof user.secUid === 'string' ? user.secUid : null,
+    avatarUrl: typeof user.avatarLarger === 'string' ? user.avatarLarger : null,
+    signature: typeof user.signature === 'string' ? user.signature : '',
+  };
+}
+
+export async function fetchPublicTikTokProfile(
+  field: 'username' | 'userId', value: string, fetcher: typeof fetch = fetch,
+) {
+  if (!(field === 'username' ? handlePattern : idPattern).test(value)) throw new Error('invalid_handle');
+  let url = new URL(field === 'username'
+    ? `https://www.tiktok.com/@${encodeURIComponent(value)}`
+    : `https://www.tiktok.com/share/user/${value}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+  try {
+    for (let redirects = 0; redirects <= 4; redirects++) {
+      if (url.origin !== 'https://www.tiktok.com' || url.username || url.password)
+        throw new Error('public_profile_unavailable');
+      const result = await fetcher(url.href, {
+        redirect: 'manual', signal: controller.signal,
+        headers: { Accept: 'text/html', 'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8' },
+      });
+      if ([301, 302, 303, 307, 308].includes(result.status)) {
+        const location = result.headers.get('location');
+        await result.body?.cancel();
+        if (!location) throw new Error('public_profile_unavailable');
+        url = new URL(location, url);
+        continue;
+      }
+      if (!result.ok || !(result.headers.get('content-type') || '').toLowerCase().includes('text/html')) {
+        await result.body?.cancel();
+        throw new Error(result.status === 429 ? 'public_rate_limited' : 'public_profile_unavailable');
+      }
+      const reader = result.body?.getReader();
+      if (!reader) throw new Error('public_profile_unavailable');
+      const decoder = new TextDecoder();
+      let html = '', bytes = 0;
+      while (true) {
+        const { done, value: chunk } = await reader.read();
+        if (done) break;
+        bytes += chunk.byteLength;
+        if (bytes > MAX_BYTES) { await reader.cancel(); throw new Error('public_profile_unavailable'); }
+        html += decoder.decode(chunk, { stream: true });
+      }
+      html += decoder.decode();
+      return parseTikTokProfile(html, field, value);
+    }
+    throw new Error('public_profile_unavailable');
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error('public_profile_timeout');
+    throw error;
+  } finally { clearTimeout(timer); }
+}

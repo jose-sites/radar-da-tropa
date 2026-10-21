@@ -1,0 +1,248 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import { stripTypeScriptTypes } from 'node:module';
+
+const source = readFileSync(new URL('../radar-sync/index.ts', import.meta.url), 'utf8');
+const publicSource = readFileSync(new URL('../tiktok-profile.ts', import.meta.url), 'utf8');
+const publicScript = '{' + stripTypeScriptTypes(publicSource.replace(/^export /gm, '')) + '; globalThis.fetchPublicTikTokProfile = fetchPublicTikTokProfile; globalThis.parseTikTokProfile = parseTikTokProfile; }';
+const profileHtml = user => `<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__">${JSON.stringify({ __DEFAULT_SCOPE__: { 'webapp.user-detail': { statusCode: 0, userInfo: { user } } } })}</script>`;
+const reportId = 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
+function server(options = {}) {
+  let handler;
+  const calls = [];
+  const report = { id: reportId, handle: 'example', profile_id: null,
+    profile_resolution_attempt_at: null, profile_resolution_error: null,
+    ...options.report };
+  const query = {
+    select() { return this; }, eq() { return this; }, is() { return this; },
+    update(values) { Object.assign(report, values); calls.push('update'); return this; },
+    maybeSingle() { return Promise.resolve({ data: report, error: null }); },
+    then(resolve) { return Promise.resolve({ error: null }).then(resolve); }
+  };
+  const profileQuery = {
+    select() { return this; }, eq() { return this; }, upsert() { return this; },
+    update() { return this; },
+    maybeSingle() { return Promise.resolve({ data: { id: 'identified-profile', current_handle: 'example', avatar_path: null }, error: null }); },
+    then(resolve) { return Promise.resolve({ error: null }).then(resolve); }
+  };
+  const admin = { from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
+  const caller = {
+    auth: { async getUser() { calls.push('getUser'); return { data: { user: options.invalidUser ? null : { id: 'user' } }, error: null }; } },
+    async rpc() { calls.push('isAdmin'); return { data: options.isAdmin ?? true, error: null }; }
+  };
+  const context = vm.createContext({
+    Request, Response, Date, Set, JSON, String, Boolean, Error, AbortController, URL, TextDecoder,
+    setTimeout, clearTimeout, console: { error() {} },
+    createClient(_url, _key, config) { return config.global ? caller : admin; },
+    fetch: async () => { calls.push('provider'); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
+    Deno: { env: { get(name) { return {
+      SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service',
+      SUPABASE_ANON_KEY: 'public', FETCHLAYER_API_KEY: options.missingIntegration ? '' : 'provider-key'
+    }[name]; } }, serve(callback) { handler = callback; } }
+  });
+  vm.runInContext(publicScript, context);
+  vm.runInContext(stripTypeScriptTypes(source.replace(/^import .*\n/gm, '')), context);
+  return { report, calls, async retry(auth = 'Bearer user-token') {
+    const headers = { origin: 'https://radardatropa.pages.dev', 'content-type': 'application/json' };
+    if (auth) headers.authorization = auth;
+    const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-sync', {
+      method: 'POST', headers, body: JSON.stringify({ action: 'retry', reportId })
+    }));
+    return { status: response.status, body: await response.json() };
+  } };
+}
+
+test('administrator can retry an old report and gets the actual provider failure', async () => {
+  const app = server({ report: { created_at: '2020-01-01' } });
+  const result = await app.retry();
+  assert.equal(result.status, 200);
+  assert.equal(result.body.profileVerified, false);
+  assert.equal(result.body.error, 'public_rate_limited');
+  assert.equal(app.report.profile_resolution_error, 'public_rate_limited');
+  assert.equal(app.report.profile_id, null);
+  assert.ok(app.calls.indexOf('isAdmin') < app.calls.indexOf('database'));
+});
+for (const [name, options, auth] of [
+  ['missing token', {}, ''], ['invalid session', { invalidUser: true }, 'Bearer user-token'],
+  ['non-administrator', { isAdmin: false }, 'Bearer user-token']
+]) test(`retry rejects ${name} before reading or updating reports`, async () => {
+  const app = server(options);
+  assert.equal((await app.retry(auth)).status, 403);
+  assert.ok(!app.calls.includes('database'));
+  assert.ok(!app.calls.includes('provider'));
+});
+test('recent attempts are rate limited without another provider request', async () => {
+  const app = server({ report: { profile_resolution_attempt_at: new Date().toISOString() } });
+  const result = await app.retry();
+  assert.equal(result.status, 429);
+  assert.equal(result.body.error, 'retry_later');
+  assert.ok(!app.calls.includes('provider'));
+});
+test('an already identified profile is returned without a new lookup', async () => {
+  const app = server({ report: { profile_id: 'existing-profile' } });
+  const result = await app.retry();
+  assert.equal(result.body.profileVerified, true);
+  assert.equal(result.body.error, null);
+  assert.ok(!app.calls.includes('provider'));
+});
+test('public lookup needs no paid provider key', async () => {
+  const app = server({ missingIntegration: true, providerStatus: 200,
+    providerProfile: { id: '1234567890', uniqueId: 'example' } });
+  const result = await app.retry();
+  assert.equal(result.status, 200);
+  assert.equal(result.body.profileVerified, true);
+});
+test('a valid provider identity is linked before the result says verified', async () => {
+  const app = server({ providerStatus: 200, providerProfile: { id: '1234567890', uniqueId: 'example' } });
+  const result = await app.retry();
+  assert.equal(result.body.profileVerified, true);
+  assert.equal(result.body.error, null);
+  assert.equal(app.report.profile_id, 'identified-profile');
+  assert.equal(app.report.profile_resolution_error, null);
+});
+test('unresolved profiles are never confirmed when the provider returns no account', async () => {
+  const app = server({ providerStatus: 200 });
+  const result = await app.retry();
+  assert.equal(result.body.profileVerified, false);
+  assert.equal(result.body.error, 'public_profile_unavailable');
+});
+
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const helpers = html.slice(html.indexOf('function profileSyncMessage('), html.indexOf('async function retryProfileSync('));
+function browser(fetchImpl) {
+  const context = vm.createContext({ fetch: fetchImpl, SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_KEY: 'public', AbortSignal, ensureAdminToken: async () => 'user-token' });
+  vm.runInContext(helpers, context);
+  return context;
+}
+test('browser preserves backend errors instead of silently treating them as pending', async () => {
+  const app = browser(async () => new Response(JSON.stringify({ error: 'integration_unavailable' }), { status: 503 }));
+  const result = await app.requestProfileSync({ reportId });
+  assert.equal(result.error, 'integration_unavailable');
+  assert.match(app.profileSyncMessage(result.error), /não está configurado/);
+});
+test('network and non-JSON gateway failures produce an honest failure message', async () => {
+  for (const fetchImpl of [async () => { throw new Error('offline'); }, async () => new Response('<html>Error</html>', { status: 502 })]) {
+    const app = browser(fetchImpl);
+    const result = await app.requestProfileSync({ reportId });
+    assert.equal(result.profileVerified, false);
+    assert.equal(result.error, 'sync_failed');
+    assert.match(app.profileSyncMessage(result.error), /falhou/);
+  }
+});
+test('administrator retry sends the session token', async () => {
+  const app = browser(async (_url, options) => {
+    assert.equal(options.headers.Authorization, 'Bearer user-token');
+    assert.equal(JSON.parse(options.body).action, 'retry');
+    return new Response(JSON.stringify({ profileVerified: true }));
+  });
+  assert.equal((await app.requestProfileSync({ action: 'retry', reportId }, true)).profileVerified, true);
+});
+
+function publicReader() {
+  const context = vm.createContext({ URL, Response, AbortController, TextDecoder, setTimeout, clearTimeout });
+  vm.runInContext(publicScript, context);
+  return context;
+}
+test('public parser uses only the requested account, preserving the full stable ID and bio', () => {
+  const reader = publicReader();
+  const result = reader.parseTikTokProfile(profileHtml({ id: '7506280430036747320', uniqueId: 'Example', signature: 'RADAR-TEST' }), 'username', 'example');
+  assert.equal(result.id, '7506280430036747320');
+  assert.equal(result.signature, 'RADAR-TEST');
+});
+test('missing data, challenge pages, rounded IDs and wrong identities are not verified', () => {
+  const reader = publicReader();
+  for (const html of ['<html>captcha</html>', '<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__">invalid</script>',
+    profileHtml({ id: 7506280430036747320, uniqueId: 'example' }),
+    profileHtml({ id: '7506280430036747320', uniqueId: 'other' })])
+    assert.throws(() => reader.parseTikTokProfile(html, 'username', 'example'));
+  assert.throws(() => reader.parseTikTokProfile(profileHtml({ id: '7506280430036747320', uniqueId: 'example' }), 'userId', '1111111111'), /identity_mismatch/);
+});
+test('stable ID lookup follows an official redirect and accepts the new handle for that same ID', async () => {
+  const reader = publicReader();
+  const urls = [];
+  const result = await reader.fetchPublicTikTokProfile('userId', '7506280430036747320', async url => {
+    urls.push(url);
+    return urls.length === 1 ? new Response(null, { status: 302, headers: { location: '/@new_handle' } })
+      : new Response(profileHtml({ id: '7506280430036747320', uniqueId: 'new_handle' }), { headers: { 'content-type': 'text/html' } });
+  });
+  assert.equal(urls[0], 'https://www.tiktok.com/share/user/7506280430036747320');
+  assert.equal(result.uniqueId, 'new_handle');
+});
+test('redirects cannot send requests to arbitrary hosts or insecure URLs', async () => {
+  for (const location of ['https://attacker.example/', 'http://www.tiktok.com/', 'https://user:password@www.tiktok.com/']) {
+    const reader = publicReader(); let requests = 0;
+    await assert.rejects(reader.fetchPublicTikTokProfile('username', 'example', async () => {
+      requests++;
+      return new Response(null, { status: 302, headers: { location } });
+    }), /public_profile_unavailable/);
+    assert.equal(requests, 1);
+  }
+});
+test('oversized HTML is rejected rather than processed', async () => {
+  const reader = publicReader();
+  await assert.rejects(reader.fetchPublicTikTokProfile('username', 'example', async () =>
+    new Response('x'.repeat(2_000_001), { headers: { 'content-type': 'text/html' } })), /public_profile_unavailable/);
+});
+
+const appealSource = readFileSync(new URL('../radar-appeal-identity/index.ts', import.meta.url), 'utf8');
+function appealServer({ lookupFails = false, signature = 'RADAR-TEST', stableId = '1234567890' } = {}) {
+  let handler;
+  const changes = [];
+  const context = vm.createContext({
+    Response, Request, Date, JSON, String, Error,
+    Deno: { env: { get() { return 'configured'; } }, serve(fn) { handler = fn; } },
+    fetchPublicTikTokProfile: async () => {
+      if (lookupFails) throw new Error('public_profile_unavailable');
+      return { id: stableId, uniqueId: 'example', signature };
+    },
+    fetch: async (url, options) => {
+      let rows;
+      if (options.method === 'PATCH') { changes.push(JSON.parse(options.body)); rows = []; }
+      else if (url.includes('radar_appeal_challenges?')) rows = [{ id: reportId, report_id: reportId,
+        handle: 'example', code: 'RADAR-TEST', expires_at: new Date(Date.now() + 60000).toISOString(), attempts: 0 }];
+      else if (url.includes('radar_profiles?')) rows = [{ tiktok_user_id: '1234567890' }];
+      else rows = [{ profile_id: 'linked-profile', handle: 'example' }];
+      return new Response(JSON.stringify(rows));
+    }
+  });
+  vm.runInContext(stripTypeScriptTypes(appealSource.replace(/^import .*\n/gm, '')), context);
+  return { changes, async verify() {
+    const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-appeal-identity', {
+      method: 'POST', headers: { origin: 'https://radardatropa.pages.dev', 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'verify', challengeId: reportId })
+    }));
+    return { status: response.status, body: await response.json() };
+  } };
+}
+test('unavailable public TikTok pages do not use up bio challenge attempts', async () => {
+  const app = appealServer({ lookupFails: true });
+  assert.equal((await app.verify()).status, 503);
+  assert.equal(app.changes.length, 0);
+});
+test('a readable bio without the code uses an attempt but does not confirm ownership', async () => {
+  const app = appealServer({ signature: 'no code' });
+  assert.equal((await app.verify()).body.verified, false);
+  assert.equal(app.changes[0].attempts, 1);
+  assert.ok(!app.changes.some(row => row.verified_at));
+});
+test('a matching bio code on a different stable ID does not confirm ownership', async () => {
+  const app = appealServer({ stableId: '9999999999' });
+  assert.equal((await app.verify()).body.verified, false);
+  assert.ok(!app.changes.some(row => row.verified_at));
+});
+test('bio verification still requires both the code and the linked permanent identity', async () => {
+  const app = appealServer();
+  assert.equal((await app.verify()).body.verified, true);
+  assert.equal(app.changes.at(-1).verified_tiktok_user_id, '1234567890');
+});
+
+test('private content does not prevent reading an explicitly public account identity', () => {
+  const reader = publicReader();
+  const html = profileHtml({ id: '7506280430036747320', uniqueId: 'example', privateAccount: true }).replace('"statusCode":0','"statusCode":10222');
+  assert.equal(reader.parseTikTokProfile(html,'username','example').id,'7506280430036747320');
+  assert.throws(() => reader.parseTikTokProfile(html.replace('"privateAccount":true','"privateAccount":false'),'username','example'));
+  assert.throws(() => reader.parseTikTokProfile(html.replace('10222','10221'),'username','example'));
+});
