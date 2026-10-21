@@ -278,10 +278,17 @@ Novas tentativas de um envio já salvo reutilizam o mesmo relato.
 
 ### Cartão para compartilhar
 
-Cada relato público pode gerar um PNG de 1080×1350 no próprio navegador, com
-categoria, arroba, resumo, data, autor, situação e link. O botão usa a consulta
+Cada relato público pode gerar um PNG de 1080×1920 no próprio navegador, em formato de Story, com foto pública
+do perfil em uma moldura, categoria, arroba, situação e endereço do Radar. O link
+completo acompanha o compartilhamento e permanece disponível para copiar. O botão usa a consulta
 pública do relato antes de gerar; um relato retirado não gera um novo cartão.
 O usuário escolhe abrir o compartilhamento nativo, baixar a imagem ou copiar o
 link. Nenhuma mensagem é enviada automaticamente. O PNG indica que o conteúdo
 é um relato e o link permite conferir o contexto e as atualizações posteriores.
 Imagens já compartilhadas não se atualizam quando um caso muda de situação.
+
+O Story usa a foto do perfil vinculado ao TikTok, com busca restrita ao bucket
+público de avatares e tamanho/tempo limitados. Se a foto não estiver disponível,
+mostra a inicial do perfil com indicação de foto indisponível. O arquivo mantém
+a informação de relato sujeito a contestação. A assinatura já cadastrada no
+rodapé, @jose027._, aparece discretamente no cabeçalho e no cartão, sem animação.
