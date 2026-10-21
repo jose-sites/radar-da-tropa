@@ -154,11 +154,18 @@ async function reportResolutionResult(reportId: string) {
   };
 }
 
-async function syncProfile(profile: { id: string; tiktok_user_id: string }) {
+async function syncProfile(profile: { id: string; tiktok_user_id: string; current_handle: string }) {
   const at = new Date().toISOString();
   await admin.from('radar_profiles').update({ last_attempt_at: at }).eq('id', profile.id);
   try {
-    const fresh = await fetchProfile('userId', profile.tiktok_user_id);
+    let fresh;
+    try { fresh = await fetchProfile('userId', profile.tiktok_user_id); }
+    catch (error) {
+      const code = error instanceof Error ? error.message : '';
+      if (!['public_profile_unavailable','public_profile_timeout'].includes(code) || !handlePattern.test(profile.current_handle)) throw error;
+      fresh = await fetchProfile('username', profile.current_handle);
+    }
+    // An old handle may have been reassigned: never update without the same stable ID.
     await saveProfile(fresh, null, profile.tiktok_user_id);
     return true;
   } catch (error) {
@@ -168,11 +175,11 @@ async function syncProfile(profile: { id: string; tiktok_user_id: string }) {
   }
 }
 
-async function scheduledSync(retryPending = false) {
+async function scheduledSync(retryPending = false, refreshProfiles = false) {
   let resolved = 0, updated = 0, failed = 0;
   const deadline = Date.now() + 80000;
   const due = new Date(Date.now() - (retryPending ? 5 * 60 * 1000 : 3 * 60 * 60 * 1000)).toISOString();
-  const refreshDue = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const refreshDue = new Date(Date.now() - (refreshProfiles ? 5 * 60 * 1000 : 24 * 60 * 60 * 1000)).toISOString();
   const { data: reports, error: reportError } = await admin.from('radar_reports')
     .select('id,handle,profile_id').is('profile_id', null).neq('status', 'rejected')
     .or(`profile_resolution_attempt_at.is.null,profile_resolution_attempt_at.lt.${due}`)
@@ -186,7 +193,7 @@ async function scheduledSync(retryPending = false) {
     (await resolveReport(report)) ? resolved++ : failed++;
   }
   const { data: profiles, error: profileError } = await admin.from('radar_profiles')
-    .select('id,tiktok_user_id').or(`last_attempt_at.is.null,last_attempt_at.lt.${refreshDue}`)
+    .select('id,tiktok_user_id,current_handle').or(`last_attempt_at.is.null,last_attempt_at.lt.${refreshDue}`)
     .order('last_attempt_at', { ascending: true, nullsFirst: true }).limit(5);
   if (profileError) {
     console.error('profile query:', profileError);
@@ -207,7 +214,7 @@ Deno.serve(async (request) => {
   if (request.headers.get('x-radar-sync-token') === syncToken && syncToken.length >= 48) {
     try {
       const options = await request.json().catch(() => ({}));
-      return response(await scheduledSync(options?.retryPending === true), 200, origin);
+      return response(await scheduledSync(options?.retryPending === true, options?.refreshProfiles === true), 200, origin);
     }
     catch (error) {
       const code = error instanceof Error ? error.message : 'sync_failed';

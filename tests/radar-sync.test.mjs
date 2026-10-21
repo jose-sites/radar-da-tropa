@@ -17,15 +17,17 @@ function server(options = {}) {
     ...options.report };
   const query = {
     select() { return this; }, eq() { return this; }, is() { return this; },
+    neq() { return this; }, or(filter) {calls.push(filter);return this;}, order(){return this;}, limit(){return this;},
     update(values) { Object.assign(report, values); calls.push('update'); return this; },
     maybeSingle() { return Promise.resolve({ data: report, error: null }); },
-    then(resolve) { return Promise.resolve({ error: null }).then(resolve); }
+    then(resolve) { return Promise.resolve({ data:[], error: null }).then(resolve); }
   };
   const profileQuery = {
     select() { return this; }, eq() { return this; }, upsert() { return this; },
+    or(filter){calls.push(filter);return this;},order(){return this;},limit(){return this;},
     update() { return this; },
     maybeSingle() { return Promise.resolve({ data: { id: 'identified-profile', current_handle: 'example', avatar_path: null }, error: null }); },
-    then(resolve) { return Promise.resolve({ error: null }).then(resolve); }
+    then(resolve) { return Promise.resolve({ data:[], error: null }).then(resolve); }
   };
   const admin = { from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
   const caller = {
@@ -36,15 +38,20 @@ function server(options = {}) {
     Request, Response, Date, Set, JSON, String, Boolean, Error, AbortController, URL, TextDecoder,
     setTimeout, clearTimeout, console: { error() {} },
     createClient(_url, _key, config) { return config.global ? caller : admin; },
-    fetch: async () => { calls.push('provider'); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
+    fetch: async url => { calls.push('provider'); if(options.stableUnavailable && url.includes('/share/user/')) return new Response('<html>Unavailable</html>',{headers:{'content-type':'text/html'}}); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
     Deno: { env: { get(name) { return {
       SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service',
-      SUPABASE_ANON_KEY: 'public', FETCHLAYER_API_KEY: options.missingIntegration ? '' : 'provider-key'
+      SUPABASE_ANON_KEY: 'public', RADAR_SYNC_TOKEN: 's'.repeat(48), FETCHLAYER_API_KEY: options.missingIntegration ? '' : 'provider-key'
     }[name]; } }, serve(callback) { handler = callback; } }
   });
   vm.runInContext(publicScript, context);
   vm.runInContext(stripTypeScriptTypes(source.replace(/^import .*\n/gm, '')), context);
-  return { report, calls, async retry(auth = 'Bearer user-token') {
+  return { report, calls, async sync(profile) {return context.syncProfile(profile);}, async scheduled(options, authorized=true) {
+    const headers = { 'content-type':'application/json','origin':'https://radardatropa.pages.dev' };
+    if(authorized) headers['x-radar-sync-token']='s'.repeat(48);
+    const response=await handler(new Request('https://example.supabase.co/functions/v1/radar-sync',{method:'POST',headers,body:JSON.stringify(options)}));
+    return {status:response.status,body:await response.json()};
+  }, async retry(auth = 'Bearer user-token') {
     const headers = { origin: 'https://radardatropa.pages.dev', 'content-type': 'application/json' };
     if (auth) headers.authorization = auth;
     const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-sync', {
@@ -245,4 +252,26 @@ test('private content does not prevent reading an explicitly public account iden
   assert.equal(reader.parseTikTokProfile(html,'username','example').id,'7506280430036747320');
   assert.throws(() => reader.parseTikTokProfile(html.replace('"privateAccount":true','"privateAccount":false'),'username','example'));
   assert.throws(() => reader.parseTikTokProfile(html.replace('10222','10221'),'username','example'));
+});
+
+test('normal schedule keeps the daily profile interval; authenticated recovery permits a five-minute interval', async () => {
+  const normal=server();assert.equal((await normal.scheduled({})).status,200);
+  const regular=normal.calls.find(x=>x.startsWith('last_attempt_at.is.null'));
+  const recovery=server();assert.equal((await recovery.scheduled({refreshProfiles:true})).status,200);
+  const forced=recovery.calls.find(x=>x.startsWith('last_attempt_at.is.null'));
+  const regularAt=Date.parse(regular.split('.lt.')[1]),forcedAt=Date.parse(forced.split('.lt.')[1]);
+  assert.ok(forcedAt-regularAt>23*60*60*1000);
+  const outsider=server();assert.equal((await outsider.scheduled({refreshProfiles:true},false)).status,400);
+  assert.ok(!outsider.calls.includes('provider'));
+});
+
+test('daily refresh falls back to the last known handle only if the permanent ID still matches',async()=>{
+  const options={stableUnavailable:true,providerStatus:200,providerProfile:{id:'1234567890',uniqueId:'example'}};
+  const same=server(options);assert.equal(await same.sync({id:'identified-profile',tiktok_user_id:'1234567890',current_handle:'example'}),true);
+  assert.equal(same.calls.filter(x=>x==='provider').length,2);
+  const reassigned=server(options);assert.equal(await reassigned.sync({id:'identified-profile',tiktok_user_id:'9999999999',current_handle:'example'}),false);
+});
+test('daily refresh does not send an extra request after a TikTok rate limit',async()=>{
+  const app=server();assert.equal(await app.sync({id:'identified-profile',tiktok_user_id:'1234567890',current_handle:'example'}),false);
+  assert.equal(app.calls.filter(x=>x==='provider').length,1);
 });

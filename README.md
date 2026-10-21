@@ -116,7 +116,7 @@ Migrações aplicadas no projeto existente estão em `supabase/migrations/`, com
 versões confirmadas no histórico remoto. Os arquivos SQL antigos continuam sendo
 parte da instalação anterior; estas migrações não substituem o esquema inicial.
 
-Validação em 21/10/2026: 32 testes automatizados, navegação em Chromium com largura
+Validação em 21/10/2026: 35 testes automatizados, navegação em Chromium com largura
 390 px, teste real de upload PNG→JPEG com fallback de Safari e falha temporária,
 reenvio sem duplicação, verificação do anexo e limpeza autenticada dos dados de
 ensaio. Agrupamento, estatísticas e selo foram exercitados em transação revertida.
@@ -135,3 +135,13 @@ Para conferir tudo novamente: `node --test tests/*.test.mjs`.
 A interface nova é publicada no GitHub Pages pelo fluxo existente do repositório.
 O Cloudflare Pages precisa receber o pacote estático atualizado separadamente:
 `index.html`, `_redirects` e `og.png`; compartilhar o banco não atualiza esse HTML.
+
+Uma recuperação interna autenticada também pode usar `{"refreshProfiles":true}`
+para atualizar até cinco perfis já vinculados após cinco minutos da última
+consulta. Isso permite migrar os erros antigos do provedor pago sem adulterar
+as datas de tentativa; chamadas normais mantêm o intervalo diário.
+
+Quando a rota pública por ID estiver indisponível, a atualização diária pode
+consultar o último arroba conhecido. O resultado só é salvo se o ID permanente
+continuar igual. A segunda tentativa não é feita após limite de requisições.
+Se o arroba tiver sido transferido para outra conta, a atualização é recusada.
