@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import urllib.parse
 import urllib.request
+import urllib.error
 
 from providers import lookup, LookupFailure
 
@@ -22,12 +23,20 @@ def call_api(body):
     separator = '&' if '?' in url else '?'
     request = urllib.request.Request(url + separator + urllib.parse.urlencode({'audience': AUDIENCE}),
                                     headers={'Authorization': 'Bearer ' + os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        token = json.load(response)['value']
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            token = json.load(response)['value']
+    except urllib.error.HTTPError as error:
+        raise RuntimeError(f'oidc_http_{error.code}') from None
     request = urllib.request.Request(ENDPOINT, data=json.dumps(body).encode(), headers={
         'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'x-radar-collector': 'v1'})
-    with urllib.request.urlopen(request, timeout=50) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=50) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        if error.code == 409 and body.get('action') == 'complete':
+            return {'profileVerified': False, 'error': 'lease_expired'}
+        raise RuntimeError(f'bridge_http_{error.code}') from None
 
 
 async def collect(jobs, api=call_api, finder=lookup, pause=asyncio.sleep):
@@ -69,7 +78,9 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
-        # Never dump provider responses, authorization headers or session cookies.
-        print('Collector failed; see the private queue status. No identity was confirmed by this error.')
+    except Exception as error:
+        # Error class and HTTP status are safe; exception text/headers are not.
+        status = error.code if isinstance(error, urllib.error.HTTPError) else None
+        code = str(error) if isinstance(error, RuntimeError) and __import__('re').fullmatch(r'(oidc|bridge)_http_[0-9]{3}', str(error)) else None
+        print(json.dumps({'collector_error': type(error).__name__, 'http_status': status, 'code': code}))
         raise SystemExit(1)

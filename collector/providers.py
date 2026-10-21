@@ -29,6 +29,22 @@ def normalize(raw, expected):
             'avatarUrl': avatar or None, 'signature': str(raw.get('signature') or '')[:2000]}
 
 
+def tiktokpy_document(document):
+    """Translate current public-page data to TikTokPy's original user schema."""
+    if 'UserModule' in document:
+        return document
+    detail = document.get('__DEFAULT_SCOPE__', {}).get('webapp.user-detail', {})
+    user = detail.get('userInfo', {}).get('user', {})
+    status = detail.get('statusCode')
+    if status != 0 and not (status == 10222 and user.get('privateAccount') is True):
+        raise LookupFailure('profile_unavailable')
+    handle = user.get('uniqueId')
+    if not isinstance(handle, str) or not HANDLE.fullmatch(handle):
+        raise LookupFailure('invalid_identity')
+    return {'UserPage': {'statusCode': 0}, 'UserModule': {
+        'users': {handle: user}, 'stats': {handle: detail.get('userInfo', {}).get('stats', {})}}}
+
+
 def launch_options():
     options = {}
     if os.getenv('RADAR_BROWSER_EXECUTABLE'):
@@ -63,6 +79,26 @@ async def tiktok_api(handle):
 async def tiktok_py(handle):
     from tiktokapipy.async_api import AsyncTikTokAPI
     class CaptureProfileApi(AsyncTikTokAPI):
+        async def _scrape_data(self, link, data_model):
+            page = await self.context.new_page()
+            try:
+                response = await page.goto(link, wait_until='domcontentloaded', timeout=15000)
+                if response and response.status == 429:
+                    raise LookupFailure('rate_limited')
+                if response and response.status == 403:
+                    raise LookupFailure('blocked')
+                if 'captcha' in page.url.lower():
+                    raise LookupFailure('blocked')
+                script = page.locator('script#__UNIVERSAL_DATA_FOR_REHYDRATION__, script#SIGI_STATE').first
+                await script.wait_for(state='attached', timeout=12000)
+                text = await script.text_content()
+                if not text or len(text.encode()) > 2000000:
+                    raise LookupFailure('profile_unavailable')
+                document = tiktokpy_document(json.loads(text))
+                return self._extract_and_dump_data(json.dumps(document), data_model)
+            finally:
+                await page.close()
+
         def _extract_and_dump_data(self, data, model):
             self.profile_document = json.loads(data)
             return super()._extract_and_dump_data(data, model)

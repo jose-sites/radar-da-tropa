@@ -25,8 +25,8 @@ servidor. Identificar uma conta não valida o conteúdo de uma denúncia.
 
 O coletor não atualiza periodicamente perfis já vinculados; essa atualização
 continua na rotina existente do Radar. Não solicita vídeos, seguidores ou provas.
-TikTokPy usa o formato antigo SIGI_STATE e pode falhar quando esse formato não
-estiver disponível. Os erros ficam registrados na fila, sem falsa confirmação.
+O adaptador TikTokPy aceita SIGI_STATE e traduz o formato público atual
+UNIVERSAL_DATA para os modelos da biblioteca. Os erros ficam registrados na fila, sem falsa confirmação.
 
 ## Autenticação e privacidade
 

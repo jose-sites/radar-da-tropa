@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import AsyncMock
-from providers import lookup, normalize, LookupFailure
+from providers import lookup, normalize, tiktokpy_document, LookupFailure
 from run import collect
 
 PROFILE = {'id': '7506280430036747320', 'uniqueId': 'Example', 'avatarUrl': 'https://p16.tiktokcdn.com/photo.jpg'}
@@ -75,3 +75,18 @@ class BlockTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(LookupFailure):
                 await lookup('example',[('first',AsyncMock(side_effect=error)),('second',second)],pause=AsyncMock())
             second.assert_not_called()
+
+class DocumentTests(unittest.TestCase):
+    def test_modern_tiktok_page_converts_without_changing_id(self):
+        raw={'id':PROFILE['id'],'uniqueId':'Example','avatarLarger':PROFILE['avatarUrl']}
+        document=tiktokpy_document({'__DEFAULT_SCOPE__':{'webapp.user-detail':{'statusCode':0,'userInfo':{'user':raw,'stats':{}}}}})
+        self.assertEqual(document['UserModule']['users']['Example']['id'],PROFILE['id'])
+        self.assertEqual(document['UserModule']['users']['Example']['avatarLarger'],PROFILE['avatarUrl'])
+
+    def test_missing_data_and_unconfirmed_private_status_rejected(self):
+        for document in [{},{'__DEFAULT_SCOPE__':{'webapp.user-detail':{'statusCode':10222,'userInfo':{'user':{'uniqueId':'example'}}}}}]:
+            with self.assertRaises(LookupFailure):tiktokpy_document(document)
+
+    def test_legacy_document_is_preserved(self):
+        document={'UserModule':{'users':{'example':PROFILE}}}
+        self.assertIs(tiktokpy_document(document),document)
