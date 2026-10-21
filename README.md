@@ -178,3 +178,11 @@ Os segredos são usados apenas no runner do GitHub e não vão para os arquivos
 públicos. É possível revogar o token no Cloudflare para suspender a integração.
 
 Referência: [Direct Upload com CI/CD](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
+
+### Fotos: prévia e acompanhamento
+
+Os formulários de denúncia e recurso mostram a prévia e o estado individual dos
+anexos: preparando, enviando (percentual medido pelo navegador), verificando,
+concluído ou erro detalhado. Uma falha preserva o arquivo para nova tentativa.
+URLs de prévia são liberadas ao trocar a seleção ou sair da área do streamer.
+O progresso de upload usa XMLHttpRequest; os dados e segredos não vão para URLs.

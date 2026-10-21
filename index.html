@@ -66,6 +66,7 @@
     button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     @media(max-width:760px){.detail-columns{grid-template-columns:1fr}.proof-gallery{grid-template-columns:1fr}.detail-head .profile-photo,.detail-head .handle-avatar{width:68px;height:68px}}
   .public-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}.public-stats>div{border:1px solid var(--border,#34382b);border-radius:18px;padding:20px;background:#1b1e17}.public-stats strong{display:block;font-size:30px;color:#d5fb69}.public-stats span{font-size:13px;color:#b2b8aa}.streamer-badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#263d2c;color:#a5e6b1;font-size:11px;font-weight:700}.group-report{padding:18px 0;border-top:1px solid #363a30}.group-report p{margin:10px 0}.group-report small{color:#abb19e}.pin-request{margin-top:22px}.pin-request summary{cursor:pointer;color:#d5fb69}.pin-request form{margin-top:16px}#load-more-profiles{display:block;margin:20px auto}#load-more-profiles[hidden]{display:none}@media(max-width:600px){.public-stats{grid-template-columns:repeat(2,1fr);gap:9px}.public-stats>div{padding:15px}.public-stats strong{font-size:26px}}
+.attachment-list{display:grid;gap:10px;margin-bottom:16px}.attachment-item{display:flex;gap:12px;padding:12px;border:1px solid #3b4330;border-radius:12px;min-width:0}.attachment-item>img{width:70px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0}.attachment-info{min-width:0;flex:1}.attachment-info strong,.attachment-info small,.attachment-status{display:block;overflow-wrap:anywhere}.attachment-info strong{font-size:13px}.attachment-info small{font-size:11px;color:#afb6a6}.attachment-info progress{width:100%;height:8px;accent-color:#d5fb69}.attachment-status{font-size:12px;margin-top:5px;color:#bbc3b0}.attachment-item[data-phase=error]{border-color:#bd8076}.attachment-item[data-phase=error] .attachment-status{color:#ffb3a7}.attachment-item[data-phase=done] .attachment-status{color:#b1e78d}
 </style>
 </head>
 <body>
@@ -139,7 +140,7 @@
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
-                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. Tentamos consultar o perfil e a foto; bloqueios do TikTok podem impedir a identificação.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. Tentamos consultar o perfil e a foto; bloqueios do TikTok podem impedir a identificação.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><div id="report-attachment-list" class="attachment-list" aria-live="polite"></div><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
                 <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
                 <p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
               </div>
@@ -158,7 +159,7 @@
               <div id="appeal-matches" class="appeal-matches"></div>
               <p id="selected-case" class="selected-case" hidden></p>
               <div id="identity-panel" class="privacy-panel" hidden><strong>Confirme o perfil pelo TikTok</strong><p>Opcional: gere um código, coloque-o temporariamente na bio do perfil citado e clique em verificar. O administrador verá que você controla a conta. Você também pode enviar o recurso sem essa confirmação.</p><button class="ghost-btn" id="identity-start" type="button">Gerar código para bio</button><div id="identity-code-box" hidden><p>Coloque este código na bio do TikTok:</p><code id="identity-code"></code><p class="helper">Depois de salvar a bio, aguarde alguns minutos e verifique. O código vale por 30 minutos.</p><button class="ghost-btn" id="identity-verify" type="button">Verificar minha bio</button></div><p id="identity-result" role="status"></p></div>
-              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
+              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><div id="appeal-attachment-list" class="attachment-list" aria-live="polite"></div><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
               <div id="appeal-confirmation" class="appeal-confirmation" hidden><strong>Recurso recebido</strong><span>Guarde este protocolo. Ele aparece só agora:</span><code id="appeal-protocol"></code><span id="appeal-upload-status"></span></div>
             </div>
             <div><div class="side-panel"><div><small>Processo justo</small><h3>Uma revisão feita por gente.</h3><p>Seu recurso não aparece na busca pública. O administrador vê o texto e as provas e pode retirar o relato da consulta.</p></div><div class="step-list"><div class="step"><b>01</b> Escolha o relato</div><div class="step"><b>02</b> Envie contexto e provas</div><div class="step"><b>03</b> Guarde o protocolo</div></div></div>
@@ -265,6 +266,8 @@ let pendingReport = null, pendingAppeal = null;
 let publicGroups = [], publicTotal = 0, publicQuery = '', whatsappNumber = '';
 const uploadedFiles = new WeakMap();
 const uploadReservations = new WeakMap();
+const attachmentViews = new Map();
+const attachmentStates = new WeakMap();
 let adminSession = null;
 let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
 let selectedAppealReport = null;
@@ -293,6 +296,7 @@ function showView(name, scroll = true) {
 function clearStreamerAccess() {
   streamerPin = null;
   pendingReport = null;
+  clearAttachmentPreviews('report');
   const reportSubmit=document.querySelector('#report-form button[type=submit]');
   reportSubmit.dataset.oldText='Enviar para análise ↗';reportSubmit.textContent='Enviar para análise ↗';
   document.querySelectorAll('#report-form [data-upload-locked]').forEach(el => { el.disabled = false; delete el.dataset.uploadLocked; });
@@ -572,6 +576,7 @@ document.getElementById('back-to-pin').addEventListener('click', () => {
   clearStreamerAccess();
   document.getElementById('pin-input').focus();
 });
+for(const context of ['report','appeal']) document.getElementById(context+'-files').addEventListener('change',()=>renderAttachmentPreviews(context));
 document.getElementById('report-form').addEventListener('submit', async event => {
   event.preventDefault();
   if (!streamerPin) return toast('Entre com seu PIN primeiro.', true);
@@ -629,6 +634,32 @@ async function validateFiles(files) {
     }
   }
 }
+function clearAttachmentPreviews(context) {
+  const view=attachmentViews.get(context);
+  if(view) for(const url of view.urls) URL.revokeObjectURL(url);
+  attachmentViews.delete(context);
+  document.getElementById(context+'-attachment-list').replaceChildren();
+}
+function renderAttachmentPreviews(context) {
+  clearAttachmentPreviews(context);
+  const files=[...document.getElementById(context+'-files').files];
+  const view={urls:[],nodes:new Map()}; attachmentViews.set(context,view);
+  const target=document.getElementById(context+'-attachment-list');
+  for(const file of files) {
+    const row=document.createElement('div');row.className='attachment-item';
+    if(isEvidenceImage(file)) {
+      const image=document.createElement('img');const url=URL.createObjectURL(file);view.urls.push(url);
+      image.src=url;image.alt='Prévia de '+file.name;image.onerror=()=>{image.hidden=true;};row.append(image);
+    }
+    const content=document.createElement('div');content.className='attachment-info';
+    const name=document.createElement('strong');name.textContent=file.name;content.append(name);
+    const size=document.createElement('small');size.textContent=(file.size/1024/1024).toFixed(1)+' MB';content.append(size);
+    const progress=document.createElement('progress');progress.max=100;progress.value=0;progress.setAttribute('aria-label','Envio de '+file.name);content.append(progress);
+    const status=document.createElement('span');status.className='attachment-status';status.textContent='Pronto para enviar';content.append(status);
+    row.append(content);target.append(row);view.nodes.set(file,{row,progress,status});
+    const previous=attachmentStates.get(file);if(previous) setAttachmentState(file,previous.phase,previous.message,previous.percent);
+  }
+}
 async function decodeEvidenceImage(file) {
   if (typeof createImageBitmap === 'function') {
     try { const bitmap = await createImageBitmap(file); return { image: bitmap, width: bitmap.width, height: bitmap.height, close: () => bitmap.close() }; } catch { /* Safari/HEIC can require HTMLImageElement. */ }
@@ -661,7 +692,43 @@ async function imageWithoutMetadata(file) {
 function isEvidenceImage(file) {
   return /^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type || '') || (!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || ''));
 }
+function setAttachmentState(file,phase,message,percent=0) {
+  if(typeof attachmentViews==='undefined' || typeof attachmentStates==='undefined') return;
+  attachmentStates.set(file,{phase,message,percent});
+  for(const view of attachmentViews.values()) {
+    const node=view.nodes.get(file);if(!node) continue;
+    node.row.dataset.phase=phase;node.status.textContent=message;
+    node.progress.value=Math.min(100,Math.max(0,percent));
+  }
+}
+async function sendEvidenceFile(path,body,onProgress) {
+  if(typeof XMLHttpRequest!=='function') {
+    return fetch(`${SUPABASE_URL}/storage/v1/object/radar-evidence/${path}`,{
+      method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':body.type,'x-upsert':'false'},body,signal:AbortSignal.timeout(60000)});
+  }
+  return new Promise((resolve,reject)=>{
+    const request=new XMLHttpRequest();request.open('POST',`${SUPABASE_URL}/storage/v1/object/radar-evidence/${path}`);request.timeout=60000;
+    request.setRequestHeader('apikey',SUPABASE_KEY);request.setRequestHeader('Content-Type',body.type);request.setRequestHeader('x-upsert','false');
+    request.upload.onprogress=event=>{if(event.lengthComputable && event.total>0) onProgress(Math.round(event.loaded/event.total*100));};
+    request.onload=()=>resolve(new Response(request.responseText,{status:request.status,headers:{'Content-Type':'application/json'}}));
+    request.onerror=()=>reject(new Error('A conexão caiu durante o envio. A foto foi preservada; tente novamente.'));
+    request.ontimeout=()=>reject(new Error('O envio demorou demais. Confira sua conexão e tente novamente.'));
+    request.onabort=()=>reject(new Error('O envio foi interrompido. Tente novamente.'));
+    request.send(body);
+  });
+}
 async function uploadEvidence(context,targetId,secret,file) {
+  try {
+    if(uploadedFiles.get(file)===targetId) {setAttachmentState(file,'done','Anexo enviado e verificado',100);return;}
+    setAttachmentState(file,'preparing','Preparando arquivo...',0);
+    await uploadEvidenceFile(context,targetId,secret,file);
+    setAttachmentState(file,'done','Anexo enviado e verificado',100);
+  } catch(error) {
+    setAttachmentState(file,'error',error.message || 'Falha no envio. Tente novamente.',0);
+    throw error;
+  }
+}
+async function uploadEvidenceFile(context,targetId,secret,file) {
   if (uploadedFiles.get(file)===targetId) return;
   const body=await imageWithoutMetadata(file);
   if (!body.size || body.size>20*1024*1024) throw new Error('O arquivo preparado deve ter até 20 MB.');
@@ -671,13 +738,14 @@ async function uploadEvidence(context,targetId,secret,file) {
     reservation={path,targetId,stored:false}; uploadReservations.set(file,reservation);
   }
   if (!reservation.stored) {
-    const response=await fetch(`${SUPABASE_URL}/storage/v1/object/radar-evidence/${reservation.path}`,{
-      method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':body.type,'x-upsert':'false'},body,signal:AbortSignal.timeout(60000)});
+    setAttachmentState(file,'uploading','Enviando: 0%',0);
+    const response=await sendEvidenceFile(reservation.path,body,percent=>setAttachmentState(file,'uploading','Enviando: '+percent+'%',percent));
     const result=await response.json().catch(()=>({}));
     // A network interruption can happen after the server has stored the object.
     if (!response.ok && !(response.status===409 || result.error==='Duplicate' || result.statusCode==='409')) throw new Error(result.message || 'Não foi possível enviar o arquivo. Tente novamente.');
     reservation.stored=true;
   }
+  setAttachmentState(file,'checking','Arquivo recebido. Verificando...',100);
   const checked=await fetch(`${SUPABASE_URL}/functions/v1/radar-upload-check`,{
     method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({path:reservation.path,secret}),signal:AbortSignal.timeout(60000)});
   if (checked.status===422) reservation.stored=false;
@@ -688,6 +756,7 @@ async function uploadEvidence(context,targetId,secret,file) {
 function selectAppealReport(id,handle) {
   if (pendingAppeal && !confirm('Há anexos pendentes do recurso salvo. Trocar o relato abandona apenas esta tentativa de envio. Continuar?')) return;
   pendingAppeal=null;
+  clearAttachmentPreviews('appeal');
   selectedAppealReport = id;
   identityChallengeId = null; verifiedChallengeId = null;
   document.getElementById('identity-panel').hidden=false;
