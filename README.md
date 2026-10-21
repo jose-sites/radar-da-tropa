@@ -275,3 +275,13 @@ antes de qualquer criação de relato ou upload. A confirmação usa o conteúdo
 conferido, e voltar para editar preserva os campos. O acesso da administração
 confirma a publicação automática; os demais confirmam o envio à moderação.
 Novas tentativas de um envio já salvo reutilizam o mesmo relato.
+
+### Cartão para compartilhar
+
+Cada relato público pode gerar um PNG de 1080×1350 no próprio navegador, com
+categoria, arroba, resumo, data, autor, situação e link. O botão usa a consulta
+pública do relato antes de gerar; um relato retirado não gera um novo cartão.
+O usuário escolhe abrir o compartilhamento nativo, baixar a imagem ou copiar o
+link. Nenhuma mensagem é enviada automaticamente. O PNG indica que o conteúdo
+é um relato e o link permite conferir o contexto e as atualizações posteriores.
+Imagens já compartilhadas não se atualizam quando um caso muda de situação.

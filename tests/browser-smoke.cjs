@@ -14,7 +14,7 @@ const stage=process.argv[2] || 'photos';
  try {
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
- const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[]};
+ const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(request.isNavigationRequest() && url.startsWith('https://radardatropa.pages.dev/')) return route.fulfill({status:200,contentType:'text/html',body:html});
@@ -25,7 +25,7 @@ const stage=process.argv[2] || 'photos';
   if(rpc==='radar_public_stats')return reply({published_reports:2,reported_profiles:1,active_streamers:1,verified_streamers:0,whatsapp_number:'5527981325470'});
   if(rpc==='radar_public_groups')return reply({groups:[{...group,reports:group.reports.map(row=>({...row,resolution_status:state.resolution,resolution_note:state.resolutionNote}))}],total_profiles:1});
   if(rpc==='radar_profile_dossier') {const args=request.postDataJSON();return reply({profile:{...report,profile_verified:true,last_checked_at:report.created_at},aliases:[{handle:'anterior',first_seen_at:report.created_at}],total_reports:2,streamer_count:1,reports:[{...report,id:args.p_offset?secondId:reportId,reason:'<script>unsafe</script>',proofs:[]}]});}
-  if(rpc==='radar_report_detail_v2')return reply({...report,resolution_status:state.resolution,resolution_note:state.resolutionNote,resolution_history:state.resolutionHistory,profile_verified:stage==='community',old_handles:stage==='community'?['anterior']:[],id:request.postDataJSON().p_id,proofs:stage==='owned'?[{path:`reports/${reportId}/${secondId}.mp4`,mime:'video/mp4'},{path:`reports/${reportId}/${secondId}.jpg`,mime:'image/jpeg'}]:[]});
+  if(rpc==='radar_report_detail_v2')return reply(state.withdrawn?null:{...report,resolution_status:state.resolution,resolution_note:state.resolutionNote,resolution_history:state.resolutionHistory,profile_verified:stage==='community',old_handles:stage==='community'?['anterior']:[],id:request.postDataJSON().p_id,proofs:stage==='owned'?[{path:`reports/${reportId}/${secondId}.mp4`,mime:'video/mp4'},{path:`reports/${reportId}/${secondId}.jpg`,mime:'image/jpeg'}]:[]});
   if(rpc==='radar_submit_pin_request') {const args=request.postDataJSON();state.pinAttempts++;if(state.pinProtocol)assert.equal(args.p_protocol,state.pinProtocol);state.pinProtocol=args.p_protocol;if(state.pinAttempts===1)return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"message":"Conexão temporariamente indisponível"}'});return reply({id:secondId,name:args.p_name,handle:args.p_handle,context:args.p_context,status:'received',created_at:report.created_at});}
   if(rpc==='radar_pin_request_status')return reply(request.postDataJSON().p_protocol===state.pinProtocol?{handle:'streamer_teste',status:state.pinStatus,reply:state.pinReply,updated_at:report.created_at}:null);
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
@@ -41,6 +41,21 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='share') {
+  await page.evaluate(()=>{window.__shares=[];window.__copied='';Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:async payload=>window.__shares.push({url:payload.url,text:payload.text,files:payload.files?.length,type:payload.files?.[0]?.type})});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>window.__copied=value}});});
+  await page.locator('.report-share-button').first().click();await page.waitForSelector('#share-preview img');await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);
+  assert.equal(await page.locator('#share-preview img').evaluate(img=>img.naturalWidth),1080);assert.equal(await page.locator('#share-preview img').evaluate(img=>img.naturalHeight),1350);assert.equal(await page.evaluate(()=>window.__shares.length),0);
+  assert.match(await page.locator('#share-url').inputValue(),new RegExp('/perfil/'+reportId));
+  if(process.env.RADAR_SHARE_IMAGE){const bytes=await page.evaluate(async()=>Array.from(new Uint8Array(await shareCardState.file.arrayBuffer())));fs.writeFileSync(process.env.RADAR_SHARE_IMAGE,Buffer.from(bytes));}
+  await page.locator('#share-copy').click();assert.match(await page.evaluate(()=>window.__copied),new RegExp('/perfil/'+reportId));
+  await page.locator('#share-native').click();const shared=await page.evaluate(()=>window.__shares[0]);assert.equal(shared.files,1);assert.equal(shared.type,'image/png');assert.match(shared.text,/alegações.*contestados/);
+  const downloadReady=page.waitForEvent('download');await page.locator('#share-download').click();const download=await downloadReady;assert.match(download.suggestedFilename(),/^radar-relato-.*\.png$/);await download.cancel();
+  await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);
+  await page.evaluate(()=>Object.defineProperty(navigator,'share',{configurable:true,value:undefined}));await page.locator('.report-share-button').first().click();await page.waitForSelector('#share-preview img');assert.equal(await page.locator('#share-native').isVisible(),false);assert.equal(await page.locator('#share-download').isVisible(),true);await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);
+  state.withdrawn=true;await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.getElementById('share-feedback').textContent.includes('não está disponível'));assert.equal(await page.locator('#share-download').isVisible(),false);assert.equal(await page.locator('#share-native').isDisabled(),true);
+  await page.locator('#share-close').click();
+  console.log('PASS share: public-only report, 1080×1350 card, no automatic share, explicit native action, download, link copy, cleanup and removed-report exclusion');
+ }
  if(stage==='review') {
   await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('#pin-input').fill('1234512345');await page.locator('#pin-preview').click();await page.waitForSelector('#report-panel.show');
   await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Descrição de teste para conferir antes de enviar.');
