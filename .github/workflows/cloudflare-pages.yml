@@ -64,7 +64,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/radar-pages"
-          cp index.html _redirects og.png "$RUNNER_TEMP/radar-pages/"
+          cp index.html _redirects og.png story-approved-v1.webp "$RUNNER_TEMP/radar-pages/"
       - name: Publicar no projeto existente
         shell: bash
         run: |
@@ -80,11 +80,15 @@ jobs:
           import {readFile} from 'node:fs/promises';
           import {setTimeout} from 'node:timers/promises';
           const expected=await readFile('index.html','utf8');
+          const expectedTemplate=await readFile('story-approved-v1.webp');
           let confirmed=false;
           for(let attempt=0;attempt<12;attempt++) {
             try {
               const response=await fetch('https://radardatropa.pages.dev/?release='+process.env.GITHUB_SHA,{signal:AbortSignal.timeout(15000),headers:{'Cache-Control':'no-cache'}});
-              if(response.ok && await response.text()===expected) {confirmed=true;break;}
+              if(response.ok && await response.text()===expected) {
+                const asset=await fetch('https://radardatropa.pages.dev/story-approved-v1.webp?release='+process.env.GITHUB_SHA,{signal:AbortSignal.timeout(15000),headers:{'Cache-Control':'no-cache'}});
+                if(asset.ok && Buffer.from(await asset.arrayBuffer()).equals(expectedTemplate)){confirmed=true;break;}
+              }
             } catch { /* Allow time for the deployment to propagate. */ }
             await setTimeout(10000);
           }

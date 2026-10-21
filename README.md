@@ -173,7 +173,7 @@ publica automaticamente. O acesso ao Supabase continua separado.
 
 O fluxo tem permissão de leitura do repositório, usa ações fixadas por commit,
 executa os testes, fixa a versão do Wrangler e envia somente `index.html`,
-`_redirects` e `og.png`. Após o envio, compara o HTML público com a versão enviada.
+`_redirects`, `og.png` e `story-approved-v1.webp`. Após o envio, compara o HTML público com a versão enviada.
 Os segredos são usados apenas no runner do GitHub e não vão para os arquivos
 públicos. É possível revogar o token no Cloudflare para suspender a integração.
 
@@ -292,3 +292,13 @@ público de avatares e tamanho/tempo limitados. Se a foto não estiver disponív
 mostra a inicial do perfil com indicação de foto indisponível. O arquivo mantém
 a informação de relato sujeito a contestação. A assinatura já cadastrada no
 rodapé, @jose027._, aparece discretamente no cabeçalho e no cartão, sem animação.
+
+### Fidelidade da arte de compartilhamento
+
+O fundo, logo, moldura e textos fixos do Story vêm da arte aprovada em
+`story-approved-v1.webp`. O navegador compõe somente foto, categoria, arroba,
+situação e data por cima dessa base, preservando a identidade visual. A foto é
+a do perfil público vinculado; uma falha usa a inicial, sem inventar um rosto.
+Se a base não carregar, o cartão pede nova tentativa em vez de trocar de estilo.
+A publicação compara tanto o HTML quanto os bytes da arte. O teste de navegador
+confere pixels nas áreas fixas da imagem exportada e o uso da foto real.

@@ -15,9 +15,10 @@ const stage=process.argv[2] || 'photos';
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  const avatarData=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=600;c.height=600;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,'#7c9a65');g.addColorStop(1,'#15281e');x.fillStyle=g;x.fillRect(0,0,600,600);x.fillStyle='#c9d5a9';x.beginPath();x.arc(300,240,100,0,Math.PI*2);x.fill();x.fillStyle='#334c39';x.beginPath();x.ellipse(300,535,205,170,0,0,Math.PI*2);x.fill();return c.toDataURL('image/png').split(',')[1];});
- const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false};
+ const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
+  if(url.startsWith('https://radardatropa.pages.dev/story-approved-v1.webp'))return route.fulfill({status:state.templateFails?503:200,contentType:'image/webp',body:state.templateFails?Buffer.from('Unavailable'):fs.readFileSync(path.join(root,'story-approved-v1.webp'))});
   if(request.isNavigationRequest() && url.startsWith('https://radardatropa.pages.dev/')) return route.fulfill({status:200,contentType:'text/html',body:html});
   const reply=data=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data),headers:{'access-control-allow-origin':'*'}});
   if(!url.startsWith(base))return route.abort();
@@ -44,20 +45,26 @@ const stage=process.argv[2] || 'photos';
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
  if(stage==='story') {
-  await page.evaluate(()=>{window.__photoDraws=0;const original=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){window.__photoDraws++;return original.apply(this,args);};});
+  await page.evaluate(()=>{window.__photoDraws=0;const original=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){if((typeof ImageBitmap==='function' && args[0] instanceof ImageBitmap) || (args[0] instanceof HTMLImageElement && args[0].src.startsWith('blob:')))window.__photoDraws++;return original.apply(this,args);};});
   await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);
   assert.equal(await page.locator('#share-preview img').evaluate(img=>img.naturalWidth),1080);assert.equal(await page.locator('#share-preview img').evaluate(img=>img.naturalHeight),1920);
-  assert.equal(state.avatarLoads,1);assert.ok(await page.evaluate(()=>window.__photoDraws>=2));
+  assert.equal(state.avatarLoads,1);assert.ok(await page.evaluate(()=>window.__photoDraws>=1));
+  const fixedPixels=await page.evaluate(async()=>{
+    const expected=document.createElement('canvas'),actual=document.createElement('canvas');expected.width=actual.width=1080;expected.height=actual.height=1920;
+    const e=expected.getContext('2d'),a=actual.getContext('2d'),template=await loadApprovedStoryTemplate(),output=await createImageBitmap(shareCardState.file);e.drawImage(template,0,0,1080,1920);a.drawImage(output,0,0);output.close();
+    return [[24,600],[450,85],[450,120],[820,220],[80,600],[480,1462],[100,1570],[830,1570]].every(([x,y])=>{x=Math.floor(x*1080/940);y=Math.floor(y*1920/1672);const first=e.getImageData(x,y,1,1).data,second=a.getImageData(x,y,1,1).data;return first.every((value,index)=>Math.abs(value-second[index])<=2);});
+  });assert.equal(fixedPixels,true,'Background, logo, frame and fixed typography must match the approved artwork');
   if(process.env.RADAR_STORY_IMAGE){const bytes=await page.evaluate(async()=>Array.from(new Uint8Array(await shareCardState.file.arrayBuffer())));fs.writeFileSync(process.env.RADAR_STORY_IMAGE,Buffer.from(bytes));}
   await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);
   await page.evaluate(()=>{window.__nativeBitmap=createImageBitmap;window.createImageBitmap=async()=>{throw new Error('Safari decoder fixture');};window.__photoDraws=0;});
-  await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);assert.equal(state.avatarLoads,2);assert.ok(await page.evaluate(()=>window.__photoDraws>=2));await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);await page.evaluate(()=>window.createImageBitmap=window.__nativeBitmap);state.avatarFails=true;
+  await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);assert.equal(state.avatarLoads,2);assert.ok(await page.evaluate(()=>window.__photoDraws>=1));await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);await page.evaluate(()=>window.createImageBitmap=window.__nativeBitmap);state.avatarFails=true;
   await page.evaluate(()=>window.__photoDraws=0);await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);assert.equal(state.avatarLoads,3);assert.equal(await page.evaluate(()=>window.__photoDraws),0);
   const invalid=await page.evaluate(()=>loadStoryAvatar({profile_verified:true,avatar_path:'../../private.png'}));assert.equal(invalid,null);assert.equal(state.avatarLoads,3);
   await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);
+  state.templateFails=true;await page.evaluate(()=>approvedStoryTemplate=null);await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.getElementById('share-feedback').textContent.includes('carregar a arte'));assert.equal(await page.locator('#share-preview img').count(),0);await page.locator('#share-close').click();await page.waitForFunction(()=>shareCardState===null);state.templateFails=false;
   assert.match(await page.locator('.creator-signature').textContent(),/@jose027\._/);
   for(const width of [320,390,430,1280]){await page.setViewportSize({width,height:844});assert.equal(await page.locator('.creator-signature').isVisible(),true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
-  console.log('PASS Story: real photo rendering, 9:16 export, photo failure fallback, safe image path and discreet responsive author credit');
+  console.log('PASS Story: approved artwork pixel check, actual photo, Safari decoder fallback, safe photo fallback, required template and responsive credit');
  }
  if(stage==='share') {
   await page.evaluate(()=>{window.__shares=[];window.__copied='';Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});Object.defineProperty(navigator,'share',{configurable:true,value:async payload=>window.__shares.push({url:payload.url,text:payload.text,files:payload.files?.length,type:payload.files?.[0]?.type})});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>window.__copied=value}});});

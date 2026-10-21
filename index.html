@@ -626,45 +626,54 @@ async function loadStoryAvatar(report) {
     }catch{URL.revokeObjectURL(objectUrl);return null;}
   }catch{return null;}
 }
-function storyRoundRect(context,x,y,width,height,radius) {
-  const r=Math.min(radius,width/2,height/2);context.beginPath();context.moveTo(x+r,y);context.lineTo(x+width-r,y);context.quadraticCurveTo(x+width,y,x+width,y+r);context.lineTo(x+width,y+height-r);context.quadraticCurveTo(x+width,y+height,x+width-r,y+height);context.lineTo(x+r,y+height);context.quadraticCurveTo(x,y+height,x,y+height-r);context.lineTo(x,y+r);context.quadraticCurveTo(x,y,x+r,y);context.closePath();
-}
 function storyCover(context,avatar,x,y,width,height) {
   const ratio=Math.max(width/avatar.width,height/avatar.height),w=avatar.width*ratio,h=avatar.height*ratio;
   context.drawImage(avatar.image,x+(width-w)/2,y+(height-h)/2,w,h);
 }
-function storyHandleLines(context,handle) {
-  let size=76,lines=[];
-  do{context.font=`bold ${size}px Arial, sans-serif`;lines=shareTextLines(context,'@'+String(handle).replace(/^@/,''),920);if(lines.length<=2)break;size-=2;}while(size>=44);
-  return {size,lines};
+let approvedStoryTemplate=null,approvedStoryAttempt=0;
+function loadApprovedStoryTemplate() {
+  if(!approvedStoryTemplate){
+    approvedStoryTemplate=new Promise((resolve,reject)=>{
+      const image=new Image(),path=location.hostname.endsWith('github.io')?'/radar-da-tropa/story-approved-v1.webp':'/story-approved-v1.webp';
+      const timer=setTimeout(()=>{image.src='';reject(new Error('Não foi possível carregar a arte. Tente novamente.'));},8000);
+      image.onload=()=>{clearTimeout(timer);resolve(image);};image.onerror=()=>{clearTimeout(timer);reject(new Error('Não foi possível carregar a arte. Tente novamente.'));};image.src=path+'?attempt='+(++approvedStoryAttempt);
+    }).catch(error=>{approvedStoryTemplate=null;throw error;});
+  }
+  return approvedStoryTemplate;
+}
+function storyPhotoQuad(context,photo) {
+  const points=[[79,320],[813,258],[874,1005],[126,1068]],radius=12;
+  const entry=(point,other)=>{const distance=Math.hypot(other[0]-point[0],other[1]-point[1]);return [point[0]+(other[0]-point[0])*radius/distance,point[1]+(other[1]-point[1])*radius/distance];};
+  context.save();context.beginPath();
+  for(let i=0;i<4;i++){
+    const point=points[i],before=entry(point,points[(i+3)%4]),after=entry(point,points[(i+1)%4]);
+    if(i===0)context.moveTo(...before);else context.lineTo(...before);context.quadraticCurveTo(...point,...after);
+  }
+  context.closePath();context.clip();
+  const triangle=(vertices,a,b,c,d,e,f)=>{context.save();context.beginPath();context.moveTo(...vertices[0]);context.lineTo(...vertices[1]);context.lineTo(...vertices[2]);context.closePath();context.clip();context.transform(a,b,c,d,e,f);context.drawImage(photo,0,0);context.restore();};
+  const [p0,p1,p2,p3]=points,w=photo.width;
+  triangle([p0,p1,p2],(p1[0]-p0[0])/w,(p1[1]-p0[1])/w,(p2[0]-p1[0])/w,(p2[1]-p1[1])/w,...p0);
+  triangle([[p0[0]+1,p0[1]-1],[p2[0]+1,p2[1]-1],p3],(p2[0]-p3[0])/w,(p2[1]-p3[1])/w,(p3[0]-p0[0])/w,(p3[1]-p0[1])/w,...p0);
+  context.restore();
 }
 async function createShareCard(report,url) {
   const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;
   const context=canvas.getContext('2d');if(!context)throw new Error('Não foi possível preparar a imagem neste aparelho.');
-  const avatar=await loadStoryAvatar(report);
+  // Keep the approved artwork intact; only the photo and report fields vary.
+  const template=await loadApprovedStoryTemplate(),avatar=await loadStoryAvatar(report);
   try{
-    context.fillStyle='#0b1009';context.fillRect(0,0,1080,1920);
-    if(avatar){context.save();context.filter='blur(40px)';context.globalAlpha=.4;storyCover(context,avatar,-80,-80,1240,2080);context.restore();context.fillStyle='rgba(8,13,6,.76)';context.fillRect(0,0,1080,1920);}
-    const glow=context.createRadialGradient(540,760,70,540,860,1080);glow.addColorStop(0,'rgba(118,151,44,.22)');glow.addColorStop(1,'rgba(7,12,5,0)');context.fillStyle=glow;context.fillRect(0,0,1080,1920);
-    for(const [x,y,r] of [[68,290,170],[1010,420,190],[40,1430,210],[1050,1610,160]]){
-      const light=context.createRadialGradient(x,y,0,x,y,r);light.addColorStop(0,'rgba(187,220,77,.13)');light.addColorStop(1,'rgba(155,190,59,0)');context.fillStyle=light;context.fillRect(x-r,y-r,r*2,r*2);
-    }
-    context.textAlign='center';context.fillStyle='#eef2e7';context.font='bold 62px Arial, sans-serif';context.fillText('RADAR',510,144);context.fillStyle='#c8ef65';context.font='bold 38px Arial, sans-serif';context.fillText('DA TROPA',540,194);
-    context.strokeStyle='#b9de5a';context.lineWidth=8;for(const radius of [19,36,53]){context.beginPath();context.arc(650,121,radius,-Math.PI/2,0);context.stroke();}
-    context.save();context.translate(540,760);context.rotate(-.055);context.shadowColor='rgba(0,0,0,.55)';context.shadowBlur=42;context.shadowOffsetY=24;context.fillStyle='#e5e4d7';storyRoundRect(context,-444,-456,888,920,27);context.fill();context.shadowColor='transparent';context.shadowBlur=0;context.shadowOffsetY=0;
-    context.save();storyRoundRect(context,-418,-430,836,836,14);context.clip();
-    if(avatar)storyCover(context,avatar,-418,-430,836,836);
-    else{
-      const fallback=context.createLinearGradient(-418,-430,418,406);fallback.addColorStop(0,'#41502e');fallback.addColorStop(1,'#172010');context.fillStyle=fallback;context.fillRect(-418,-430,836,836);context.fillStyle='#d0dfb5';context.textAlign='center';context.font='bold 330px Arial, sans-serif';context.fillText(String(report.handle || '?').replace(/^@/,'').slice(0,1).toUpperCase(),0,76);context.font='25px Arial, sans-serif';context.fillStyle='#b9c8a6';context.fillText('Foto indisponível',0,300);
-    }
-    context.restore();context.restore();
-    const label='Relato • '+(categoryLabels[report.category] || 'Outro');context.font='bold 28px Arial, sans-serif';const width=context.measureText(label).width+58;
-    context.fillStyle='#342a15';storyRoundRect(context,540-width/2,1290,width,64,20);context.fill();context.strokeStyle='#9e833d';context.lineWidth=2;context.stroke();context.fillStyle='#edce88';context.textAlign='center';context.fillText(label,540,1332);
-    const title=storyHandleLines(context,report.handle);context.fillStyle='#f6f7f0';context.font=`bold ${title.size}px Arial, sans-serif`;title.lines.slice(0,2).forEach((line,index)=>context.fillText(line,540,1455+index*84));
-    const resolved=report.resolution_status==='resolved';context.font='29px Arial, sans-serif';context.fillStyle=resolved?'#c9e6a8':'#c5cbbd';context.fillText(resolved?'Caso marcado como resolvido.':'Relato publicado para consulta.',540,1602);
-    const published=new Date(report.created_at);if(Number.isFinite(published.getTime())){context.font='21px Arial, sans-serif';context.fillStyle='#919f84';context.fillText(new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).format(published).replace(/ de /g,' ').replace(/\./g,'').toUpperCase(),540,1650);}
-    context.strokeStyle='#435130';context.lineWidth=1;context.beginPath();context.moveTo(330,1716);context.lineTo(750,1716);context.stroke();context.fillStyle='#c8ed71';context.font='bold 30px Arial, sans-serif';context.fillText('Veja o relato completo no Radar',540,1772);
-    context.fillStyle='#c0c8b5';context.font='25px Arial, sans-serif';context.fillText(new URL(url).hostname,540,1832);context.fillStyle='#9ba88e';context.font='21px Arial, sans-serif';context.fillText('Relato sujeito a contestação.',540,1872);context.fillStyle='#728066';context.font='17px Arial, sans-serif';context.fillText('Criado por @jose027._',540,1903);
+    context.scale(1080/940,1920/1672);context.drawImage(template,0,0,940,1672);
+    const photo=document.createElement('canvas');photo.width=800;photo.height=800;const image=photo.getContext('2d');if(!image)throw new Error('Não foi possível preparar a foto.');
+    image.imageSmoothingQuality='high';
+    if(avatar)storyCover(image,avatar,0,0,800,800);
+    else{const background=image.createLinearGradient(0,0,800,800);background.addColorStop(0,'#344126');background.addColorStop(1,'#11190d');image.fillStyle=background;image.fillRect(0,0,800,800);image.fillStyle='#d4dfc0';image.textAlign='center';image.font='bold 280px Arial, sans-serif';image.fillText(String(report.handle || '?').replace(/^@/,'').slice(0,1).toUpperCase(),400,470);image.font='23px Arial, sans-serif';image.fillStyle='#a7b498';image.fillText('Foto indisponível',400,710);}
+    storyPhotoQuad(context,photo);
+    context.textAlign='center';context.fillStyle='#f3cb71';const category='Relato • '+(categoryLabels[report.category] || 'Outro');let categorySize=26;do{context.font=`bold ${categorySize}px Arial, sans-serif`;if(context.measureText(category).width<=318)break;categorySize--;}while(categorySize>18);context.fillText(category,504,1167);
+    const handle='@'+String(report.handle).replace(/^@/,'');let font=88;do{context.font=`bold ${font}px Arial, sans-serif`;if(context.measureText(handle).width<=822)break;font-=2;}while(font>44);
+    const lines=shareTextLines(context,handle,822);context.fillStyle='#f8f8f3';lines.slice(0,2).forEach((line,index)=>context.fillText(line,470,(lines.length===1?1289:1258)+index*54));
+    context.font='31px Arial, sans-serif';context.fillStyle=report.resolution_status==='resolved'?'#cfdfa8':'#d4d7cd';context.fillText(report.resolution_status==='resolved'?'Caso marcado como resolvido.':'Relato publicado para consulta.',470,lines.length===1?1360:1371);
+    const date=new Date(report.created_at);if(Number.isFinite(date.getTime())){context.fillStyle='#d6dacd';context.font='18px Arial, sans-serif';context.fillText(new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).format(date).replace(/ de /g,' ').replace(/\./g,'').toUpperCase(),475,1577);}
+    context.fillStyle='#808d72';context.font='14px Arial, sans-serif';context.fillText('Criado por @jose027._',470,1640);
     const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('Não foi possível gerar o cartão.');return blob;
   }finally{avatar?.close();}
 }
