@@ -145,3 +145,36 @@ Quando a rota pública por ID estiver indisponível, a atualização diária pod
 consultar o último arroba conhecido. O resultado só é salvo se o ID permanente
 continuar igual. A segunda tentativa não é feita após limite de requisições.
 Se o arroba tiver sido transferido para outra conta, a atualização é recusada.
+
+## Publicação automática no Cloudflare
+
+O fluxo `.github/workflows/cloudflare-pages.yml` executa nos pushes da branch
+`main` e também pelo botão **Run workflow** no GitHub Actions. Não exige ZIP,
+computador ligado ou projeto novo. O projeto Cloudflare existente é consultado
+antes do envio; o fluxo exige o nome `radardatropa`, o domínio já usado e a branch
+real de produção. Sem confirmação, ele interrompe e nunca cria um projeto.
+
+Uma única configuração inicial é necessária em
+[Settings → Secrets and variables → Actions](https://github.com/jose-sites/radar-da-tropa/settings/secrets/actions):
+
+- `CLOUDFLARE_API_TOKEN`: token restrito à conta do Radar, com permissão
+  **Account → Cloudflare Pages → Edit**.
+- `CLOUDFLARE_ACCOUNT_ID`: ID da conta Cloudflare que contém o projeto.
+
+O token é criado no [painel do Cloudflare](https://dash.cloudflare.com/profile/api-tokens)
+e colado diretamente no segredo do GitHub. Não deve ser enviado no chat ou
+incluído em arquivos do repositório. O Account ID está no painel da conta; não é
+um domínio nem o ID do projeto Supabase.
+
+Sem os dois segredos, o fluxo registra **Falta autorizar o Cloudflare uma vez**
+e não tenta publicar. Depois de salvá-los, executar o fluxo uma vez (ou enviar
+uma alteração à `main`) inicia a primeira atualização. Daí em diante, cada push
+publica automaticamente. O acesso ao Supabase continua separado.
+
+O fluxo tem permissão de leitura do repositório, usa ações fixadas por commit,
+executa os testes, fixa a versão do Wrangler e envia somente `index.html`,
+`_redirects` e `og.png`. Após o envio, compara o HTML público com a versão enviada.
+Os segredos são usados apenas no runner do GitHub e não vão para os arquivos
+públicos. É possível revogar o token no Cloudflare para suspender a integração.
+
+Referência: [Direct Upload com CI/CD](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
