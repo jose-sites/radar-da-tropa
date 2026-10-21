@@ -83,3 +83,55 @@ Testes locais, sem acessar serviços ou alterar dados de produção (Node 24):
 ```sh
 node --test tests/radar-sync.test.mjs
 ```
+
+## Comunidade, anexos e moderação
+
+- O formulário de solicitação de PIN abre o WhatsApp com nome, arroba e contexto.
+  O visitante revisa e envia a mensagem; não há envio automático nem geração de PIN
+  sem aprovação. O administrador pode mudar o número em **Contato para solicitações
+  de PIN**, dentro do painel. O número fornecido pelo dono foi configurado no banco.
+- O selo **Streamer verificado** é concedido/retirado pelo administrador após uma
+  conferência manual. Começa desativado para todos e some publicamente se o acesso
+  do streamer for suspenso. O selo pertence à equipe Radar, não ao TikTok, e não
+  comprova a veracidade de uma denúncia.
+- A consulta agrupa pelo ID permanente da conta quando disponível; sem ID, somente
+  pelo arroba exato, ignorando maiúsculas. A busca aproximada encontra perfis, mas não
+  os funde. Cada grupo mostra relatos publicados, autores, contagem e links de provas.
+  Grupos têm paginação; cada grupo devolve no máximo os 50 relatos mais recentes.
+- As estatísticas contam apenas relatos publicados e streamers ativos. Contatos,
+  PINs, recursos, protocolos e denúncias em análise não entram nas respostas públicas.
+- Fotos usam fallback de decodificação compatível com Safari e são recriadas em JPEG
+  antes do envio. O MIME real da imagem preparada é usado no ticket e no Storage.
+  HEIC/HEIF dependem de o navegador conseguir abrir a foto; quando não conseguir,
+  o formulário orienta enviar uma captura JPG/PNG. Até 3 arquivos, 20 MB por arquivo.
+- Uma falha preserva a seleção de arquivos, o relato/protocolo e a reserva de upload
+  na aba atual. A nova tentativa reutiliza o mesmo registro e ticket; o estado não
+  sobrevive ao fechamento/recarregamento da aba. Anexos originais continuam privados.
+- Corrigidas as permissões do verificador de anexos (SELECT/UPDATE/DELETE somente
+  para service_role), o limite concorrente de três tickets, o limite de leitura no
+  servidor e a publicação de provas com caminho/estado/MIME validados. A operação de
+  cancelar anexo exige o segredo do envio e só aceita relatos/recursos ainda pendentes.
+
+Migrações aplicadas no projeto existente estão em `supabase/migrations/`, com as
+versões confirmadas no histórico remoto. Os arquivos SQL antigos continuam sendo
+parte da instalação anterior; estas migrações não substituem o esquema inicial.
+
+Validação em 21/10/2026: 32 testes automatizados, navegação em Chromium com largura
+390 px, teste real de upload PNG→JPEG com fallback de Safari e falha temporária,
+reenvio sem duplicação, verificação do anexo e limpeza autenticada dos dados de
+ensaio. Agrupamento, estatísticas e selo foram exercitados em transação revertida.
+Não houve envio de mensagem no WhatsApp durante os testes.
+
+A revisão de segurança preserva as tabelas privadas sem políticas de acesso direto:
+nesses casos RLS bloqueia as linhas, e apenas as funções deliberadamente expostas
+executam operações limitadas. Avisos do Advisor sobre funções SECURITY DEFINER
+públicas permanecem para essas APIs intencionais, com grants explícitos e guards
+administrativos nas operações de moderação. A função interna de evento não pode
+mais ser chamada por anon/authenticated. A proteção de senhas vazadas do Supabase
+Auth continua desativada na configuração da conta; não é controlada por esta mudança.
+Vídeos permanecem privados e não passam por remoção automática de metadados.
+
+Para conferir tudo novamente: `node --test tests/*.test.mjs`.
+A interface nova é publicada no GitHub Pages pelo fluxo existente do repositório.
+O Cloudflare Pages precisa receber o pacote estático atualizado separadamente:
+`index.html`, `_redirects` e `og.png`; compartilhar o banco não atualiza esse HTML.

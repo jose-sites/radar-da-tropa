@@ -65,7 +65,8 @@
     #identity-panel{margin:16px 0}#identity-panel p{line-height:1.6}#identity-code{display:block;width:max-content;max-width:100%;padding:10px 14px;border-radius:10px;background:#111810;color:var(--lime);font:800 18px var(--display);letter-spacing:.08em;margin:12px 0}
     button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     @media(max-width:760px){.detail-columns{grid-template-columns:1fr}.proof-gallery{grid-template-columns:1fr}.detail-head .profile-photo,.detail-head .handle-avatar{width:68px;height:68px}}
-  </style>
+  .public-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}.public-stats>div{border:1px solid var(--border,#34382b);border-radius:18px;padding:20px;background:#1b1e17}.public-stats strong{display:block;font-size:30px;color:#d5fb69}.public-stats span{font-size:13px;color:#b2b8aa}.streamer-badge{display:inline-block;padding:4px 7px;border-radius:7px;background:#263d2c;color:#a5e6b1;font-size:11px;font-weight:700}.group-report{padding:18px 0;border-top:1px solid #363a30}.group-report p{margin:10px 0}.group-report small{color:#abb19e}.pin-request{margin-top:22px}.pin-request summary{cursor:pointer;color:#d5fb69}.pin-request form{margin-top:16px}#load-more-profiles{display:block;margin:20px auto}#load-more-profiles[hidden]{display:none}@media(max-width:600px){.public-stats{grid-template-columns:repeat(2,1fr);gap:9px}.public-stats>div{padding:15px}.public-stats strong{font-size:26px}}
+</style>
 </head>
 <body>
   <div class="site-shell">
@@ -114,7 +115,7 @@
           </div>
         </div>
 
-        <div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Últimos relatos aprovados pela moderação.</p></div><span class="result-count"><b id="result-number">0</b> <span id="result-count-label">relatos aprovados</span></span></div><div id="results-grid" class="results-grid"></div><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Carregando relatos...</strong><p>A lista mostra somente relatos aprovados.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
+        <div class="container public-stats" aria-label="Estatísticas públicas"><div><strong id="stat-reports">—</strong><span>Relatos publicados</span></div><div><strong id="stat-profiles">—</strong><span>Perfis citados</span></div><div><strong id="stat-streamers">—</strong><span>Streamers ativos</span></div><div><strong id="stat-verified">—</strong><span>Streamers verificados</span></div></div><p class="container helper">Contagens de relatos revisados. A quantidade não comprova uma acusação.</p><div class="container results-section" id="results"><div class="section-head"><div><div class="section-kicker">Explorar relatos</div><h2 id="results-title">Olho no radar.</h2><p id="results-subtitle">Últimos relatos aprovados pela moderação.</p></div><span class="result-count"><b id="result-number">0</b> <span id="result-count-label">relatos aprovados</span></span></div><div id="results-grid" class="results-grid"></div><button type="button" class="ghost-btn" id="load-more-profiles" hidden>Carregar mais perfis</button><div id="empty-state" class="empty-state"><svg width="37" height="37" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/><path d="M8 11h6"/></svg><strong>Carregando relatos...</strong><p>A lista mostra somente relatos aprovados.</p></div><p class="note"><b>Importante:</b> relatos são enviados por streamers e analisados antes da publicação. Um relato não comprova automaticamente uma acusação; confira o contexto antes de tomar decisões.</p></div>
       </section>
 
       <section id="perfil" class="view" aria-label="Detalhes do relato">
@@ -133,12 +134,12 @@
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">⌁</span><span><h2>Acessar com PIN</h2><small>Identificação do streamer</small></span></div>
                 <label class="field"><span>Seu código de acesso</span><input id="pin-input" class="pin-input" type="text" inputmode="text" autocomplete="off" maxlength="29" placeholder="Seu PIN privado" aria-describedby="pin-help"></label>
                 <button class="primary-btn full" id="pin-preview" type="button">Validar PIN <span aria-hidden="true">→</span></button>
-                <p class="helper" id="pin-help">Código de 12 ou 20 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p>
+                <p class="helper" id="pin-help">Código de 12 ou 20 caracteres fornecido pelo administrador. Espaços e traços são opcionais.</p><details class="pin-request"><summary>Sou streamer e quero solicitar um PIN</summary><form id="pin-request-form"><label class="field"><span>Seu nome de streamer</span><input id="pin-request-name" required minlength="2" maxlength="60" autocomplete="name"></label><label class="field"><span>Seu arroba no TikTok</span><input id="pin-request-handle" required maxlength="40" placeholder="@seuperfil" autocapitalize="none" autocomplete="off"></label><label class="field"><span>Como você participa das lives?</span><textarea id="pin-request-context" required minlength="10" maxlength="400"></textarea></label><p class="helper">Abriremos o WhatsApp com a mensagem pronta. Você revisa e envia; o PIN depende da aprovação do administrador.</p><button type="submit" class="ghost-btn full" id="pin-request-submit" disabled>Solicitar PIN pelo WhatsApp ↗</button><p class="helper" id="pin-request-status" role="status">Carregando contato...</p></form></details>
               </div>
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
-                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. O perfil, a foto e futuras trocas de nome serão consultados automaticamente.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. Tentamos consultar o perfil e a foto; bloqueios do TikTok podem impedir a identificação.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas só ficam disponíveis ao administrador.</small></label><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
                 <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
                 <p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
               </div>
@@ -157,7 +158,7 @@
               <div id="appeal-matches" class="appeal-matches"></div>
               <p id="selected-case" class="selected-case" hidden></p>
               <div id="identity-panel" class="privacy-panel" hidden><strong>Confirme o perfil pelo TikTok</strong><p>Opcional: gere um código, coloque-o temporariamente na bio do perfil citado e clique em verificar. O administrador verá que você controla a conta. Você também pode enviar o recurso sem essa confirmação.</p><button class="ghost-btn" id="identity-start" type="button">Gerar código para bio</button><div id="identity-code-box" hidden><p>Coloque este código na bio do TikTok:</p><code id="identity-code"></code><p class="helper">Depois de salvar a bio, aguarde alguns minutos e verifique. O código vale por 30 minutos.</p><button class="ghost-btn" id="identity-verify" type="button">Verificar minha bio</button></div><p id="identity-result" role="status"></p></div>
-              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
+              <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
               <div id="appeal-confirmation" class="appeal-confirmation" hidden><strong>Recurso recebido</strong><span>Guarde este protocolo. Ele aparece só agora:</span><code id="appeal-protocol"></code><span id="appeal-upload-status"></span></div>
             </div>
             <div><div class="side-panel"><div><small>Processo justo</small><h3>Uma revisão feita por gente.</h3><p>Seu recurso não aparece na busca pública. O administrador vê o texto e as provas e pode retirar o relato da consulta.</p></div><div class="step-list"><div class="step"><b>01</b> Escolha o relato</div><div class="step"><b>02</b> Envie contexto e provas</div><div class="step"><b>03</b> Guarde o protocolo</div></div></div>
@@ -194,7 +195,7 @@
             <div id="admin-dashboard" class="admin-dash">
               <div class="admin-top"><div><span class="admin-badge">● Visão geral</span><h2>Painel da tropa</h2><p>Gerencie relatos e acessos num só lugar.</p></div><div class="admin-top-buttons"><button class="ghost-btn" id="refresh-dashboard" type="button">Atualizar</button><button class="ghost-btn" id="close-dashboard" type="button">Sair</button></div></div>
               <div class="metric-grid"><div class="metric accent"><small>Relatos recebidos</small><strong id="metric-reports">0</strong><span>Total registrado</span></div><div class="metric"><small>Acessos ativos</small><strong id="metric-streamers">0</strong><span>Streamers habilitados</span></div><div class="metric"><small>Em análise</small><strong id="metric-pending">0</strong><span>Aguardando revisão</span></div><div class="metric"><small>Recursos abertos</small><strong id="metric-appeals">0</strong><span>Aguardando decisão</span></div></div>
-              <div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
+              <details class="glass-card"><summary>Contato para solicitações de PIN</summary><form id="whatsapp-settings-form"><label class="field"><span>WhatsApp com código do país e DDD</span><input id="whatsapp-settings-number" inputmode="tel" required maxlength="20" placeholder="5527999999999"></label><button class="ghost-btn" type="submit">Salvar WhatsApp</button></form></details><div class="admin-columns"><div class="dashboard-card"><div class="dashboard-head"><h3>Relatos</h3><span>REVISÃO MANUAL</span></div><div id="reports-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Acessos dos streamers</h3><button class="icon-btn" type="button" id="create-streamer-open" aria-label="Criar novo acesso">+</button></div><div id="streamers-list"></div></div></div>
               <div class="lower-admin"><div class="dashboard-card"><div class="dashboard-head"><h3>Recursos</h3><span>RESPOSTA E PROVAS</span></div><div id="appeals-list"></div></div><div class="dashboard-card"><div class="dashboard-head"><h3>Atividade recente</h3><span>ADMINISTRAÇÃO</span></div><div id="audit-list"></div></div></div>
               <div class="dashboard-card" style="margin-top:18px"><div class="dashboard-head"><h3>Pedidos de privacidade</h3><span>ACESSO, CORREÇÃO E REMOÇÃO</span></div><div id="privacy-list"></div></div>
               <p class="admin-footnote">O PIN aparece somente ao criar ou gerar um novo código. Guarde e compartilhe com o streamer por um canal confiável.</p>
@@ -260,6 +261,10 @@ const resultsGrid = document.getElementById('results-grid');
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let toastTimer, searchTimer, searchSerial = 0;
 let streamerPin = null;
+let pendingReport = null, pendingAppeal = null;
+let publicGroups = [], publicTotal = 0, publicQuery = '', whatsappNumber = '';
+const uploadedFiles = new WeakMap();
+const uploadReservations = new WeakMap();
 let adminSession = null;
 let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
 let selectedAppealReport = null;
@@ -281,11 +286,16 @@ function showView(name, scroll = true) {
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
-  history.replaceState(null, '', location.pathname.startsWith('/perfil/') && name !== 'perfil' ? '/#' + name : '#' + name);
+  if (name !== 'perfil' && new URLSearchParams(location.search).has('relato')) history.replaceState(null,'',location.pathname+'#'+name);
+  else history.replaceState(null, '', location.pathname.startsWith('/perfil/') && name !== 'perfil' ? '/#' + name : '#' + name);
   if (name === 'admin' && adminSession) loadDashboard();
 }
 function clearStreamerAccess() {
   streamerPin = null;
+  pendingReport = null;
+  const reportSubmit=document.querySelector('#report-form button[type=submit]');
+  reportSubmit.dataset.oldText='Enviar para análise ↗';reportSubmit.textContent='Enviar para análise ↗';
+  document.querySelectorAll('#report-form [data-upload-locked]').forEach(el => { el.disabled = false; delete el.dataset.uploadLocked; });
   document.getElementById('pin-input').value = '';
   document.getElementById('report-panel').classList.remove('show');
   document.getElementById('report-preview').classList.remove('show');
@@ -402,32 +412,53 @@ function profilePhoto(path, label, extraClass = '') {
 function tiktokProfileLink(handle) {
   return /^[A-Za-z0-9._]{2,40}$/.test(handle || '') ? `https://www.tiktok.com/@${encodeURIComponent(handle)}` : '';
 }
+function streamerBadge(verified) {
+  return verified ? '<span class="streamer-badge" title="Identidade do streamer conferida pela equipe Radar; não é um selo oficial do TikTok">✓ Streamer verificado</span>' : '';
+}
+async function loadPublicStats() {
+  try {
+    const stats = await rpc('radar_public_stats');
+    for (const [id,key] of Object.entries({'stat-reports':'published_reports','stat-profiles':'reported_profiles','stat-streamers':'active_streamers','stat-verified':'verified_streamers'}))
+      document.getElementById(id).textContent = Number(stats[key] || 0).toLocaleString('pt-BR');
+    whatsappNumber = /^[1-9][0-9]{9,14}$/.test(stats.whatsapp_number || '') ? stats.whatsapp_number : '';
+    document.getElementById('pin-request-submit').disabled = !whatsappNumber;
+    document.getElementById('pin-request-status').textContent = whatsappNumber ? 'Solicitação gratuita. Não compartilhe seu PIN publicamente.' : 'O contato está temporariamente indisponível.';
+  } catch { document.getElementById('pin-request-status').textContent = 'Não foi possível carregar o contato. Atualize a página para tentar novamente.'; }
+}
+async function loadGroups(query, serial, append = false) {
+  const data = await rpc('radar_public_groups', { p_query: query, p_limit: 24, p_offset: append ? publicGroups.length : 0 });
+  if (serial !== searchSerial) return;
+  publicQuery = query;
+  publicGroups = append ? publicGroups.concat(data.groups || []) : (data.groups || []);
+  publicTotal = Number(data.total_profiles || 0);
+  renderReports(publicGroups, query);
+  document.getElementById('load-more-profiles').hidden = publicGroups.length >= publicTotal;
+}
 async function loadRecentReports(expectedSerial = searchSerial) {
   const target = document.getElementById('quick-handles');
   try {
-    const rows = await rpc('radar_recent_approved_reports');
-    const approved = Array.isArray(rows) ? rows : [];
-    target.textContent = approved.length ? approved.slice(0, 3).map(row => '@' + row.handle).join(' · ') : 'Nenhum relato aprovado';
-    if (expectedSerial === searchSerial && !document.getElementById('search-input').value.trim()) renderReports(approved, '');
+    if (expectedSerial !== searchSerial || document.getElementById('search-input').value.trim()) return;
+    await loadGroups('', expectedSerial);
+    target.textContent = publicGroups.length ? publicGroups.slice(0,3).map(row => '@'+row.handle).join(' · ') : 'Nenhum relato aprovado';
   } catch {
     target.textContent = 'Consulte os relatos abaixo';
-    if (expectedSerial === searchSerial && !document.getElementById('search-input').value.trim()) renderReports([], '', 'Não foi possível carregar os relatos');
+    if (expectedSerial === searchSerial) renderReports([], '', 'Não foi possível carregar os relatos');
   }
 }
 async function openProfile(id, push = true) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
   showView('perfil');
-  if (push) history.pushState({profileId:id}, '', '/perfil/' + id);
+  if (push) history.pushState({profileId:id}, '', profileHref(id));
   const target = document.getElementById('profile-detail');
   target.innerHTML = '<div class="glass-card">Carregando relato...</div>';
   try {
-    const report = await rpc('radar_report_detail', {p_id:id});
+    const report = await rpc('radar_report_detail_v2', {p_id:id});
     if (!report) throw new Error('Relato indisponível.');
     const handle = '@' + report.handle.replace(/^@/,'');
     const aliases = Array.isArray(report.old_handles) ? report.old_handles : [];
     const proofs = Array.isArray(report.proofs) ? report.proofs : [];
     const profileUrl = report.profile_verified ? tiktokProfileLink(report.handle) : '';
-    target.innerHTML = `<div class="detail-main glass-card"><div class="detail-head">${profilePhoto(report.avatar_path,handle,'detail-avatar')}<div><div class="section-kicker">Relato publicado</div><h1>${escapeHtml(handle)}</h1><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span></div></div><div class="detail-meta">${report.event_date ? `Ocorrido em ${escapeHtml(report.event_date)} · ` : ''}Publicado em ${escapeHtml(formattedDate(report.created_at))}</div><h2>O que foi relatado</h2><p class="detail-reason">${escapeHtml(report.reason)}</p>${aliases.length ? `<p class="profile-meta">Arrobas anteriores: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-check">${report.profile_verified ? 'Perfil identificado no TikTok. Confira o arroba atual antes de agir.' : 'Identidade do perfil ainda não confirmada.'}</p>${profileUrl ? `<a class="ghost-btn" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir TikTok ↗</a>` : ''}<div class="detail-actions"><button class="ghost-btn" type="button" id="detail-appeal">Recorrer deste relato</button><button class="ghost-btn" type="button" id="detail-privacy">Pedir revisão de dados</button></div></div><aside class="glass-card detail-proofs"><div class="section-kicker">Anexos revisados</div><h2>Provas públicas</h2>${proofs.length ? proofs.map(proof=>`<a href="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" target="_blank" rel="noopener noreferrer"><img src="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" alt="Prova revisada do relato" loading="lazy"></a>`).join('') : '<p>Nenhuma prova foi liberada para publicação. Os anexos originais são privados e podem ser analisados pelo administrador.</p>'}<p class="note">Relatos são alegações e podem ser contestados. Confira o contexto antes de tomar decisões.</p></aside>`;
+    target.innerHTML = `<div class="detail-main glass-card"><div class="detail-head">${profilePhoto(report.avatar_path,handle,'detail-avatar')}<div><div class="section-kicker">Relato publicado</div><h1>${escapeHtml(handle)}</h1><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span></div></div><div class="detail-meta">${report.event_date ? `Ocorrido em ${escapeHtml(report.event_date)} · ` : ''}Publicado em ${escapeHtml(formattedDate(report.created_at))}</div><p class="profile-meta">Relatado por ${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><h2>O que foi relatado</h2><p class="detail-reason">${escapeHtml(report.reason)}</p>${aliases.length ? `<p class="profile-meta">Arrobas anteriores: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-check">${report.profile_verified ? 'Perfil identificado no TikTok. Confira o arroba atual antes de agir.' : 'Identidade do perfil ainda não confirmada.'}</p>${profileUrl ? `<a class="ghost-btn" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir TikTok ↗</a>` : ''}<div class="detail-actions"><button class="ghost-btn" type="button" id="detail-appeal">Recorrer deste relato</button><button class="ghost-btn" type="button" id="detail-privacy">Pedir revisão de dados</button></div></div><aside class="glass-card detail-proofs"><div class="section-kicker">Anexos revisados</div><h2>Provas públicas</h2>${proofs.length ? proofs.map(proof=>`<a href="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" target="_blank" rel="noopener noreferrer"><img src="${SUPABASE_URL}/storage/v1/object/public/radar-public-evidence/${encodeURIComponent(proof.path).replaceAll('%2F','/')}" alt="Prova revisada do relato" loading="lazy"></a>`).join('') : '<p>Nenhuma prova foi liberada para publicação. Os anexos originais são privados e podem ser analisados pelo administrador.</p>'}<p class="note">Relatos são alegações e podem ser contestados. Confira o contexto antes de tomar decisões.</p></aside>`;
     document.getElementById('detail-appeal').addEventListener('click',()=>selectAppealReport(id,handle));
     document.getElementById('detail-privacy').addEventListener('click',()=>{
       document.getElementById('privacy-report-id').value=id; showView('privacidade');
@@ -436,27 +467,27 @@ async function openProfile(id, push = true) {
 }
 function renderReports(reports, query, message = '') {
   const normalized = foldHandle(query);
-  document.getElementById('results-title').textContent = normalized ? `Resultados para “${query.trim()}”` : 'Olho no radar.';
-  document.getElementById('results-subtitle').textContent = normalized
-    ? 'A busca considera trechos, acentos e trocas comuns de letras por números.'
-    : 'Últimos relatos aprovados pela moderação.';
+  document.getElementById('results-title').textContent = normalized ? `Perfis para “${query.trim()}”` : 'Olho no radar.';
+  document.getElementById('results-subtitle').textContent = 'Relatos publicados agrupados por conta. Abra cada relato para ver o contexto e as provas.';
   document.getElementById('result-number').textContent = reports.length;
-  document.getElementById('result-count-label').textContent = normalized
-    ? (reports.length === 1 ? 'relato encontrado' : 'relatos encontrados')
-    : (reports.length === 1 ? 'relato aprovado' : 'relatos aprovados');
+  document.getElementById('result-count-label').textContent = reports.length === 1 ? 'perfil exibido' : 'perfis exibidos';
   const empty = document.getElementById('empty-state');
   empty.style.display = reports.length ? 'none' : 'block';
-  empty.querySelector('strong').textContent = message || (normalized ? 'Nenhum relato publicado encontrado' : 'Nenhum relato aprovado ainda');
-  empty.querySelector('p').textContent = normalized ? 'Tente outro trecho do arroba. A ausência de relato não comprova a identidade de alguém.' : 'Os relatos aparecerão aqui após aprovação pela moderação.';
+  empty.querySelector('strong').textContent = message || 'Nenhum relato publicado encontrado';
+  empty.querySelector('p').textContent = 'A ausência de relato não comprova a identidade de alguém.';
   resultsGrid.style.display = reports.length ? 'grid' : 'none';
+  if (!reports.length) document.getElementById('load-more-profiles').hidden = true;
   resultsGrid.innerHTML = reports.map(item => {
-    const handle = item.handle.startsWith('@') ? item.handle : '@' + item.handle;
-    const category = categoryLabels[item.category] || 'Outro';
-    const aliases = Array.isArray(item.old_handles) ? item.old_handles.filter(x => x && x.toLowerCase() !== handle.slice(1).toLowerCase()) : [];
-    const fresh = item.last_checked_at && Date.now() - new Date(item.last_checked_at).getTime() < 24 * 60 * 60 * 1000;
-  const profileUrl = item.profile_verified ? tiktokProfileLink(handle.slice(1)) : '';
-    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path, handle)}<span class="status-pill">${escapeHtml(category)}</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<div class="profile-meta">Antes: <b>${aliases.map(x => '@' + escapeHtml(x)).join(', ')}</b></div>` : ''}<p>${escapeHtml(item.reason)}</p><div class="result-card-foot"><span>${escapeHtml(item.event_date || 'Relato publicado')}</span><span>${escapeHtml(formattedDate(item.created_at))}</span></div>${profileUrl ? `<a class="profile-link" href="${profileUrl}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<div class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Última conferência antiga; confirme o @ no TikTok') : 'Identidade do perfil ainda não confirmada'}</div><a class="case-link" href="/perfil/${escapeHtml(item.id)}" data-profile-id="${escapeHtml(item.id)}">Ver detalhes e provas ↗</a></article>`;
+    const handle = '@' + item.handle.replace(/^@/,'');
+    const aliases = Array.isArray(item.old_handles) ? item.old_handles : [];
+    const fresh = item.last_checked_at && Date.now() - new Date(item.last_checked_at).getTime() < 24*60*60*1000;
+    const children = item.reports || [item];
+    return `<article class="result-card"><div class="result-card-head">${profilePhoto(item.avatar_path,handle)}<span class="status-pill">${Number(item.report_count || 1)} relato(s)</span></div><h3>${escapeHtml(handle)}</h3>${aliases.length ? `<p class="profile-meta">Antes: ${aliases.map(x=>'@'+escapeHtml(x)).join(', ')}</p>` : ''}<p class="profile-meta">${Number(item.streamer_count || 1)} streamer(s) · relatos revisados</p><p class="profile-check ${fresh ? '' : 'warning'}">${item.profile_verified ? (fresh ? 'Perfil conferido automaticamente' : 'Conferência antiga; confira o arroba atual') : 'Identidade do perfil ainda não confirmada'}</p>${item.profile_verified ? `<a class="profile-link" href="${tiktokProfileLink(item.handle)}" target="_blank" rel="noopener noreferrer">Abrir perfil no TikTok ↗</a>` : ''}<div class="group-reports">${children.map(report=>`<div class="group-report"><span class="status-pill">${escapeHtml(categoryLabels[report.category] || 'Outro')}</span><p>${escapeHtml(report.reason)}</p><p class="profile-meta">${escapeHtml(report.streamer_name || 'Streamer')} ${streamerBadge(report.streamer_verified)}</p><small>${escapeHtml(formattedDate(report.created_at))}${report.event_date ? ' · Ocorrido em '+escapeHtml(report.event_date) : ''}</small><a class="case-link" href="${profileHref(report.id)}" data-profile-id="${escapeHtml(report.id)}">Ver relato e provas ↗</a></div>`).join('')}</div>${Number(item.report_count || 1)>children.length ? '<p class="helper">Exibindo os 50 relatos mais recentes deste perfil.</p>' : ''}</article>`;
   }).join('');
+}
+function profileHref(id) {
+  // GitHub Pages serves under a repository prefix; Cloudflare supports /perfil/<id>.
+  return location.hostname.endsWith('github.io') ? `?relato=${encodeURIComponent(id)}#perfil` : `/perfil/${encodeURIComponent(id)}`;
 }
 async function searchReports(query, scroll = false) {
   const serial = ++searchSerial;
@@ -471,9 +502,8 @@ async function searchReports(query, scroll = false) {
   }
   document.getElementById('results-title').textContent = 'Consultando o radar...';
   try {
-    const reports = await rpc('radar_search_reports_v2', { p_query: query.trim(), p_category: null });
+    await loadGroups(query.trim(), serial);
     if (serial !== searchSerial) return;
-    renderReports(Array.isArray(reports) ? reports : [], query);
     if (scroll) document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (error) {
     if (serial !== searchSerial) return;
@@ -481,6 +511,27 @@ async function searchReports(query, scroll = false) {
     toast(error.message, true);
   }
 }
+document.getElementById('pin-request-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const handle = document.getElementById('pin-request-handle').value.trim().replace(/^@+/,'');
+  if (!/^[A-Za-z0-9._]{2,40}$/.test(handle)) return toast('Informe um arroba válido.',true);
+  if (!whatsappNumber) return toast('Contato indisponível. Tente mais tarde.',true);
+  const message = ['Olá! Quero solicitar um PIN do Radar da Tropa.',
+    'Nome: '+document.getElementById('pin-request-name').value.trim(),
+    'TikTok: https://www.tiktok.com/@'+handle,
+    'Participação nas lives: '+document.getElementById('pin-request-context').value.trim(),
+    'Entendo que o acesso depende da análise do administrador.'].join('\n');
+  window.location.href = 'https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(message);
+});
+document.getElementById('whatsapp-settings-form').addEventListener('submit', async event => {
+  event.preventDefault(); const button = event.target.querySelector('button'); busy(button,true,'Salvando...');
+  try { await rpc('radar_admin_set_whatsapp',{p_number:document.getElementById('whatsapp-settings-number').value.replace(/\D/g,'')},true); await loadPublicStats(); toast('Contato atualizado.'); }
+  catch(error) { toast(error.message,true); } finally { busy(button,false); }
+});
+document.getElementById('load-more-profiles').addEventListener('click',async event => {
+  const button=event.currentTarget; busy(button,true,'Carregando...');
+  try { await loadGroups(publicQuery,searchSerial,true); } catch(error) { toast(error.message,true); } finally { busy(button,false); }
+});
 document.getElementById('search-form').addEventListener('submit', event => {
   event.preventDefault(); clearTimeout(searchTimer);
   searchReports(document.getElementById('search-input').value, true);
@@ -532,8 +583,10 @@ document.getElementById('report-form').addEventListener('submit', async event =>
   busy(button, true, 'Enviando...');
   try {
     await validateFiles(files);
-    const reportId = await rpc('radar_submit_report_v2', { p_pin: streamerPin, p_handle: handle, p_reason: reason,
+    const reportId = pendingReport?.id || await rpc('radar_submit_report_v2', { p_pin: streamerPin, p_handle: handle, p_reason: reason,
       p_category: document.getElementById('report-category').value, p_event_date: document.getElementById('report-date').value || null });
+    pendingReport = { id:reportId };
+    for (const el of event.target.querySelectorAll('input:not([type=file]),textarea,select')) { el.disabled=true;el.dataset.uploadLocked='true'; }
     const profileTask = requestProfileSync({ reportId, pin: streamerPin });
     let uploadProblem = false;
     for (const file of files) {
@@ -542,10 +595,13 @@ document.getElementById('report-form').addEventListener('submit', async event =>
     }
     document.getElementById('preview-handle').textContent = handle.startsWith('@') ? handle : '@' + handle;
     const profileResult = await profileTask;
-    document.getElementById('preview-reason').textContent = uploadProblem ? 'Relato recebido. Uma prova não foi enviada; avise o administrador.' : profileResult?.profileVerified ? 'Relato e provas recebidos. A conta do TikTok foi identificada; o administrador vai analisar antes de publicar.' : `Relato recebido. ${profileSyncMessage(profileResult?.error)} O administrador vai analisar antes de publicar.`;
+    document.getElementById('preview-reason').textContent = uploadProblem ? 'Relato salvo. Uma prova falhou; toque em Tentar anexos pendentes. O relato não será duplicado.' : profileResult?.profileVerified ? 'Relato e provas recebidos. A conta do TikTok foi identificada; o administrador vai analisar antes de publicar.' : `Relato recebido. ${profileSyncMessage(profileResult?.error)} O administrador vai analisar antes de publicar.`;
     document.getElementById('report-preview').classList.add('show');
-    event.target.reset();
-    if (!uploadProblem) toast('Relato enviado para análise.');
+    if (!uploadProblem) {
+      pendingReport=null; event.target.reset();button.dataset.oldText='Enviar para análise ↗';
+      for(const el of event.target.querySelectorAll('[data-upload-locked]')) {el.disabled=false;delete el.dataset.uploadLocked;}
+      toast('Relato enviado para análise.');
+    } else { button.dataset.oldText='Tentar anexos pendentes'; }
   } catch (error) { toast(error.message, true); }
   finally { busy(button, false); }
 });
@@ -554,7 +610,8 @@ async function validateFiles(files) {
   if (files.length > 3) throw new Error('Envie no máximo três arquivos.');
   const allowed = ['image/jpeg','image/png','image/webp','video/mp4'];
   for (const file of files) {
-    if (!allowed.includes(file.type)) throw new Error('Use JPG, PNG, WebP ou MP4.');
+    if (!allowed.includes(file.type) && !isEvidenceImage(file)) throw new Error('Use JPG, PNG, WebP, HEIC ou MP4.');
+    if (!file.size) throw new Error('Um dos arquivos está vazio.');
     if (file.size > 20 * 1024 * 1024) throw new Error('Cada arquivo deve ter até 20 MB.');
     if (file.type.startsWith('video/')) {
       const url = URL.createObjectURL(file);
@@ -562,8 +619,9 @@ async function validateFiles(files) {
         const duration = await new Promise((resolve, reject) => {
           const video = document.createElement('video');
           video.preload = 'metadata';
-          video.onloadedmetadata = () => resolve(video.duration);
-          video.onerror = () => reject(new Error('Não foi possível ler o vídeo.'));
+          const timer=setTimeout(()=>{video.removeAttribute('src');video.load();reject(new Error('Não foi possível ler a duração do vídeo. Tente um MP4 menor.'));},15000);
+          video.onloadedmetadata = () => {clearTimeout(timer);resolve(video.duration);};
+          video.onerror = () => {clearTimeout(timer);reject(new Error('Não foi possível ler o vídeo.'));};
           video.src = url;
         });
         if (!Number.isFinite(duration) || duration > 30) throw new Error('O vídeo deve ter até 30 segundos.');
@@ -571,35 +629,65 @@ async function validateFiles(files) {
     }
   }
 }
-async function imageWithoutMetadata(file) {
-  if (!file.type.startsWith('image/')) return file;
-  const bitmap = await createImageBitmap(file);
+async function decodeEvidenceImage(file) {
+  if (typeof createImageBitmap === 'function') {
+    try { const bitmap = await createImageBitmap(file); return { image: bitmap, width: bitmap.width, height: bitmap.height, close: () => bitmap.close() }; } catch { /* Safari/HEIC can require HTMLImageElement. */ }
+  }
+  const url = URL.createObjectURL(file);
   try {
-    const ratio = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(bitmap.width * ratio));
-    canvas.height = Math.max(1, Math.round(bitmap.height * ratio));
-    const context = canvas.getContext('2d');
-    if (file.type === 'image/jpeg') { context.fillStyle = '#fff'; context.fillRect(0,0,canvas.width,canvas.height); }
-    context.drawImage(bitmap,0,0,canvas.width,canvas.height);
-    return await new Promise((resolve,reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Não foi possível preparar a imagem.')),file.type,.9));
-  } finally { bitmap.close(); }
+    const image = await new Promise((resolve,reject) => {
+      const img = new Image(); const timer=setTimeout(()=>{img.src='';reject(new Error('A imagem demorou para abrir. Use uma captura de tela em JPG ou PNG.'));},15000);
+      img.onload=()=>{clearTimeout(timer);resolve(img);};
+      img.onerror=()=>{clearTimeout(timer);reject(new Error('Não foi possível abrir esta foto. Tente uma captura de tela em JPG ou PNG.'));};
+      img.src=url;
+    });
+    return { image, width: image.naturalWidth, height: image.naturalHeight, close: () => URL.revokeObjectURL(url) };
+  } catch(error) { URL.revokeObjectURL(url); throw error; }
+}
+async function imageWithoutMetadata(file) {
+  if (!isEvidenceImage(file)) return file;
+  const decoded = await decodeEvidenceImage(file);
+  try {
+    if (!decoded.width || !decoded.height || decoded.width*decoded.height>80000000) throw new Error('A foto é grande demais para preparar. Envie uma captura de tela.');
+    const ratio=Math.min(1,2400/Math.max(decoded.width,decoded.height));
+    const canvas=document.createElement('canvas'); canvas.width=Math.max(1,Math.round(decoded.width*ratio)); canvas.height=Math.max(1,Math.round(decoded.height*ratio));
+    const context=canvas.getContext('2d'); if (!context) throw new Error('Não foi possível preparar a foto neste navegador.');
+    context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(decoded.image,0,0,canvas.width,canvas.height);
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob ? resolve(blob) : reject(new Error('Não foi possível preparar a foto.')),'image/jpeg',.9));
+    if (blob.type!=='image/jpeg') throw new Error('O navegador não conseguiu converter a foto em JPG.');
+    return blob;
+  } finally { decoded.close(); }
+}
+function isEvidenceImage(file) {
+  return /^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type || '') || (!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || ''));
 }
 async function uploadEvidence(context,targetId,secret,file) {
-  const body = await imageWithoutMetadata(file);
-  const path = await rpc('radar_create_upload_ticket', { p_context:context,p_target_id:targetId,p_secret:secret,p_mime:file.type });
-  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/radar-evidence/${path}`, {
-    method:'POST', headers:{ apikey:SUPABASE_KEY, 'Content-Type':file.type, 'x-upsert':'false' }, body
-  });
-  await parseResponse(response);
-  const checked = await fetch(`${SUPABASE_URL}/functions/v1/radar-upload-check`,{
-    method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({path,secret})
-  });
+  if (uploadedFiles.get(file)===targetId) return;
+  const body=await imageWithoutMetadata(file);
+  if (!body.size || body.size>20*1024*1024) throw new Error('O arquivo preparado deve ter até 20 MB.');
+  let reservation=uploadReservations.get(file);
+  if (!reservation || reservation.targetId!==targetId) {
+    const path=await rpc('radar_create_upload_ticket',{p_context:context,p_target_id:targetId,p_secret:secret,p_mime:body.type});
+    reservation={path,targetId,stored:false}; uploadReservations.set(file,reservation);
+  }
+  if (!reservation.stored) {
+    const response=await fetch(`${SUPABASE_URL}/storage/v1/object/radar-evidence/${reservation.path}`,{
+      method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':body.type,'x-upsert':'false'},body,signal:AbortSignal.timeout(60000)});
+    const result=await response.json().catch(()=>({}));
+    // A network interruption can happen after the server has stored the object.
+    if (!response.ok && !(response.status===409 || result.error==='Duplicate' || result.statusCode==='409')) throw new Error(result.message || 'Não foi possível enviar o arquivo. Tente novamente.');
+    reservation.stored=true;
+  }
+  const checked=await fetch(`${SUPABASE_URL}/functions/v1/radar-upload-check`,{
+    method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({path:reservation.path,secret}),signal:AbortSignal.timeout(60000)});
+  if (checked.status===422) reservation.stored=false;
   await parseResponse(checked);
+  uploadedFiles.set(file,targetId);
 }
 
 function selectAppealReport(id,handle) {
+  if (pendingAppeal && !confirm('Há anexos pendentes do recurso salvo. Trocar o relato abandona apenas esta tentativa de envio. Continuar?')) return;
+  pendingAppeal=null;
   selectedAppealReport = id;
   identityChallengeId = null; verifiedChallengeId = null;
   document.getElementById('identity-panel').hidden=false;
@@ -659,8 +747,11 @@ document.getElementById('appeal-form').addEventListener('submit',async event => 
   busy(button,true,'Enviando recurso...');
   try {
     await validateFiles(files);
-    const created = await rpc('radar_create_appeal',{p_report_id:selectedAppealReport,
+    const created = pendingAppeal || await rpc('radar_create_appeal',{p_report_id:selectedAppealReport,
       p_handle:document.getElementById('appeal-handle').value.trim(),p_message:document.getElementById('appeal-message').value.trim()});
+    pendingAppeal=created;
+    document.getElementById('appeal-confirmation').hidden=false;
+    document.getElementById('appeal-protocol').textContent=created.protocol;
     const appealEmail = document.getElementById('appeal-email').value.trim();
     if (appealEmail) await rpc('radar_set_appeal_contact',{p_appeal_id:created.id,p_protocol:created.protocol,p_email:appealEmail});
     if (verifiedChallengeId) await rpc('radar_bind_appeal_identity',{p_appeal_id:created.id,p_protocol:created.protocol,p_challenge_id:verifiedChallengeId});
@@ -669,8 +760,9 @@ document.getElementById('appeal-form').addEventListener('submit',async event => 
     const output = document.getElementById('appeal-confirmation');
     output.hidden=false;
     document.getElementById('appeal-protocol').textContent=created.protocol;
-    document.getElementById('appeal-upload-status').textContent=failures ? `${failures} arquivo(s) não foram enviados. O texto do recurso foi recebido.` : 'Recurso e arquivos recebidos para análise.';
-    event.target.reset();
+    document.getElementById('appeal-upload-status').textContent=failures ? `${failures} arquivo(s) não foram enviados. Tente novamente sem duplicar o recurso.` : 'Recurso e arquivos recebidos para análise.';
+    if (!failures) {pendingAppeal=null;event.target.reset();button.dataset.oldText='Enviar recurso ↗';}
+    else {button.dataset.oldText='Tentar anexos pendentes';}
     toast('Recurso registrado. Guarde seu protocolo.');
   } catch(error) { toast(error.message,true); }
   finally { busy(button,false); }
@@ -711,11 +803,13 @@ document.getElementById('privacy-status-form').addEventListener('submit',async e
 
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard_v3', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v4', {}, true);
     renderDashboard();
+    loadPublicStats();
   } catch (error) { toast(error.message, true); }
 }
 function renderDashboard() {
+  document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
   const reports = dashboard.reports || [];
   const streamers = dashboard.streamers || [];
   const appeals = dashboard.appeals || [];
@@ -729,7 +823,7 @@ function renderDashboard() {
     return `<details class="dash-row dash-fold review-row" data-review-id="${escapeHtml(r.id)}"><summary>${profilePhoto(r.avatar_path, '@' + r.handle, 'dash-avatar')}<span class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))} · ${escapeHtml(categoryLabels[r.category] || 'Outro')}</small></span><span class="fold-right"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">${r.event_date ? `Ocorrido em ${escapeHtml(r.event_date)} · ` : ''}${r.profile_verified ? 'Conta do TikTok identificada' : 'Identidade do perfil ainda não confirmada'}</p>${!r.profile_verified ? `<p class="profile-sync-feedback note" role="status"></p><button type="button" class="mini-btn subtle" data-retry-profile="${escapeHtml(r.id)}">Conferir perfil no TikTok</button>` : ''}<p class="row-reason">${escapeHtml(r.reason)}</p>${evidenceButtons(r.evidence)}<label class="review-label">Nota da revisão <textarea maxlength="500" placeholder="Contexto da decisão (opcional)">${escapeHtml(r.review_note || '')}</textarea></label><div class="row-buttons">${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></details>`;
   }).join('') : '<div class="list-empty">Nenhum relato recebido ainda.</div>';
   const streamersList = document.getElementById('streamers-list');
-  streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><div class="row-buttons"><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
+  streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)} ${streamerBadge(s.verified && s.active)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><div class="row-buttons"><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="verify">${s.verified ? 'Retirar selo' : 'Verificar streamer'}</button><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
   document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<details class="dash-row dash-fold review-row" data-appeal-id="${escapeHtml(a.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small></span><span class="fold-right"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></details>`).join('') : '<div class="list-empty">Nenhum recurso recebido ainda.</div>';
   const contacts=new Map((dashboard.appeal_contacts||[]).map(c=>[c.id,c]));
   document.querySelectorAll('[data-appeal-id]').forEach(row=>{
@@ -755,13 +849,13 @@ async function publishEvidence(path) {
   if(!['image/jpeg','image/png','image/webp'].includes(source.type)) throw new Error('Só fotos podem ser publicadas.');
   const clean=await imageWithoutMetadata(source);
   if(clean.size>20*1024*1024) throw new Error('A imagem preparada excede 20 MB.');
-  const extension=path.split('.').pop();
+  const extension=clean.type==='image/jpeg'?'jpg':clean.type==='image/png'?'png':'webp';
   const publicPath=`reports/${reportId}/${crypto.randomUUID()}.${extension}`;
   const uploaded=await fetch(`${SUPABASE_URL}/storage/v1/object/radar-public-evidence/${publicPath}`,{
-    method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':source.type,'x-upsert':'false'},body:clean});
+    method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':clean.type,'x-upsert':'false'},body:clean});
   await parseResponse(uploaded);
   try { await rpc('radar_admin_approve_public_evidence',{
-    p_report_id:reportId,p_source_path:path,p_public_path:publicPath,p_mime:source.type},true); }
+    p_report_id:reportId,p_source_path:path,p_public_path:publicPath,p_mime:clean.type},true); }
   catch(error) {
     fetch(`${SUPABASE_URL}/storage/v1/object/radar-public-evidence`,{
       method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${await ensureAdminToken()}`,'Content-Type':'application/json'},
@@ -949,12 +1043,17 @@ document.getElementById('streamers-list').addEventListener('click', async event 
     if (button.dataset.action === 'rotate') {
       const data = await rpc('radar_admin_rotate_pin', { p_streamer_id: streamer.id }, true);
       showPin(data.name, data.pin);
+    } else if (button.dataset.action === 'verify') {
+      if (!streamer.verified && !confirm('Confirma que você conferiu a identidade deste streamer? O selo é da equipe Radar, não do TikTok.')) return;
+      await rpc('radar_admin_set_verified', { p_streamer_id: streamer.id, p_verified: !streamer.verified }, true);
+      toast(streamer.verified ? 'Selo retirado.' : 'Streamer verificado pela equipe Radar.');
     } else {
       await rpc('radar_admin_set_streamer_active', { p_streamer_id: streamer.id, p_active: !streamer.active }, true);
       toast(streamer.active ? 'Acesso suspenso.' : 'Acesso reativado.');
     }
     await loadDashboard();
-  } catch (error) { toast(error.message, true); busy(button, false); }
+  } catch (error) { toast(error.message, true); }
+  finally { busy(button, false); }
 });
 const modal = document.getElementById('admin-modal');
 let modalReturnFocus=null;
@@ -1018,12 +1117,15 @@ try {
   }
 } catch { sessionStorage.removeItem(SESSION_KEY); }
 loadRecentReports();
-const initialProfile = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i);
+loadPublicStats();
+const queryProfile = new URLSearchParams(location.search).get('relato');
+const initialProfile = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i) || (/^[0-9a-f-]{36}$/i.test(queryProfile || '') ? [null,queryProfile] : null);
 const initialView = location.hash.replace('#','');
 if (initialProfile) openProfile(initialProfile[1], false);
 else if (['consultar','relatar','recorrer','admin','privacidade','termos'].includes(initialView)) showView(initialView, false);
 window.addEventListener('popstate', () => {
-  const match = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i);
+  const qp = new URLSearchParams(location.search).get('relato');
+  const match = location.pathname.match(/^\/perfil\/([0-9a-f-]{36})\/?$/i) || (/^[0-9a-f-]{36}$/i.test(qp || '') ? [null,qp] : null);
   if (match) openProfile(match[1], false);
   else showView(location.hash.slice(1) || 'consultar', false);
 });

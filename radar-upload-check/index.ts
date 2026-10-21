@@ -7,6 +7,8 @@ const cors = (origin: string | null) => ({
   'Access-Control-Allow-Headers': 'apikey, authorization, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json',
+  'Cache-Control': 'no-store',
+  'Vary': 'Origin',
 });
 const reply = (status: number, body: unknown, origin: string | null) =>
   new Response(JSON.stringify(body), { status, headers: cors(origin) });
@@ -37,6 +39,7 @@ function mp4Duration(data: Uint8Array): number | null {
       if (kind === 'mvhd' || kind === 'mdhd') {
         const p=at+head;
         const version=data[p];
+        if (version!==0 && version!==1) return;
         const rateAt=p+(version===1?20:12);
         const durationAt=p+(version===1?24:16);
         if (durationAt+(version===1?8:4)<=at+size) {
@@ -71,19 +74,38 @@ Deno.serve(async request => {
   if (request.method==='OPTIONS') return new Response(null,{status:204,headers:cors(origin)});
   if (request.method!=='POST') return reply(405,{error:'Método inválido'},origin);
   try {
-    const {path,secret}=await request.json();
+    const {path,secret,action='verify'}=await request.json();
+    if (!['verify','cancel'].includes(action)) return reply(400,{error:'Ação inválida'},origin);
     if (typeof path!=='string' || !/^(reports|appeals)\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp|mp4)$/.test(path) || typeof secret!=='string')
       return reply(400,{error:'Envio inválido'},origin);
     const allowed=await rest('rpc/radar_check_upload_secret',{method:'POST',body:JSON.stringify({p_path:path,p_secret:secret})});
     if (allowed!==true) return reply(403,{error:'Envio não autorizado'},origin);
     const ticket=await rest(`radar_upload_tickets?object_path=eq.${encodeURIComponent(path)}&select=id,verified_at`,{method:'GET'});
     if (!ticket?.length) return reply(404,{error:'Arquivo não encontrado'},origin);
+    if (action==='cancel') {
+      // Ownership was checked above; pending-upload cleanup must remove the stored bytes too.
+      const removed=await fetch(`${base}/storage/v1/object/radar-evidence`,{method:'DELETE',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({prefixes:[path]})});
+      if (!removed.ok) throw new Error('Não foi possível remover o anexo.');
+      await rest(`radar_upload_tickets?id=eq.${ticket[0].id}`,{method:'DELETE'});
+      return reply(200,{removed:true},origin);
+    }
     if (ticket[0].verified_at) return reply(200,{verified:true},origin);
     const object=await fetch(`${base}/storage/v1/object/authenticated/radar-evidence/${path}`,{headers});
     if (!object.ok) return reply(404,{error:'Arquivo não encontrado'},origin);
     const length=Number(object.headers.get('content-length'));
     if (length>20*1024*1024) throw new Error('Cada arquivo deve ter até 20 MB.');
-    const data=new Uint8Array(await object.arrayBuffer());
+    const reader=object.body?.getReader();
+    if (!reader) throw new Error('Arquivo vazio.');
+    const chunks: Uint8Array[]=[]; let size=0;
+    while(true) {
+      const {done,value}=await reader.read(); if(done) break;
+      size+=value.byteLength;
+      if(size>20*1024*1024) {await reader.cancel();throw new Error('Cada arquivo deve ter até 20 MB.');}
+      chunks.push(value);
+    }
+    const data=new Uint8Array(size);let offset=0;
+    for(const chunk of chunks) {data.set(chunk,offset);offset+=chunk.byteLength;}
+
     const mime=fileType(data);
     const ext=path.split('.').pop();
     const expected: Record<string,string>={jpg:'image/jpeg',png:'image/png',webp:'image/webp',mp4:'video/mp4'};
