@@ -14,7 +14,7 @@ const stage=process.argv[2] || 'photos';
  try {
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
- const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:''};
+ const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(request.isNavigationRequest() && url.startsWith('https://radardatropa.pages.dev/')) return route.fulfill({status:200,contentType:'text/html',body:html});
@@ -25,15 +25,16 @@ const stage=process.argv[2] || 'photos';
   if(rpc==='radar_public_stats')return reply({published_reports:2,reported_profiles:1,active_streamers:1,verified_streamers:0,whatsapp_number:'5527981325470'});
   if(rpc==='radar_public_groups')return reply({groups:[group],total_profiles:1});
   if(rpc==='radar_profile_dossier') {const args=request.postDataJSON();return reply({profile:{...report,profile_verified:true,last_checked_at:report.created_at},aliases:[{handle:'anterior',first_seen_at:report.created_at}],total_reports:2,streamer_count:1,reports:[{...report,id:args.p_offset?secondId:reportId,reason:'<script>unsafe</script>',proofs:[]}]});}
-  if(rpc==='radar_report_detail_v2')return reply({...report,id:request.postDataJSON().p_id,proofs:[]});
+  if(rpc==='radar_report_detail_v2')return reply({...report,id:request.postDataJSON().p_id,proofs:stage==='owned'?[{path:`reports/${reportId}/${secondId}.mp4`,mime:'video/mp4'},{path:`reports/${reportId}/${secondId}.jpg`,mime:'image/jpeg'}]:[]});
   if(rpc==='radar_submit_pin_request') {const args=request.postDataJSON();state.pinAttempts++;if(state.pinProtocol)assert.equal(args.p_protocol,state.pinProtocol);state.pinProtocol=args.p_protocol;if(state.pinAttempts===1)return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"message":"Conexão temporariamente indisponível"}'});return reply({id:secondId,name:args.p_name,handle:args.p_handle,context:args.p_context,status:'received',created_at:report.created_at});}
   if(rpc==='radar_pin_request_status')return reply(request.postDataJSON().p_protocol===state.pinProtocol?{handle:'streamer_teste',status:state.pinStatus,reply:state.pinReply,updated_at:report.created_at}:null);
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
   if(rpc==='radar_admin_dashboard_v6')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
-  if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste'});
+  if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:stage==='owned'});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
   if(rpc==='radar_create_upload_ticket'){state.tickets++;return reply(`reports/${secondId}/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.jpg`);}
   if(url.includes('/storage/v1/object/radar-evidence/')){state.uploads++;assert.equal(request.headers()['content-type'],'image/jpeg');if(state.uploads===1)return route.fulfill({status:503,contentType:'application/json',body:'{"message":"Falha temporária simulada. Tente novamente."}'});return reply({});}
+  if(url.includes('/functions/v1/radar-publish-owned')){state.publications++;assert.equal(request.postDataJSON().pin,'1234512345');if(state.publications===1)return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"error":"Falha temporária ao confirmar a publicação"}'});return reply({published:true,proof_count:request.postDataJSON().expectedFiles});}
   if(url.includes('/functions/v1/radar-upload-check'))return reply({verified:true});
   if(url.includes('/functions/v1/radar-sync'))return reply({profileVerified:false,error:'verification_pending'});
   return reply({});
@@ -48,9 +49,24 @@ const stage=process.argv[2] || 'photos';
   await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=error]');
   assert.match(await page.locator('.attachment-status').textContent(),/Falha temporária/);assert.equal(await page.locator('#report-files').evaluate(el=>el.files.length),1);
   await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=done]');
-  assert.equal(await page.locator('.attachment-item progress').evaluate(el=>el.value),100);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);
+  assert.equal(await page.locator('.attachment-item progress').evaluate(el=>el.value),100);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,0);
   await page.locator('#back-to-pin').click();assert.equal(await page.locator('.attachment-item').count(),0);
   console.log('PASS photos: preview, escaped filename, measured upload, failure message, preserved retry, no duplicate report or ticket, preview cleanup');
+ }
+ if(stage==='owned') {
+  await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('#pin-input').fill('1234512345');await page.locator('#pin-preview').click();await page.waitForSelector('#report-panel.show');
+  assert.match(await page.locator('#report-publish-mode').textContent(),/publica automaticamente/);
+  await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Teste fictício de publicação automática sem gravação real.');
+  await page.locator('#report-files').setInputFiles({name:'foto.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
+  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=error]');assert.equal(state.publications,0);
+  await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('#report-form button[type=submit]').textContent==='Tentar publicação');
+  assert.equal(state.publications,1);assert.equal(await page.locator('#report-files').evaluate(el=>el.disabled),true);
+  await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>document.getElementById('preview-reason').textContent.includes('publicado automaticamente'));
+  assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,2);assert.equal(await page.locator('#report-files').evaluate(el=>el.disabled),false);
+  await page.locator('#report-handle').fill('outro_perfil');await page.locator('#report-reason').fill('Novo relato de teste sem anexos para publicação automática.');await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>pendingReport===null && document.querySelector('#report-form button[type=submit]').disabled===false);
+  assert.equal(state.reports,2);assert.equal(state.publications,3);
+  await page.evaluate(id=>openProfile(id),reportId);await page.waitForSelector('#detail-appeal');assert.equal(await page.locator('.detail-proofs video').count(),1);assert.equal(await page.locator('.detail-proofs img').count(),1);
+  console.log('PASS owner: 10-digit PIN, explicit auto mode, no publication after upload failure, retry without duplicates, public photo/video and no-attachment report');
  }
  if(stage==='pin') {
   await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('.pin-request summary').first().click();

@@ -229,3 +229,29 @@ RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs pa
 RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs dossier
 RADAR_PLAYWRIGHT_MODULE=/caminho/para/playwright node tests/browser-smoke.cjs pin
 ```
+
+### Publicação pelo acesso do administrador
+
+O streamer reservado à administração pode ter `auto_publish_by` vinculado a um
+administrador existente. Só esse acesso aceita o PIN numérico personalizado de
+10 dígitos; os acessos comuns mantêm os PINs de 12/20 caracteres e moderação.
+O PIN real é configurado diretamente como hash no banco, nunca no HTML, Git ou
+migration. Essa permissão não concede login ao painel administrativo.
+
+A tela informa o modo automático antes do envio. Primeiro salva o relato
+pendente e verifica os anexos privados; a função `radar-publish-owned` publica
+cópias e só então conclui a publicação. Fotos são preparadas sem metadados pelo
+navegador; a cópia pública também descarta EXIF, comentários e metadados de imagem.
+MP4 de até 30 segundos é aceito e exibido em player, removendo metadados de usuário
+do contêiner sem deslocar os dados do vídeo. Isso não remove dados pessoais
+visíveis no conteúdo: quem publica precisa conferir os arquivos antes de enviar.
+
+A função exige o PIN correspondente ao autor e permissão ativa. RPCs de início,
+conclusão e cancelamento são exclusivas de `service_role`. Uma reserva curta
+impede publicações concorrentes. Falhas preservam os originais e permitem repetir
+sem criar outro relato; uma resposta final perdida não apaga provas já publicadas.
+O painel mantém a capacidade de retirar relatos e provas. A autorização não
+publica relatos antigos nem comprova automaticamente a identidade no TikTok.
+
+Testes adicionais: `tests/owned-publication.test.mjs`, a transação revertida
+`tests/owned-publication.sql` e `node tests/browser-smoke.cjs owned`.
