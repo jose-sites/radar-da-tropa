@@ -13,14 +13,14 @@ function server(options = {}) {
   let handler;
   const calls = [];
   const report = { id: reportId, handle: 'example', profile_id: null,
-    profile_resolution_attempt_at: null, profile_resolution_error: null,
+    profile_resolution_attempt_at: null, profile_resolution_error: null, created_at: new Date().toISOString(),
     ...options.report };
   const query = {
     select() { return this; }, eq() { return this; }, is() { return this; },
     neq() { return this; }, or(filter) {calls.push(filter);return this;}, order(){return this;}, limit(){return this;},
     update(values) { Object.assign(report, values); calls.push('update'); return this; },
     maybeSingle() { return Promise.resolve({ data: report, error: null }); },
-    then(resolve) { return Promise.resolve({ data:[], error: null }).then(resolve); }
+    then(resolve) { return Promise.resolve({ data:options.pendingReports ? [report] : [], error: null }).then(resolve); }
   };
   const profileQuery = {
     select() { return this; }, eq() { return this; }, upsert() { return this; },
@@ -29,16 +29,16 @@ function server(options = {}) {
     maybeSingle() { return Promise.resolve({ data: { id: 'identified-profile', current_handle: 'example', avatar_path: null }, error: null }); },
     then(resolve) { return Promise.resolve({ data:[], error: null }).then(resolve); }
   };
-  const admin = { from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
+  const admin = { async rpc() { calls.push('verifyPin'); return { data: options.invalidPin ? null : { id: 'streamer' }, error: null }; }, from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
   const caller = {
     auth: { async getUser() { calls.push('getUser'); return { data: { user: options.invalidUser ? null : { id: 'user' } }, error: null }; } },
     async rpc() { calls.push('isAdmin'); return { data: options.isAdmin ?? true, error: null }; }
   };
   const context = vm.createContext({
     Request, Response, Date, Set, JSON, String, Boolean, Error, AbortController, URL, TextDecoder,
-    setTimeout, clearTimeout, console: { error() {} },
+    setTimeout(callback, delay) { if (delay < 10000) { calls.push(`wait:${delay}`); queueMicrotask(callback); return undefined; } return setTimeout(callback, delay); }, clearTimeout, console: { error() {} },
     createClient(_url, _key, config) { return config.global ? caller : admin; },
-    fetch: async url => { calls.push('provider'); if(options.stableUnavailable && url.includes('/share/user/')) return new Response('<html>Unavailable</html>',{headers:{'content-type':'text/html'}}); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
+    fetch: async url => { calls.push('provider'); const step=options.providerSteps?.[calls.filter(x=>x==='provider').length-1]; if(step instanceof Error) throw step; if(step) return new Response(profileHtml(step.profile ?? {}), {status:step.status,headers:{'content-type':'text/html'}}); if(options.stableUnavailable && url.includes('/share/user/')) return new Response('<html>Unavailable</html>',{headers:{'content-type':'text/html'}}); return new Response(profileHtml(options.providerProfile ?? {}), { status: options.providerStatus ?? 429, headers: { 'content-type': 'text/html' } }); },
     Deno: { env: { get(name) { return {
       SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service',
       SUPABASE_ANON_KEY: 'public', RADAR_SYNC_TOKEN: 's'.repeat(48), FETCHLAYER_API_KEY: options.missingIntegration ? '' : 'provider-key'
@@ -46,7 +46,12 @@ function server(options = {}) {
   });
   vm.runInContext(publicScript, context);
   vm.runInContext(stripTypeScriptTypes(source.replace(/^import .*\n/gm, '')), context);
-  return { report, calls, async sync(profile) {return context.syncProfile(profile);}, async scheduled(options, authorized=true) {
+  return { report, calls, async submit(pin = '0123456789') {
+    const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-sync', {
+      method: 'POST', headers: {origin:'https://radardatropa.pages.dev','content-type':'application/json'}, body: JSON.stringify({reportId,pin})
+    }));
+    return {status:response.status,body:await response.json()};
+  }, async sync(profile) {return context.syncProfile(profile);}, async scheduled(options, authorized=true) {
     const headers = { 'content-type':'application/json','origin':'https://radardatropa.pages.dev' };
     if(authorized) headers['x-radar-sync-token']='s'.repeat(48);
     const response=await handler(new Request('https://example.supabase.co/functions/v1/radar-sync',{method:'POST',headers,body:JSON.stringify(options)}));
@@ -274,4 +279,37 @@ test('daily refresh falls back to the last known handle only if the permanent ID
 test('daily refresh does not send an extra request after a TikTok rate limit',async()=>{
   const app=server();assert.equal(await app.sync({id:'identified-profile',tiktok_user_id:'1234567890',current_handle:'example'}),false);
   assert.equal(app.calls.filter(x=>x==='provider').length,1);
+});
+
+
+test('temporary initial lookup failures retry with backoff and link once on success', async () => {
+  const app=server({providerSteps:[{status:503},new Error('public_profile_timeout'),{status:200,profile:{id:'1234567890',uniqueId:'example'}}]});
+  const result=await app.submit();
+  assert.equal(result.status,200);assert.equal(result.body.profileVerified,true);
+  assert.equal(app.calls.filter(x=>x==='provider').length,3);
+  assert.deepEqual(app.calls.filter(x=>x.startsWith('wait:')),['wait:1000','wait:3000']);
+  assert.equal(app.calls.filter(x=>x==='update').length,2);
+  assert.ok(app.calls.indexOf('verifyPin')<app.calls.indexOf('provider'));
+});
+test('three unsuccessful lookups stay unresolved and stop retrying',async()=>{
+  const app=server({providerStatus:503});const result=await app.retry();
+  assert.equal(result.body.profileVerified,false);assert.equal(result.body.error,'public_profile_unavailable');
+  assert.equal(app.calls.filter(x=>x==='provider').length,3);assert.equal(app.report.profile_id,null);
+});
+test('a rate limit or a different identity stops immediate retries',async()=>{
+  for(const options of [{},{providerStatus:200,providerProfile:{id:'1234567890',uniqueId:'someone_else'}}]){
+    const app=server(options);assert.equal((await app.retry()).body.profileVerified,false);
+    assert.equal(app.calls.filter(x=>x==='provider').length,1);
+    assert.equal(app.calls.filter(x=>x.startsWith('wait:')).length,0);
+  }
+});
+test('ten digit PIN still requires server verification before any report lookup',async()=>{
+  const app=server({invalidPin:true});assert.equal((await app.submit()).status,403);
+  assert.ok(app.calls.includes('verifyPin'));assert.ok(!app.calls.includes('database'));assert.ok(!app.calls.includes('provider'));
+});
+test('scheduled report resolution keeps a single attempt per report',async()=>{
+  const app=server({pendingReports:true,providerStatus:503});const result=await app.scheduled({});
+  assert.equal(result.status,200);assert.equal(result.body.failed,1);
+  assert.equal(app.calls.filter(x=>x==='provider').length,1);
+  assert.equal(app.calls.filter(x=>x.startsWith('wait:')).length,0);
 });

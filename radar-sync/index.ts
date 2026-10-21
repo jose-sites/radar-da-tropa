@@ -122,13 +122,25 @@ async function saveProfile(profile: any, originalHandle: string | null = null, e
   return profileId;
 }
 
-async function resolveReport(report: { id: string; handle: string; profile_id?: string | null }) {
+// Retry only temporary lookup failures; never repeat persistence or a rate-limited lookup.
+async function lookupReportProfile(handle: string, attempts: number) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await fetchProfile('username', handle); }
+    catch (error) {
+      const code = error instanceof Error ? error.message : '';
+      if (attempt + 1 >= attempts || !['public_profile_unavailable', 'public_profile_timeout'].includes(code)) throw error;
+      await new Promise(resolve => setTimeout(resolve, attempt === 0 ? 1000 : 3000));
+    }
+  }
+}
+
+async function resolveReport(report: { id: string; handle: string; profile_id?: string | null }, attempts = 1) {
   if (report.profile_id) return true;
   const at = new Date().toISOString();
   await admin.from('radar_reports').update({ profile_resolution_attempt_at: at, profile_resolution_error: null }).eq('id', report.id);
   try {
     if (!handlePattern.test(report.handle)) throw new Error('invalid_handle');
-    const profile = await fetchProfile('username', report.handle);
+    const profile = await lookupReportProfile(report.handle, attempts);
     const profileId = await saveProfile(profile, report.handle);
     const { error } = await admin.from('radar_reports').update({ profile_id: profileId, profile_resolution_error: null }).eq('id', report.id).is('profile_id', null);
     if (error) throw new Error('report_link_failed');
@@ -244,12 +256,12 @@ Deno.serve(async (request) => {
     if (!report.profile_id) {
       if (report.profile_resolution_attempt_at && Date.now() - new Date(report.profile_resolution_attempt_at).getTime() < 5 * 60 * 1000)
         return response({ error: 'retry_later' }, 429, origin);
-      await resolveReport(report);
+      await resolveReport(report, 3);
     }
     return response(await reportResolutionResult(reportId), 200, origin);
   }
   const pin = String(body?.pin || '');
-  if (!/^[0-9a-fA-F\s-]{12,29}$/.test(pin)) return response({ error: 'invalid_request' }, 400, origin);
+  if (!/^(?:[0-9]{10}|[0-9a-fA-F\s-]{12,29})$/.test(pin)) return response({ error: 'invalid_request' }, 400, origin);
   const { data: streamer, error: pinError } = await publicClient.rpc('radar_verify_pin', { p_pin: pin });
   if (pinError || !streamer?.id) return response({ error: 'access_denied' }, 403, origin);
   const { data: report, error: reportError } = await admin.from('radar_reports')
@@ -259,7 +271,7 @@ Deno.serve(async (request) => {
   if (Date.now() - new Date(report.created_at).getTime() > 30 * 60 * 1000) return response({ error: 'registration_expired' }, 400, origin);
   if (report.profile_resolution_attempt_at && Date.now() - new Date(report.profile_resolution_attempt_at).getTime() < 5 * 60 * 1000)
     return response(await reportResolutionResult(reportId), 200, origin);
-  await resolveReport(report);
+  await resolveReport(report, 3);
   return response(await reportResolutionResult(reportId), 200, origin);
 });
 
