@@ -267,3 +267,11 @@ não são expostos. A tabela de eventos é privada e a RPC de alteração exige 
 
 A interface é estática: sem animações, transições ou rolagem suave; os controles
 continuam respondendo ao usuário e arquivos continuam sendo enviados normalmente.
+
+### Conferência antes de enviar
+
+Novos relatos abrem uma prévia com categoria, arroba, descrição, data e anexos
+antes de qualquer criação de relato ou upload. A confirmação usa o conteúdo
+conferido, e voltar para editar preserva os campos. O acesso da administração
+confirma a publicação automática; os demais confirmam o envio à moderação.
+Novas tentativas de um envio já salvo reutilizam o mesmo relato.

@@ -31,16 +31,30 @@ const stage=process.argv[2] || 'photos';
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
   if(rpc==='radar_admin_resolve_report'){const args=request.postDataJSON();state.resolution=args.p_status;state.resolutionNote=args.p_note;state.resolutionHistory.push({status:args.p_status,note:args.p_note,created_at:report.created_at});return reply(null);}
   if(rpc==='radar_admin_dashboard_v7')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
-  if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:stage==='owned'});
+  if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:['owned','review'].includes(stage)});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
   if(rpc==='radar_create_upload_ticket'){state.tickets++;return reply(`reports/${secondId}/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.jpg`);}
   if(url.includes('/storage/v1/object/radar-evidence/')){state.uploads++;assert.equal(request.headers()['content-type'],'image/jpeg');if(state.uploads===1)return route.fulfill({status:503,contentType:'application/json',body:'{"message":"Falha temporária simulada. Tente novamente."}'});return reply({});}
-  if(url.includes('/functions/v1/radar-publish-owned')){state.publications++;assert.equal(request.postDataJSON().pin,'1234512345');if(state.publications===1)return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"error":"Falha temporária ao confirmar a publicação"}'});return reply({published:true,proof_count:request.postDataJSON().expectedFiles});}
+  if(url.includes('/functions/v1/radar-publish-owned')){state.publications++;assert.equal(request.postDataJSON().pin,'1234512345');if(state.publications===1 && stage==='owned')return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"error":"Falha temporária ao confirmar a publicação"}'});return reply({published:true,proof_count:request.postDataJSON().expectedFiles});}
   if(url.includes('/functions/v1/radar-upload-check'))return reply({verified:true});
   if(url.includes('/functions/v1/radar-sync'))return reply({profileVerified:false,error:'verification_pending'});
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='review') {
+  await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('#pin-input').fill('1234512345');await page.locator('#pin-preview').click();await page.waitForSelector('#report-panel.show');
+  await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Descrição de teste para conferir antes de enviar.');
+  await page.locator('#report-files').setInputFiles({name:'<b>foto</b>.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
+  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');
+  assert.equal(state.reports,0);assert.equal(state.uploads,0);assert.equal(state.tickets,0);assert.equal(await page.locator('#report-review-content img').count(),1);
+  assert.equal(await page.locator('#report-review-content figcaption').textContent(),'<b>foto</b>.png');assert.equal(await page.locator('#report-review-content b').count(),0);
+  await page.locator('#report-review-edit').click();await page.waitForFunction(()=>reportReviewUrls.length===0);assert.equal(await page.locator('#report-files').evaluate(el=>el.files.length),1);assert.equal(await page.evaluate(()=>reportReviewUrls.length),0);
+  await page.locator('#report-files').setInputFiles([]);await page.locator('#report-reason').fill('Descrição corrigida antes da publicação automática.');
+  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');assert.match(await page.locator('#report-review-content').textContent(),/Descrição corrigida/);
+  assert.equal(state.reports,0);await page.locator('#report-review-confirm').click();await page.waitForFunction(()=>document.getElementById('preview-reason').textContent.includes('publicado automaticamente'));
+  assert.equal(state.reports,1);assert.equal(state.publications,1);assert.equal(await page.evaluate(()=>reportReviewUrls.length),0);
+  console.log('PASS review: no submission before confirmation, photo preview, escaped filename, edit without data loss and explicit publication');
+ }
  if(stage==='community') {
   const sample={...group,profile_verified:true,old_handles:['anterior'],handle:'perfil_atual'};
   await page.evaluate(sample=>renderReports([sample],''),sample);assert.match(await page.locator('.handle-change-notice').textContent(),/Antes @anterior.*agora @perfil_atual/);
@@ -101,7 +115,7 @@ const stage=process.argv[2] || 'photos';
   const filename='<b>minha foto</b>.png';
   await page.locator('#report-files').setInputFiles({name:filename,mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
   assert.equal(await page.locator('.attachment-info strong').textContent(),filename);assert.equal(await page.locator('.attachment-item b').count(),0);assert.equal(await page.locator('.attachment-item img').count(),1);
-  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=error]');
+  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');await page.locator('#report-review-confirm').click();await page.waitForSelector('.attachment-item[data-phase=error]');
   assert.match(await page.locator('.attachment-status').textContent(),/Falha temporária/);assert.equal(await page.locator('#report-files').evaluate(el=>el.files.length),1);
   await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=done]');
   assert.equal(await page.locator('.attachment-item progress').evaluate(el=>el.value),100);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,0);
@@ -113,12 +127,12 @@ const stage=process.argv[2] || 'photos';
   assert.match(await page.locator('#report-publish-mode').textContent(),/publica automaticamente/);
   await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Teste fictício de publicação automática sem gravação real.');
   await page.locator('#report-files').setInputFiles({name:'foto.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
-  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=error]');assert.equal(state.publications,0);
+  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');await page.locator('#report-review-confirm').click();await page.waitForSelector('.attachment-item[data-phase=error]');assert.equal(state.publications,0);
   await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('#report-form button[type=submit]').textContent==='Tentar publicação');
   assert.equal(state.publications,1);assert.equal(await page.locator('#report-files').evaluate(el=>el.disabled),true);
   await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>document.getElementById('preview-reason').textContent.includes('publicado automaticamente'));
   assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,2);assert.equal(await page.locator('#report-files').evaluate(el=>el.disabled),false);
-  await page.locator('#report-handle').fill('outro_perfil');await page.locator('#report-reason').fill('Novo relato de teste sem anexos para publicação automática.');await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>pendingReport===null && document.querySelector('#report-form button[type=submit]').disabled===false);
+  await page.locator('#report-handle').fill('outro_perfil');await page.locator('#report-reason').fill('Novo relato de teste sem anexos para publicação automática.');await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');await page.locator('#report-review-confirm').click();await page.waitForFunction(()=>pendingReport===null && document.querySelector('#report-form button[type=submit]').disabled===false);
   assert.equal(state.reports,2);assert.equal(state.publications,3);
   await page.evaluate(id=>openProfile(id),reportId);await page.waitForSelector('#detail-appeal');assert.equal(await page.locator('.detail-proofs video').count(),1);assert.equal(await page.locator('.detail-proofs img').count(),1);
   console.log('PASS owner: 10-digit PIN, explicit auto mode, no publication after upload failure, retry without duplicates, public photo/video and no-attachment report');

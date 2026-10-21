@@ -113,6 +113,7 @@
 .primary-btn:hover,.primary-btn:active,.result-card:hover{transform:none}
 .detail-proofs img{aspect-ratio:4/3;height:auto;object-fit:contain}
 .handle-change-notice,.case-resolution{padding:13px 14px;margin:0 0 20px;border:1px solid #52683c;border-radius:12px;background:#263020;overflow-wrap:anywhere}.handle-change-notice strong,.case-resolution strong{display:block;color:#cce99d;font-size:12px}.result-card .handle-change-notice p,.result-card .case-resolution p,.case-resolution p{font-size:12px;line-height:1.7;margin:5px 0;color:#d1dbc6}.handle-change-notice small,.case-resolution small{display:block;color:#a5b59a;font-size:10px;margin-top:4px}.case-resolution.is-reopened{border-color:#7b6840;background:#30291c}.case-resolution.is-reopened strong{color:#e5c890}.case-resolution details{font-size:12px;margin-top:12px}.case-resolution li{margin:10px 0}.case-resolution summary{cursor:pointer}#resolution-dialog{max-width:540px}#resolution-dialog>.ghost-btn{float:right}
+#report-review-dialog{max-width:620px}.review-description{white-space:pre-line;overflow-wrap:anywhere;color:#e0e7d7}.report-review-gallery{display:grid;gap:14px;margin-top:18px}.report-review-gallery figure{margin:0;min-width:0}.report-review-gallery img,.report-review-gallery video{width:100%;max-height:260px;object-fit:contain;background:#11170f;border-radius:10px}.report-review-gallery figcaption{color:#a9b49e;font-size:12px;overflow-wrap:anywhere;margin-top:5px}#report-review-dialog .detail-actions{justify-content:space-between}#report-review-dialog .detail-actions button{white-space:normal}
 </style>
 </head>
 <body>
@@ -186,7 +187,7 @@
               <div id="report-panel" class="glass-card form-panel">
                 <button class="back-link" type="button" id="back-to-pin">← Sair da área do streamer</button>
                 <div class="card-topline"><span class="circle-icon" aria-hidden="true">＋</span><span><h2>Novo relato</h2><small id="streamer-name">Acesso validado</small></span></div>
-                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. Tentamos consultar o perfil e a foto; bloqueios do TikTok podem impedir a identificação.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Confira abaixo o modo de publicação do seu acesso.</small></label><div id="report-attachment-list" class="attachment-list" aria-live="polite"></div><button class="primary-btn full" type="submit">Enviar para análise <span aria-hidden="true">↗</span></button></form>
+                <form id="report-form"><label class="field"><span>Arroba atual da pessoa</span><input id="report-handle" required maxlength="40" placeholder="@exemplo"><small class="helper">Informe só o @. Tentamos consultar o perfil e a foto; bloqueios do TikTok podem impedir a identificação.</small></label><label class="field"><span>Categoria</span><select id="report-category"><option value="nao_pagamento">Não pagamento</option><option value="falsidade">Identidade falsa</option><option value="abuso">Abuso</option><option value="outro">Outro</option></select></label><label class="field"><span>Data do ocorrido (opcional)</span><input id="report-date" type="date"></label><label class="field"><span>O que aconteceu?</span><textarea id="report-reason" required minlength="15" maxlength="500" placeholder="Descreva a situação de forma clara e objetiva, sem divulgar dados pessoais..."></textarea></label><label class="field"><span>Fotos ou vídeo de até 30 segundos (opcional)</span><input id="report-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Confira abaixo o modo de publicação do seu acesso.</small></label><div id="report-attachment-list" class="attachment-list" aria-live="polite"></div><button class="primary-btn full" type="submit">Revisar relato <span aria-hidden="true">↗</span></button></form>
                 <div class="preview-report" id="report-preview" role="status"><b id="preview-handle"></b><p id="preview-reason"></p></div>
                 <p id="report-publish-mode" class="helper" role="status">Relatos e anexos são enviados para análise.</p><p class="helper">Evite publicar telefones, endereços ou dados privados de outras pessoas.</p>
               </div>
@@ -284,6 +285,7 @@
     </main>
 
     <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Idealizado e criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Streamer</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#privacidade" data-go="privacidade">Privacidade</a><a href="#termos" data-go="termos">Termos</a><a href="#admin" data-go="admin">Admin</a></div></div></footer>
+    <dialog id="report-review-dialog" class="media-dialog" aria-labelledby="report-review-title"><h2 id="report-review-title">Confira antes de enviar</h2><div id="report-review-content"></div><p id="report-review-mode" class="helper"></p><div class="detail-actions"><button type="button" id="report-review-edit" class="ghost-btn">Voltar e editar</button><button type="button" id="report-review-confirm" class="primary-btn">Confirmar envio</button></div></dialog>
     <dialog id="resolution-dialog" class="media-dialog" aria-labelledby="resolution-title"><button type="button" class="ghost-btn" id="resolution-close">Fechar ×</button><h2 id="resolution-title">Atualizar situação do caso</h2><form id="resolution-form"><input id="resolution-id" type="hidden"><label class="field"><span>Situação</span><select id="resolution-status"><option value="resolved">Caso resolvido</option><option value="open">Caso reaberto</option></select></label><label class="field"><span>Explicação pública</span><textarea id="resolution-note" required minlength="5" maxlength="300" placeholder="Ex.: pagamento confirmado pelas partes."></textarea></label><p class="helper">Esta explicação aparece publicamente. Atualizar a situação mantém o relato original e o histórico de alterações.</p><button class="primary-btn" type="submit">Salvar situação</button><p id="resolution-feedback" class="helper" role="status"></p></form></dialog>
     <dialog id="evidence-dialog" class="media-dialog" aria-label="Prova privada"><button id="evidence-close" class="ghost-btn" type="button">Fechar ×</button><div id="evidence-content"></div></dialog>
     <div class="modal-backdrop" id="admin-modal" hidden aria-hidden="true">
@@ -310,6 +312,8 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'
 let toastTimer, searchTimer, searchSerial = 0;
 let streamerPin = null, streamerAutoPublish=false;
 let pendingReport = null, pendingAppeal = null;
+let reportReviewApproved=null,reportReviewDraft=null,reportSending=false;
+const reportReviewUrls=[];
 let dossierSerial=0;
 let pinRequestDraft=null;
 const PIN_REQUEST_KEY='radar_pin_request_draft';
@@ -349,11 +353,12 @@ function showView(name, scroll = true) {
 }
 function clearStreamerAccess() {
   streamerPin = null;streamerAutoPublish=false;
+  if(document.getElementById('report-review-dialog').open)document.getElementById('report-review-dialog').close();
   document.getElementById('report-publish-mode').textContent='Relatos e anexos são enviados para análise.';
   pendingReport = null;
   clearAttachmentPreviews('report');
   const reportSubmit=document.querySelector('#report-form button[type=submit]');
-  reportSubmit.dataset.oldText='Enviar para análise ↗';reportSubmit.textContent='Enviar para análise ↗';
+  reportSubmit.dataset.oldText='Revisar relato ↗';reportSubmit.textContent='Revisar relato ↗';
   document.querySelectorAll('#report-form [data-upload-locked]').forEach(el => { el.disabled = false; delete el.dataset.uploadLocked; });
   document.getElementById('pin-input').value = '';
   document.getElementById('report-panel').classList.remove('show');
@@ -740,7 +745,7 @@ document.getElementById('pin-preview').addEventListener('click', async event => 
     if (!streamer?.id) throw new Error('PIN inválido ou inativo.');
     streamerPin = pin;streamerAutoPublish=streamer.can_auto_publish===true;
     document.getElementById('report-publish-mode').textContent=streamerAutoPublish?'Seu acesso publica automaticamente o relato e as cópias das provas após o envio e a validação. Revise os arquivos e remova dados pessoais antes de enviar.':'Seu relato será analisado antes de publicar. Os anexos originais ficam privados para a administração.';
-    const submit=document.querySelector('#report-form button[type=submit]');submit.textContent=streamerAutoPublish?'Enviar e publicar ↗':'Enviar para análise ↗';
+    const submit=document.querySelector('#report-form button[type=submit]');submit.textContent=streamerAutoPublish?'Revisar e publicar ↗':'Revisar relato ↗';
     document.getElementById('pin-input').value = '';
     document.getElementById('streamer-name').textContent = `Acesso de ${streamer.name}`;
     document.getElementById('pin-panel').style.display = 'none';
@@ -754,20 +759,51 @@ document.getElementById('back-to-pin').addEventListener('click', () => {
   document.getElementById('pin-input').focus();
 });
 for(const context of ['report','appeal']) document.getElementById(context+'-files').addEventListener('change',()=>renderAttachmentPreviews(context));
+function openReportReview(handle,reason,files,categoryValue,eventDate) {
+  reportReviewDraft={handle,reason,files,categoryValue,eventDate};
+  const target=document.getElementById('report-review-content');target.replaceChildren();
+  const category=document.createElement('span');category.className='status-pill';category.textContent=categoryLabels[categoryValue] || 'Outro';target.append(category);
+  const heading=document.createElement('h3');heading.textContent=handle.startsWith('@')?handle:'@'+handle;target.append(heading);
+  const description=document.createElement('p');description.className='review-description';description.textContent=reason;target.append(description);
+  const occurred=eventDate;
+  if(occurred){const date=document.createElement('p');date.className='helper';date.textContent='Ocorrido em '+cardEventDate(occurred);target.append(date);}
+  const gallery=document.createElement('div');gallery.className='report-review-gallery';
+  for(const file of files){
+    const figure=document.createElement('figure'),url=URL.createObjectURL(file);reportReviewUrls.push(url);
+    const media=document.createElement(file.type==='video/mp4'?'video':'img');media.src=url;
+    if(media.tagName==='VIDEO'){media.controls=true;media.playsInline=true;media.preload='metadata';}else {media.alt='Prévia de '+file.name;media.onerror=()=>{media.hidden=true;};}
+    const name=document.createElement('figcaption');name.textContent=file.name;figure.append(media,name);gallery.append(figure);
+  }
+  if(files.length)target.append(gallery);else {const empty=document.createElement('p');empty.className='helper';empty.textContent='Nenhum anexo selecionado.';target.append(empty);}
+  document.getElementById('report-review-mode').textContent=streamerAutoPublish?'Ao confirmar, o relato e as provas serão publicados pelo seu acesso após o envio e a validação. Confira os dados pessoais nos arquivos.':'Ao confirmar, o relato será enviado para análise. Os anexos originais ficam privados para a administração.';
+  document.getElementById('report-review-confirm').textContent=streamerAutoPublish?'Confirmar e publicar':'Confirmar envio para análise';
+  document.getElementById('report-review-dialog').showModal();
+}
+document.getElementById('report-review-edit').addEventListener('click',()=>document.getElementById('report-review-dialog').close());
+document.getElementById('report-review-dialog').addEventListener('close',()=>{
+  document.getElementById('report-review-content').querySelectorAll('video').forEach(video=>{video.pause();video.removeAttribute('src');video.load();});
+  for(const url of reportReviewUrls)URL.revokeObjectURL(url);reportReviewUrls.length=0;reportReviewDraft=null;document.getElementById('report-review-content').replaceChildren();
+});
+document.getElementById('report-review-confirm').addEventListener('click',()=>{
+  reportReviewApproved=reportReviewDraft;document.getElementById('report-review-dialog').close();document.getElementById('report-form').requestSubmit();reportReviewApproved=null;
+});
 async function publishOwnedReport(reportId,expectedFiles) {
   const response=await fetch(`${SUPABASE_URL}/functions/v1/radar-publish-owned`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({reportId,pin:streamerPin,expectedFiles}),signal:AbortSignal.timeout(110000)});
   const result=await parseResponse(response);if(result?.published!==true)throw new Error('Não foi possível confirmar a publicação. Tente novamente.');return result;
 }
 document.getElementById('report-form').addEventListener('submit', async event => {
-  event.preventDefault();
+  event.preventDefault();const reviewed=reportReviewApproved;reportReviewApproved=null;
+  if(reportSending)return;
   if (!streamerPin) return toast('Entre com seu PIN primeiro.', true);
-  const handle=document.getElementById('report-handle').value.trim(),reason=document.getElementById('report-reason').value.trim();
-  const files=[...document.getElementById('report-files').files];
+  const handle=reviewed?.handle ?? document.getElementById('report-handle').value.trim(),reason=reviewed?.reason ?? document.getElementById('report-reason').value.trim();
+  const files=reviewed?.files ?? [...document.getElementById('report-files').files],categoryValue=reviewed?.categoryValue ?? document.getElementById('report-category').value,eventDate=reviewed?.eventDate ?? document.getElementById('report-date').value;
   if(reason.length<15)return toast('Descreva o motivo em pelo menos 15 caracteres.',true);
-  const button=event.target.querySelector('button[type=submit]');busy(button,true,'Enviando...');
+  const button=event.target.querySelector('button[type=submit]');reportSending=true;busy(button,true,'Conferindo...');
   try {
     await validateFiles(files);
-    const reportId=pendingReport?.id || await rpc('radar_submit_report_v2',{p_pin:streamerPin,p_handle:handle,p_reason:reason,p_category:document.getElementById('report-category').value,p_event_date:document.getElementById('report-date').value || null});
+    if(!pendingReport && !reviewed){openReportReview(handle,reason,files,categoryValue,eventDate);return;}
+    busy(button,true,'Enviando...');
+    const reportId=pendingReport?.id || await rpc('radar_submit_report_v2',{p_pin:streamerPin,p_handle:handle,p_reason:reason,p_category:categoryValue,p_event_date:eventDate || null});
     pendingReport={id:reportId};
     for(const el of event.target.querySelectorAll(streamerAutoPublish?'input,textarea,select':'input:not([type=file]),textarea,select')){el.disabled=true;el.dataset.uploadLocked='true';}
     const profileTask=requestProfileSync({reportId,pin:streamerPin});let uploadProblem=false,publicationProblem='';
@@ -780,12 +816,12 @@ document.getElementById('report-form').addEventListener('submit', async event =>
     document.getElementById('preview-reason').textContent=uploadProblem?'Relato salvo. Uma prova falhou; toque em Tentar anexos pendentes. O relato não será duplicado.':publicationProblem?'Relato salvo, mas a publicação ainda não foi confirmada: '+publicationProblem+' Toque em Tentar publicação.':streamerAutoPublish?'Relato publicado automaticamente, com as provas enviadas. '+(profileResult?.profileVerified?'A conta do TikTok foi identificada.':'A identidade do perfil ainda não foi confirmada.'):profileResult?.profileVerified?'Relato e provas recebidos. A conta do TikTok foi identificada; o administrador vai analisar antes de publicar.':`Relato recebido. ${profileSyncMessage(profileResult?.error)} O administrador vai analisar antes de publicar.`;
     document.getElementById('report-preview').classList.add('show');
     if(!uploadProblem && !publicationProblem){
-      pendingReport=null;event.target.reset();button.dataset.oldText=streamerAutoPublish?'Enviar e publicar ↗':'Enviar para análise ↗';
+      pendingReport=null;event.target.reset();button.dataset.oldText=streamerAutoPublish?'Revisar e publicar ↗':'Revisar relato ↗';
       for(const el of event.target.querySelectorAll('[data-upload-locked]')){el.disabled=false;delete el.dataset.uploadLocked;}
       toast(streamerAutoPublish?'Relato e provas publicados.':'Relato enviado para análise.');
       if(streamerAutoPublish){searchReports(document.getElementById('search-input').value);loadPublicStats();}
     }else button.dataset.oldText=uploadProblem?'Tentar anexos pendentes':'Tentar publicação';
-  }catch(error){toast(error.message,true);}finally{busy(button,false);}
+  }catch(error){toast(error.message,true);}finally{reportSending=false;busy(button,false);}
 });
 
 async function validateFiles(files) {
