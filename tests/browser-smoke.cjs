@@ -58,6 +58,25 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='collapse') {
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});
+  await page.waitForSelector('[data-review-id]');
+  assert.equal(await page.locator('.admin-section-toggle').count(),6);
+  const reports=page.locator('.dashboard-card').filter({has:page.locator('#reports-list')});
+  await page.locator('[data-review-id]').first().locator('summary').click();
+  await page.locator('[data-review-id]').first().locator('textarea').fill('Rascunho preservado ao minimizar');
+  const toggle=reports.locator('.admin-section-toggle');await toggle.click();
+  assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#reports-list').isVisible(),false);
+  const refreshed=page.waitForResponse(response=>response.url().endsWith('/rpc/radar_admin_dashboard_v8'));
+  await page.locator('#refresh-dashboard').click();await refreshed;
+  assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+  await toggle.focus();await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#reports-list').isVisible(),true);
+  assert.equal(await page.locator('[data-review-id]').first().locator('textarea').inputValue(),'Rascunho preservado ao minimizar');
+  for(const button of await page.locator('.admin-section-toggle').all()){await button.click();assert.equal(await button.getAttribute('aria-expanded'),'false');await button.click();assert.equal(await button.getAttribute('aria-expanded'),'true');}
+  await page.locator('#create-streamer-open').click();await page.waitForSelector('#admin-modal:visible');
+  console.log('PASS collapse: six sections, keyboard, refresh, preserved draft and create-access action');
+ }
  if(stage==='routing') {
   await page.locator('[data-profile-id]').first().click();await page.waitForSelector('#detail-appeal');
   const detailUrl=page.url();await page.reload();await page.waitForSelector('#detail-appeal');
