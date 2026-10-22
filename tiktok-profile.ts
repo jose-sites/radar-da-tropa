@@ -115,3 +115,47 @@ export async function fetchPublicTikTokSummary(handle: string, fetcher: typeof f
     return { displayName };
   } finally { clearTimeout(timer); }
 }
+
+// Public API-live account metadata, also used by open-source TikTok LIVE clients.
+// This reads only account identity; it never opens a stream or uses a login cookie.
+export async function fetchPublicTikTokLiveProfile(handle: string, fetcher: typeof fetch = fetch) {
+  if (!handlePattern.test(handle)) throw new Error('invalid_handle');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const url = new URL('https://www.tiktok.com/api-live/user/room/');
+    url.searchParams.set('uniqueId', handle);
+    url.searchParams.set('sourceType', '54');
+    url.searchParams.set('aid', '1988');
+    const result = await fetcher(url.href, { redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json' } });
+    if (!result.ok || !(result.headers.get('content-type') || '').toLowerCase().includes('application/json')) {
+      await result.body?.cancel();
+      throw new Error(result.status === 429 ? 'public_rate_limited' : 'public_profile_unavailable');
+    }
+    const reader = result.body?.getReader();
+    if (!reader) throw new Error('public_profile_unavailable');
+    const decoder = new TextDecoder();
+    let text = '', bytes = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > 250000) { await reader.cancel(); throw new Error('public_profile_unavailable'); }
+      text += decoder.decode(value, { stream: true });
+    }
+    let data: any;
+    try { data = JSON.parse(text + decoder.decode()); } catch { throw new Error('public_profile_unavailable'); }
+    const user = data?.data?.user;
+    if (data?.statusCode !== 0 || typeof user?.id !== 'string' || !idPattern.test(user.id) ||
+        typeof user.uniqueId !== 'string' || !handlePattern.test(user.uniqueId)) throw new Error('public_profile_unavailable');
+    if (user.uniqueId.toLowerCase() !== handle.toLowerCase()) throw new Error('identity_mismatch');
+    return { id: user.id, uniqueId: user.uniqueId,
+      secUid: typeof user.secUid === 'string' ? user.secUid : null,
+      avatarUrl: typeof user.avatarLarger === 'string' ? user.avatarLarger : typeof user.avatarMedium === 'string' ? user.avatarMedium : null,
+      signature: typeof user.signature === 'string' ? user.signature : '' };
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error('public_profile_timeout');
+    if (error instanceof Error && ['public_rate_limited', 'public_profile_unavailable', 'identity_mismatch'].includes(error.message)) throw error;
+    throw new Error('public_profile_unavailable');
+  } finally { clearTimeout(timer); }
+}

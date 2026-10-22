@@ -313,3 +313,15 @@ Quando a página não fornece ID/foto, uma consulta ao oEmbed oficial pode salva
 somente o nome e a data. A interface informa dados parciais; `profile_verified`
 permanece falso e o agrupamento continua pelo arroba. Essa consulta básica roda
 no Supabase independentemente do agendamento do worker de navegador no GitHub.
+
+## Consulta pública de identidade
+
+A resolução tenta primeiro os metadados públicos `/api-live/user/room/` do TikTok
+(uma chamada JSON, sem login). Aceita somente `data.user.id` textual e o arroba
+exato; `roomId` nunca identifica a pessoa. A rota pode não fornecer dados para
+contas sem histórico de LIVE; nesse caso a consulta HTML e o oEmbed continuam
+como alternativas. HTTP 429 ou identidade divergente interrompem as alternativas.
+O teste real de @ntdamidia0 nessa rota retornou ID e avatar em 22/10/2026.
+Disponibilidade futura não é garantida; não são usados cookies nem assinadores
+externos. A busca pelo ID permanente e a validação contra troca de dono do
+arroba permanecem obrigatórias nas atualizações.

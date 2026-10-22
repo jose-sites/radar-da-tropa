@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { fetchPublicTikTokProfile, fetchPublicTikTokSummary } from '../tiktok-profile.ts';
+import { fetchPublicTikTokProfile, fetchPublicTikTokSummary, fetchPublicTikTokLiveProfile } from '../tiktok-profile.ts';
 import { collectorRequest } from '../collector-bridge.ts';
 
 // O identificador da conta e a chave do provedor nunca saem deste servidor.
@@ -125,6 +125,14 @@ async function saveProfile(profile: any, originalHandle: string | null = null, e
 
 // Retry only temporary lookup failures; never repeat persistence or a rate-limited lookup.
 async function lookupReportProfile(handle: string, attempts: number) {
+  // One small public JSON request first; keep HTML as a fallback for accounts
+  // without API-live metadata. Never retry another route after a rate limit or
+  // mismatched account, and never confuse roomId with the permanent user ID.
+  try { return await fetchPublicTikTokLiveProfile(handle); }
+  catch (error) {
+    const code = error instanceof Error ? error.message : '';
+    if (!['public_profile_unavailable', 'public_profile_timeout'].includes(code)) throw error;
+  }
   for (let attempt = 0; ; attempt++) {
     try { return await fetchProfile('username', handle); }
     catch (error) {
@@ -186,7 +194,7 @@ async function syncProfile(profile: { id: string; tiktok_user_id: string; curren
     catch (error) {
       const code = error instanceof Error ? error.message : '';
       if (!['public_profile_unavailable','public_profile_timeout'].includes(code) || !handlePattern.test(profile.current_handle)) throw error;
-      fresh = await fetchProfile('username', profile.current_handle);
+      fresh = await lookupReportProfile(profile.current_handle, 1);
     }
     // An old handle may have been reassigned: never update without the same stable ID.
     await saveProfile(fresh, null, profile.tiktok_user_id);
