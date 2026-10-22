@@ -15,7 +15,7 @@ const stage=process.argv[2] || 'photos';
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  const avatarData=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=600;c.height=600;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,'#7c9a65');g.addColorStop(1,'#15281e');x.fillStyle=g;x.fillRect(0,0,600,600);x.fillStyle='#c9d5a9';x.beginPath();x.arc(300,240,100,0,Math.PI*2);x.fill();x.fillStyle='#334c39';x.beginPath();x.ellipse(300,535,205,170,0,0,Math.PI*2);x.fill();return c.toDataURL('image/png').split(',')[1];});
- const state={reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
+ const state={verified:[],verifiedFails:false,reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(url.startsWith('https://radardatropa.pages.dev/story-approved-v1.webp'))return route.fulfill({status:state.templateFails?503:200,contentType:'image/webp',body:state.templateFails?Buffer.from('Unavailable'):fs.readFileSync(path.join(root,'story-approved-v1.webp'))});
@@ -24,6 +24,7 @@ const stage=process.argv[2] || 'photos';
   if(!url.startsWith(base))return route.abort();
   if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*'}});
   const rpc=url.split('/rpc/')[1];
+  if(rpc==='radar_public_verified_streamers')return state.verifiedFails ? route.fulfill({status:503,contentType:'application/json',body:'{}',headers:{'access-control-allow-origin':'*'}}) : reply(state.verified);
   if(rpc==='radar_public_stats')return reply({published_reports:2,reported_profiles:1,active_streamers:1,verified_streamers:0,whatsapp_number:'5527981325470'});
   if(rpc==='radar_public_groups')return reply({groups:[{...group,reports:group.reports.map(row=>({...row,resolution_status:state.resolution,resolution_note:state.resolutionNote}))}],total_profiles:1});
   if(rpc==='radar_profile_dossier') {const args=request.postDataJSON();return reply({profile:{...report,profile_verified:true,last_checked_at:report.created_at},aliases:[{handle:'anterior',first_seen_at:report.created_at}],total_reports:2,streamer_count:1,reports:[{...report,id:args.p_offset?secondId:reportId,reason:'<script>unsafe</script>',proofs:[]}]});}
@@ -44,6 +45,29 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='verified') {
+  assert.equal(await page.locator('.nav [data-go=admin]').count(),0);
+  assert.equal(await page.locator('.nav [data-go=relatar]').textContent(),'Denunciar');
+  await page.locator('.nav [data-go=verificados]').click();
+  await page.waitForFunction(()=>document.getElementById('verified-status').textContent.includes('Ainda não'));
+  assert.equal(await page.locator('.verified-card').count(),0);
+  state.verified=[{name:'Canal de teste'},{name:'<img src=x onerror=alert(1)>'}];
+  await page.reload();
+  await page.waitForSelector('.verified-card');
+  assert.equal(await page.locator('.verified-card').count(),2);
+  assert.equal(await page.locator('.verified-card img').count(),0);
+  assert.equal(await page.locator('.verified-card h2').last().textContent(),'<img src=x onerror=alert(1)>');
+  assert.equal(await page.locator('.streamer-badge:visible').count(),2);
+  state.verifiedFails=true;
+  await page.reload();await page.waitForSelector('#verified-retry:visible');
+  state.verifiedFails=false;state.verified=[];
+  await page.locator('#verified-retry').click();
+  await page.waitForFunction(()=>document.getElementById('verified-status').textContent.includes('Ainda não'));
+  assert.equal(await page.locator('#verified-retry').isVisible(),false);
+  await page.locator('.footer-links [data-go=admin]').click();
+  await page.waitForSelector('#admin.active');
+  console.log('PASS verified: public nav, footer admin, empty directory, badges, escaped names, retry, mobile');
+ }
  if(stage==='story') {
   await page.evaluate(()=>{window.__photoDraws=0;const original=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){if((typeof ImageBitmap==='function' && args[0] instanceof ImageBitmap) || (args[0] instanceof HTMLImageElement && args[0].src.startsWith('blob:')))window.__photoDraws++;return original.apply(this,args);};});
   await page.locator('.report-share-button').first().click();await page.waitForFunction(()=>document.querySelector('#share-preview img')?.naturalWidth>0);

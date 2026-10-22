@@ -1,4 +1,4 @@
-import { fetchPublicTikTokProfile } from '../tiktok-profile.ts';
+import { fetchPublicTikTokProfile, fetchPublicTikTokLiveProfile } from '../tiktok-profile.ts';
 // Código temporário na bio do TikTok para identificar quem apresenta um recurso.
 const base = Deno.env.get('SUPABASE_URL') || '';
 const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -45,8 +45,15 @@ Deno.serve(async request=>{
       if(!row||Date.parse(row.expires_at)<Date.now()||row.attempts>=5) return reply(410,{error:'Código expirado. Gere outro.'},origin);
       if(row.verified_at) return reply(200,{verified:true},origin);
       let profile;
-      try { profile = await fetchPublicTikTokProfile('username', row.handle); }
-      catch { return reply(503,{error:'Não foi possível ler a bio pública no TikTok. Tente mais tarde.'},origin); }
+      try {
+        try { profile = await fetchPublicTikTokLiveProfile(row.handle); }
+        catch (error) {
+          const code = error instanceof Error ? error.message : '';
+          if (!['public_profile_unavailable', 'public_profile_timeout'].includes(code)) throw error;
+          profile = await fetchPublicTikTokProfile('username', row.handle);
+        }
+      }
+      catch { return reply(503,{error:'O TikTok não disponibilizou a bio agora. Tente mais tarde ou envie o recurso sem confirmar o perfil.'},origin); }
       // Provider failures do not spend one of the user's code-verification attempts.
       await query('radar_appeal_challenges?id=eq.'+row.id,'PATCH',{attempts:row.attempts+1});
       const signature=String(profile?.signature||'');

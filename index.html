@@ -116,6 +116,7 @@
 #report-review-dialog{max-width:620px}.review-description{white-space:pre-line;overflow-wrap:anywhere;color:#e0e7d7}.report-review-gallery{display:grid;gap:14px;margin-top:18px}.report-review-gallery figure{margin:0;min-width:0}.report-review-gallery img,.report-review-gallery video{width:100%;max-height:260px;object-fit:contain;background:#11170f;border-radius:10px}.report-review-gallery figcaption{color:#a9b49e;font-size:12px;overflow-wrap:anywhere;margin-top:5px}#report-review-dialog .detail-actions{justify-content:space-between}#report-review-dialog .detail-actions button{white-space:normal}
 #share-dialog{max-width:540px}#share-close{float:right}#share-preview{margin:18px 0}#share-preview img{display:block;width:100%;height:auto;max-height:none;border-radius:12px}#share-dialog .detail-actions{flex-wrap:wrap}#share-dialog [hidden]{display:none!important}#share-dialog .ghost-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px}#share-url{font-size:12px;min-width:0}.report-share-button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;width:100%;border:1px solid #414d35;border-radius:10px;background:transparent;color:#bdd89a;font-size:12px;margin-top:10px;padding:10px;cursor:pointer}.report-share-button:hover{border-color:#b3d47b}.report-share-button:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
 .creator-signature{font-size:10px;font-weight:500;letter-spacing:.015em;color:#8fa180;margin-top:6px}.brand .brand-name{display:block}#share-dialog{max-width:440px}#share-preview img{max-height:65vh;width:auto;max-width:100%;margin-inline:auto;object-fit:contain}#share-dialog .detail-actions{gap:8px}
+.verified-list{margin:24px 0 40px}.verified-card{border:1px solid #343a31;border-radius:16px;background:#1c211b;padding:22px;min-width:0}.verified-card h2{font-size:20px;overflow-wrap:anywhere;margin:14px 0}.verified-explainer{max-width:660px;margin:0 auto 24px;text-align:center}
 </style>
 </head>
 <body>
@@ -128,9 +129,9 @@
         </a>
         <nav class="nav" aria-label="Navegação principal">
           <button class="nav-btn active" type="button" data-go="consultar">Consultar @</button>
-          <button class="nav-btn" type="button" data-go="relatar">Streamer</button>
+          <button class="nav-btn" type="button" data-go="relatar">Denunciar</button>
           <button class="nav-btn" type="button" data-go="recorrer">Recorrer</button>
-          <button class="nav-btn" type="button" data-go="admin">Administrador</button>
+          <button class="nav-btn" type="button" data-go="verificados">Verificados</button>
         </nav>
       </div>
     </header>
@@ -141,7 +142,7 @@
           <div class="hero-content">
             <div class="eyebrow"><span class="eyebrow-line"></span> Informação para quem faz live</div>
             <h1>Antes da próxima rodada, <em>confere o @.</em></h1>
-            <p class="hero-copy">Consulte os relatos analisados pela comunidade de streamers. Busque o @ inteiro ou só um trecho; variações como João e Jo4o entram na mesma busca.</p>
+            <p class="hero-copy">Consulte os relatos analisados pela comunidade de streamers. Digite o @ para encontrar relatos e conferir as provas.</p>
             <form id="search-form" class="search-box" role="search">
               <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
               <input id="search-input" aria-label="Buscar arroba" autocomplete="off" placeholder="Buscar arroba, ex: @joao" maxlength="40">
@@ -199,6 +200,16 @@
         </div>
       </section>
 
+      <section id="verificados" class="view" aria-label="Streamers verificados">
+        <div class="container inner-page">
+          <div class="page-intro"><div class="eyebrow">Selo do Radar</div><h1>Streamers <em>verificados.</em></h1><p>Conheça os streamers com identidade conferida pela equipe do Radar.</p></div>
+          <p class="helper verified-explainer">O selo é do Radar, não do TikTok. Ele confirma a identidade do streamer, sem garantir pagamentos ou negociações.</p>
+          <p id="verified-status" class="helper" role="status" aria-live="polite"></p>
+          <div id="verified-list" class="results-grid verified-list" aria-label="Lista de streamers verificados"></div>
+          <button id="verified-retry" class="ghost-btn" type="button" hidden>Tentar novamente</button>
+        </div>
+      </section>
+
       <section id="recorrer" class="view" aria-label="Recorrer de um relato">
         <div class="container inner-page">
           <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> Direito de resposta <span class="eyebrow-line"></span></div><h1>Seu lado também <em>faz parte.</em></h1><p>Conteste um relato publicado, envie provas e acompanhe a revisão pelo seu protocolo privado.</p></div>
@@ -207,7 +218,7 @@
               <form id="appeal-search-form" class="search-box"><input id="appeal-search" aria-label="Buscar relato para recorrer" placeholder="Busque o arroba do relato" maxlength="40"><button class="primary-btn" type="submit">Buscar</button></form>
               <div id="appeal-matches" class="appeal-matches"></div>
               <p id="selected-case" class="selected-case" hidden></p>
-              <div id="identity-panel" class="privacy-panel" hidden><strong>Confirme o perfil pelo TikTok</strong><p>Opcional: gere um código, coloque-o temporariamente na bio do perfil citado e clique em verificar. O administrador verá que você controla a conta. Você também pode enviar o recurso sem essa confirmação.</p><button class="ghost-btn" id="identity-start" type="button">Gerar código para bio</button><div id="identity-code-box" hidden><p>Coloque este código na bio do TikTok:</p><code id="identity-code"></code><p class="helper">Depois de salvar a bio, aguarde alguns minutos e verifique. O código vale por 30 minutos.</p><button class="ghost-btn" id="identity-verify" type="button">Verificar minha bio</button></div><p id="identity-result" role="status"></p></div>
+              <div id="identity-panel" class="privacy-panel" hidden><strong>Confirme que o perfil é seu (opcional)</strong><p>Coloque o código na bio do perfil citado e clique em verificar. Você pode enviar o recurso mesmo sem confirmar a conta.</p><button class="ghost-btn" id="identity-start" type="button">Gerar código para bio</button><div id="identity-code-box" hidden><p>Coloque este código na bio do TikTok:</p><code id="identity-code"></code><p class="helper">Salve a bio no TikTok e volte para verificar. O código vale por 30 minutos.</p><button class="ghost-btn" id="identity-verify" type="button">Verificar minha bio</button></div><p id="identity-result" role="status"></p></div>
               <form id="appeal-form"><label class="field"><span>Seu arroba</span><input id="appeal-handle" required maxlength="40" placeholder="@seuusuario"></label><label class="field"><span>E-mail de contato (opcional)</span><input id="appeal-email" type="email" maxlength="150" autocomplete="email" placeholder="voce@exemplo.com"><small class="helper">Ajuda o administrador a localizar seu recurso se você perder o protocolo. O contato não fica público.</small></label><label class="field"><span>Explique seu lado</span><textarea id="appeal-message" required minlength="30" maxlength="1500" placeholder="Conte o que aconteceu, com datas e contexto. Não inclua telefone ou endereço de ninguém."></textarea></label><label class="field"><span>Prints ou vídeo de até 30 segundos (opcional)</span><input id="appeal-files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4" multiple><small class="helper">Até 3 arquivos de 20 MB cada. Provas privadas para a revisão.</small></label><div id="appeal-attachment-list" class="attachment-list" aria-live="polite"></div><button class="primary-btn full" type="submit">Enviar recurso ↗</button></form>
               <div id="appeal-confirmation" class="appeal-confirmation" hidden><strong>Recurso recebido</strong><span>Guarde este protocolo. Ele aparece só agora:</span><code id="appeal-protocol"></code><span id="appeal-upload-status"></span></div>
             </div>
@@ -286,7 +297,7 @@
       </section>
     </main>
 
-    <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Streamer</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#privacidade" data-go="privacidade">Privacidade</a><a href="#termos" data-go="termos">Termos</a><a href="#admin" data-go="admin">Admin</a></div></div></footer>
+    <footer class="footer"><div class="container footer-inner"><div class="footer-credit"><strong>RADAR<span>.</span>TROPA</strong><small>Criado por <a class="credit-link" href="https://www.tiktok.com/@jose027._" target="_blank" rel="noopener noreferrer">@jose027._</a></small></div><span>Relatos sujeitos à análise e recurso.</span><div class="footer-links"><a href="#consultar" data-go="consultar">Consultar</a><a href="#relatar" data-go="relatar">Denunciar</a><a href="#recorrer" data-go="recorrer">Recorrer</a><a href="#privacidade" data-go="privacidade">Privacidade</a><a href="#termos" data-go="termos">Termos</a><a href="#admin" data-go="admin">Administração</a></div></div></footer>
     <dialog id="share-dialog" class="media-dialog" aria-labelledby="share-title"><button class="ghost-btn" type="button" id="share-close">Fechar ×</button><h2 id="share-title">Compartilhar relato</h2><p class="helper">Pronto para os Stories. Envie o link junto para abrir o relato completo.</p><div id="share-preview"></div><label class="field"><span>Link do relato</span><input id="share-url" readonly aria-label="Link público do relato"></label><div class="detail-actions"><button type="button" class="primary-btn" id="share-native" disabled>Compartilhar</button><a class="ghost-btn" id="share-download" hidden>Baixar imagem</a><button type="button" class="ghost-btn" id="share-copy" disabled>Copiar link</button></div><p id="share-feedback" class="helper" role="status"></p></dialog>
     <dialog id="report-review-dialog" class="media-dialog" aria-labelledby="report-review-title"><h2 id="report-review-title">Confira antes de enviar</h2><div id="report-review-content"></div><p id="report-review-mode" class="helper"></p><div class="detail-actions"><button type="button" id="report-review-edit" class="ghost-btn">Voltar e editar</button><button type="button" id="report-review-confirm" class="primary-btn">Confirmar envio</button></div></dialog>
     <dialog id="resolution-dialog" class="media-dialog" aria-labelledby="resolution-title"><button type="button" class="ghost-btn" id="resolution-close">Fechar ×</button><h2 id="resolution-title">Atualizar situação do caso</h2><form id="resolution-form"><input id="resolution-id" type="hidden"><label class="field"><span>Situação</span><select id="resolution-status"><option value="resolved">Caso resolvido</option><option value="open">Caso reaberto</option></select></label><label class="field"><span>Explicação pública</span><textarea id="resolution-note" required minlength="5" maxlength="300" placeholder="Ex.: pagamento confirmado pelas partes."></textarea></label><p class="helper">Esta explicação aparece publicamente. Atualizar a situação mantém o relato original e o histórico de alterações.</p><button class="primary-btn" type="submit">Salvar situação</button><p id="resolution-feedback" class="helper" role="status"></p></form></dialog>
@@ -354,6 +365,7 @@ function showView(name, scroll = true) {
   if(name!=='perfil' && (routeParams.has('relato') || routeParams.has('ficha') || /^\/(perfil|ficha)\//.test(location.pathname))) history.replaceState(null,'','/#'+name);
   else history.replaceState(null,'','#'+name);
   if (name === 'admin' && adminSession) loadDashboard();
+  if (name === 'verificados') loadVerifiedStreamers();
 }
 function clearStreamerAccess() {
   streamerPin = null;streamerAutoPublish=false;
@@ -417,6 +429,27 @@ async function rpc(name, args = {}, admin = false) {
   });
   return parseResponse(response);
 }
+let verifiedListSerial = 0;
+async function loadVerifiedStreamers() {
+  const serial = ++verifiedListSerial;
+  const list = document.getElementById('verified-list');
+  const status = document.getElementById('verified-status');
+  const retry = document.getElementById('verified-retry');
+  list.replaceChildren(); retry.hidden = true;
+  status.textContent = 'Carregando streamers...';
+  try {
+    const streamers = await rpc('radar_public_verified_streamers');
+    if (serial !== verifiedListSerial) return;
+    if (!Array.isArray(streamers)) throw new Error('Lista indisponível.');
+    list.innerHTML = streamers.map(streamer => `<article class="verified-card"><span class="streamer-badge">✓ Verificado pelo Radar</span><h2>${escapeHtml(streamer.name)}</h2></article>`).join('');
+    status.textContent = streamers.length ? `${streamers.length} ${streamers.length === 1 ? 'streamer verificado' : 'streamers verificados'}` : 'Ainda não há streamers com selo do Radar.';
+  } catch (error) {
+    if (serial !== verifiedListSerial) return;
+    status.textContent = 'Não foi possível carregar a lista agora.';
+    retry.hidden = false;
+  }
+}
+document.getElementById('verified-retry').addEventListener('click', loadVerifiedStreamers);
 function profileSyncMessage(code) {
   return ({
     public_profile_partial: 'O TikTok forneceu o nome do perfil, mas a foto e a identificação completa ainda estão indisponíveis.',

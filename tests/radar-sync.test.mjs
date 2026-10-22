@@ -200,13 +200,19 @@ test('oversized HTML is rejected rather than processed', async () => {
 });
 
 const appealSource = readFileSync(new URL('../radar-appeal-identity/index.ts', import.meta.url), 'utf8');
-function appealServer({ lookupFails = false, signature = 'RADAR-TEST', stableId = '1234567890' } = {}) {
+function appealServer({ lookupFails = false, liveFails = false, liveError = 'public_profile_unavailable', signature = 'RADAR-TEST', stableId = '1234567890' } = {}) {
   let handler;
-  const changes = [];
+  const changes = [], providers = [];
   const context = vm.createContext({
     Response, Request, Date, JSON, String, Error,
     Deno: { env: { get() { return 'configured'; } }, serve(fn) { handler = fn; } },
+    fetchPublicTikTokLiveProfile: async () => {
+      providers.push('api-live');
+      if (lookupFails || liveFails) throw new Error(lookupFails ? 'public_profile_unavailable' : liveError);
+      return { id: stableId, uniqueId: 'example', signature };
+    },
     fetchPublicTikTokProfile: async () => {
+      providers.push('html');
       if (lookupFails) throw new Error('public_profile_unavailable');
       return { id: stableId, uniqueId: 'example', signature };
     },
@@ -221,7 +227,7 @@ function appealServer({ lookupFails = false, signature = 'RADAR-TEST', stableId 
     }
   });
   vm.runInContext(stripTypeScriptTypes(appealSource.replace(/^import .*\n/gm, '')), context);
-  return { changes, async verify() {
+  return { changes, providers, async verify() {
     const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-appeal-identity', {
       method: 'POST', headers: { origin: 'https://radardatropa.pages.dev', 'content-type': 'application/json' },
       body: JSON.stringify({ action: 'verify', challengeId: reportId })
@@ -368,4 +374,21 @@ test('API-live rate limit or mismatched account stops fallbacks',async()=>{
 });
 test('API-live response size and redirect policy are bounded',async()=>{
  const reader=publicReader();await assert.rejects(reader.fetchPublicTikTokLiveProfile('example',async()=>new Response('x'.repeat(250001),{headers:{'content-type':'application/json'}})));
+});
+
+test('bio verification uses API-live without depending on HTML access', async () => {
+  const app = appealServer();
+  assert.equal((await app.verify()).body.verified, true);
+  assert.deepEqual(app.providers, ['api-live']);
+});
+test('bio verification falls back to HTML when API-live has no account', async () => {
+  const app = appealServer({liveFails:true});
+  assert.equal((await app.verify()).body.verified, true);
+  assert.deepEqual(app.providers, ['api-live', 'html']);
+});
+for (const code of ['public_rate_limited', 'identity_mismatch']) test(`bio verification stops after ${code} without spending a challenge attempt`, async () => {
+  const app = appealServer({liveFails:true,liveError:code});
+  assert.equal((await app.verify()).status, 503);
+  assert.deepEqual(app.providers, ['api-live']);
+  assert.equal(app.changes.length, 0);
 });
