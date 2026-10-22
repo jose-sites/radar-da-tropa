@@ -257,6 +257,33 @@ Deno.serve(async (request) => {
   if (!origin || !allowedOrigins.has(origin)) return response({ error: 'origin_not_allowed' }, 403, origin);
   let body: any;
   try { body = await request.json(); } catch { return response({ error: 'invalid_request' }, 400, origin); }
+  if (body?.action === 'streamer-profile') {
+    const streamerId = String(body?.streamerId || '');
+    const handle = String(body?.handle || '');
+    if (!uuidPattern.test(streamerId) || !handlePattern.test(handle)) return response({error:'invalid_request'},400,origin);
+    const authorization = request.headers.get('authorization') || '';
+    if (!/^Bearer \S+$/i.test(authorization)) return response({error:'access_denied'},403,origin);
+    const caller = createClient(projectUrl, publicKey, {
+      global:{headers:{Authorization:authorization}},auth:{persistSession:false},
+    });
+    const {data:user,error:userError} = await caller.auth.getUser();
+    if (userError || !user.user) return response({error:'access_denied'},403,origin);
+    const {data:isAdmin,error:adminError} = await caller.rpc('radar_is_admin');
+    if (adminError || isAdmin !== true) return response({error:'access_denied'},403,origin);
+    const {data:claimed,error:claimError} = await caller.rpc('radar_admin_claim_streamer_lookup',{p_streamer_id:streamerId});
+    if (claimError) return response({error:'streamer_lookup_failed'},500,origin);
+    if (claimed !== true) return response({error:'retry_later'},429,origin);
+    try {
+      const profile = await lookupReportProfile(handle,1);
+      const profileId = await saveProfile(profile);
+      const {error} = await caller.rpc('radar_admin_link_streamer_profile',{p_streamer_id:streamerId,p_profile_id:profileId});
+      if (error) throw new Error('streamer_link_failed');
+      return response({linked:true},200,origin);
+    } catch (error) {
+      const code=error instanceof Error ? error.message : 'profile_lookup_failed';
+      return response({linked:false,error:['public_profile_unavailable','public_profile_timeout','public_rate_limited','identity_mismatch'].includes(code)?code:'streamer_link_failed'},502,origin);
+    }
+  }
   const reportId = String(body?.reportId || '');
   if (!uuidPattern.test(reportId)) return response({ error: 'invalid_request' }, 400, origin);
   // Existing reports can be retried by a verified administrator, without sharing a PIN.

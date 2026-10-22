@@ -15,7 +15,7 @@ const stage=process.argv[2] || 'photos';
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  const avatarData=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=600;c.height=600;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,'#7c9a65');g.addColorStop(1,'#15281e');x.fillStyle=g;x.fillRect(0,0,600,600);x.fillStyle='#c9d5a9';x.beginPath();x.arc(300,240,100,0,Math.PI*2);x.fill();x.fillStyle='#334c39';x.beginPath();x.ellipse(300,535,205,170,0,0,Math.PI*2);x.fill();return c.toDataURL('image/png').split(',')[1];});
- const state={verified:[],verifiedFails:false,reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
+ const state={streamerLinked:false,streamerLookupAttempts:0,verified:[],verifiedFails:false,reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(url.startsWith('https://radardatropa.pages.dev/story-approved-v1.webp'))return route.fulfill({status:state.templateFails?503:200,contentType:'image/webp',body:state.templateFails?Buffer.from('Unavailable'):fs.readFileSync(path.join(root,'story-approved-v1.webp'))});
@@ -33,14 +33,20 @@ const stage=process.argv[2] || 'photos';
   if(rpc==='radar_pin_request_status')return reply(request.postDataJSON().p_protocol===state.pinProtocol?{handle:'streamer_teste',status:state.pinStatus,reply:state.pinReply,updated_at:report.created_at}:null);
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
   if(rpc==='radar_admin_resolve_report'){const args=request.postDataJSON();state.resolution=args.p_status;state.resolutionNote=args.p_note;state.resolutionHistory.push({status:args.p_status,note:args.p_note,created_at:report.created_at});return reply(null);}
-  if(rpc==='radar_admin_dashboard_v7')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
+  if(rpc==='radar_admin_dashboard_v8')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:stage==='verified'?[{id:streamerId,name:'Canal de teste',active:true,verified:false,created_at:report.created_at,tiktok_profile_id:state.streamerLinked?secondId:null,tiktok_handle:state.streamerLinked?'canal.exemplo':null}]:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
   if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:['owned','review'].includes(stage)});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
   if(rpc==='radar_create_upload_ticket'){state.tickets++;return reply(`reports/${secondId}/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.jpg`);}
-  if(url.includes('/storage/v1/object/public/radar-avatars/')){state.avatarLoads++;return route.fulfill({status:state.avatarFails?503:200,contentType:'image/png',body:Buffer.from(avatarData,'base64'),headers:{'access-control-allow-origin':'*'}});}
+  if(url.includes('/storage/v1/object/public/radar-avatars/')){state.avatarLoads++;return route.fulfill({status:state.avatarFails?503:200,contentType:'image/png',body:state.avatarFails?Buffer.from('Unavailable'):Buffer.from(avatarData,'base64'),headers:{'access-control-allow-origin':'*'}});}
   if(url.includes('/storage/v1/object/radar-evidence/')){state.uploads++;assert.equal(request.headers()['content-type'],'image/jpeg');if(state.uploads===1)return route.fulfill({status:503,contentType:'application/json',body:'{"message":"Falha temporária simulada. Tente novamente."}'});return reply({});}
   if(url.includes('/functions/v1/radar-publish-owned')){state.publications++;assert.equal(request.postDataJSON().pin,'1234512345');if(state.publications===1 && stage==='owned')return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"error":"Falha temporária ao confirmar a publicação"}'});return reply({published:true,proof_count:request.postDataJSON().expectedFiles});}
   if(url.includes('/functions/v1/radar-upload-check'))return reply({verified:true});
+  if(url.includes('/functions/v1/radar-sync') && request.postDataJSON().action==='streamer-profile'){
+    const args=request.postDataJSON();assert.equal(args.handle,'canal.exemplo');assert.equal(args.streamerId,streamerId);assert.equal(request.headers().authorization,'Bearer fixture');
+    state.streamerLookupAttempts++;
+    if(state.streamerLookupAttempts===1)return route.fulfill({status:502,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"linked":false,"error":"public_profile_unavailable"}'});
+    state.streamerLinked=true;return reply({linked:true});
+  }
   if(url.includes('/functions/v1/radar-sync'))return reply({profileVerified:false,error:'verification_pending'});
   return reply({});
  });
@@ -51,13 +57,19 @@ const stage=process.argv[2] || 'photos';
   await page.locator('.nav [data-go=verificados]').click();
   await page.waitForFunction(()=>document.getElementById('verified-status').textContent.includes('Ainda não'));
   assert.equal(await page.locator('.verified-card').count(),0);
-  state.verified=[{name:'Canal de teste'},{name:'<img src=x onerror=alert(1)>'}];
+  state.verified=[{name:'Canal de teste',handle:'canal.exemplo',avatar_path:'44444444-4444-4444-8444-444444444444.jpg'},{name:'<img src=x onerror=alert(1)>',handle:'javascript:alert(1)',avatar_path:'https://unsafe.example/avatar.jpg'}];
   await page.reload();
   await page.waitForSelector('.verified-card');
   assert.equal(await page.locator('.verified-card').count(),2);
-  assert.equal(await page.locator('.verified-card img').count(),0);
+  await page.waitForFunction(()=>document.querySelector('.verified-card img')?.naturalWidth>0);
+  assert.equal(await page.locator('.verified-card img').count(),1);
+  assert.equal(await page.locator('.verified-link').count(),1);
+  assert.equal(await page.locator('.verified-link').getAttribute('href'),'https://www.tiktok.com/@canal.exemplo');
+  assert.equal(await page.locator('.verified-link').getAttribute('rel'),'noopener noreferrer');
   assert.equal(await page.locator('.verified-card h2').last().textContent(),'<img src=x onerror=alert(1)>');
-  assert.equal(await page.locator('.streamer-badge:visible').count(),2);
+  assert.equal(await page.locator('.gold-seal:visible').count(),2);
+  if(process.env.RADAR_VERIFIED_IMAGE)await page.screenshot({path:process.env.RADAR_VERIFIED_IMAGE,fullPage:true});
+  state.avatarFails=true;await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.verified-card .handle-avatar').length===2);state.avatarFails=false;
   state.verifiedFails=true;
   await page.reload();await page.waitForSelector('#verified-retry:visible');
   state.verifiedFails=false;state.verified=[];
@@ -66,7 +78,19 @@ const stage=process.argv[2] || 'photos';
   assert.equal(await page.locator('#verified-retry').isVisible(),false);
   await page.locator('.footer-links [data-go=admin]').click();
   await page.waitForSelector('#admin.active');
-  console.log('PASS verified: public nav, footer admin, empty directory, badges, escaped names, retry, mobile');
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();});
+  await page.waitForSelector('[data-streamer-row]');await page.locator('[data-streamer-row] summary').click();
+  await page.locator('[data-streamer-handle]').fill('https://unsafe.example/@canal.exemplo');
+  await page.locator('.streamer-tiktok-form [type=submit]').click();assert.equal(state.streamerLookupAttempts,0);
+  await page.locator('[data-streamer-handle]').fill('https://www.tiktok.com/@canal.exemplo?_r=1');
+  await page.locator('.streamer-tiktok-form [type=submit]').click();
+  await page.waitForFunction(()=>document.querySelector('[data-streamer-profile-status]').textContent.includes('Não foi possível'));
+  assert.equal(await page.locator('[data-streamer-handle]').inputValue(),'https://www.tiktok.com/@canal.exemplo?_r=1');
+  await page.locator('.streamer-tiktok-form [type=submit]').click();
+  await page.waitForSelector('[data-streamer-unlink]',{state:'attached'});
+  assert.equal(state.streamerLookupAttempts,2);
+  assert.equal(await page.locator('[data-streamer-handle]').inputValue(),'@canal.exemplo');
+  console.log('PASS verified: photos, gold badges, safe links/text, unavailable photo, retry, admin linking and mobile');
  }
  if(stage==='story') {
   await page.evaluate(()=>{window.__photoDraws=0;const original=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){if((typeof ImageBitmap==='function' && args[0] instanceof ImageBitmap) || (args[0] instanceof HTMLImageElement && args[0].src.startsWith('blob:')))window.__photoDraws++;return original.apply(this,args);};});

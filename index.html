@@ -116,7 +116,7 @@
 #report-review-dialog{max-width:620px}.review-description{white-space:pre-line;overflow-wrap:anywhere;color:#e0e7d7}.report-review-gallery{display:grid;gap:14px;margin-top:18px}.report-review-gallery figure{margin:0;min-width:0}.report-review-gallery img,.report-review-gallery video{width:100%;max-height:260px;object-fit:contain;background:#11170f;border-radius:10px}.report-review-gallery figcaption{color:#a9b49e;font-size:12px;overflow-wrap:anywhere;margin-top:5px}#report-review-dialog .detail-actions{justify-content:space-between}#report-review-dialog .detail-actions button{white-space:normal}
 #share-dialog{max-width:540px}#share-close{float:right}#share-preview{margin:18px 0}#share-preview img{display:block;width:100%;height:auto;max-height:none;border-radius:12px}#share-dialog .detail-actions{flex-wrap:wrap}#share-dialog [hidden]{display:none!important}#share-dialog .ghost-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px}#share-url{font-size:12px;min-width:0}.report-share-button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;width:100%;border:1px solid #414d35;border-radius:10px;background:transparent;color:#bdd89a;font-size:12px;margin-top:10px;padding:10px;cursor:pointer}.report-share-button:hover{border-color:#b3d47b}.report-share-button:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
 .creator-signature{font-size:10px;font-weight:500;letter-spacing:.015em;color:#8fa180;margin-top:6px}.brand .brand-name{display:block}#share-dialog{max-width:440px}#share-preview img{max-height:65vh;width:auto;max-width:100%;margin-inline:auto;object-fit:contain}#share-dialog .detail-actions{gap:8px}
-.verified-list{margin:24px 0 40px}.verified-card{border:1px solid #343a31;border-radius:16px;background:#1c211b;padding:22px;min-width:0}.verified-card h2{font-size:20px;overflow-wrap:anywhere;margin:14px 0}.verified-explainer{max-width:660px;margin:0 auto 24px;text-align:center}
+.verified-list{margin:24px 0 40px}.verified-card{border:1px solid #3b4430;border-radius:18px;background:#1c211b;padding:24px;min-width:0}.verified-card-profile{display:flex;align-items:center;gap:18px}.verified-card-copy{min-width:0;flex:1}.verified-card h2{display:flex;align-items:center;gap:8px;font-size:20px;line-height:1.3;margin:0 0 5px}.verified-card h2 span{min-width:0;overflow-wrap:anywhere}.verified-card .verified-avatar{width:86px;height:86px;flex:0 0 86px;border-radius:50%;object-fit:cover;border:1px solid #4b553d;background:#303d24;font-size:30px}.verified-card p{font-size:13px;line-height:1.6;margin:0;color:#aeb6a5;overflow-wrap:anywhere}.verified-card .verified-caption{color:#d9b867;font-size:12px;margin-top:10px}.gold-seal{width:23px;height:23px;flex:0 0 23px;color:#d9b867}.verified-link{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid #b3d47b;color:var(--lime);border-radius:11px;min-height:46px;padding:10px 12px;font-size:13px;font-weight:700;text-decoration:none;margin-top:24px}.verified-link:focus-visible{outline:2px solid var(--lime);outline-offset:4px}.verified-card .verified-unlinked{margin-top:24px}.verified-explainer{max-width:660px;margin:24px auto;text-align:center}.streamer-badge{background:#342d1e;color:#e4c579}.streamer-tiktok-form{margin:16px 0}.streamer-tiktok-form .row-buttons{flex-wrap:wrap}@media(max-width:600px){.verified-card{padding:20px}.verified-card-profile{gap:14px}.verified-card h2{font-size:19px}.verified-card .verified-avatar{width:76px;height:76px;flex-basis:76px}}
 </style>
 </head>
 <body>
@@ -202,11 +202,11 @@
 
       <section id="verificados" class="view" aria-label="Streamers verificados">
         <div class="container inner-page">
-          <div class="page-intro"><div class="eyebrow">Selo do Radar</div><h1>Streamers <em>verificados.</em></h1><p>Conheça os streamers com identidade conferida pela equipe do Radar.</p></div>
-          <p class="helper verified-explainer">O selo é do Radar, não do TikTok. Ele confirma a identidade do streamer, sem garantir pagamentos ou negociações.</p>
+          <div class="page-intro"><div class="eyebrow">Selo do Radar</div><h1>Streamers <em>verificados.</em></h1><p>Perfis conferidos pela equipe do Radar.</p></div>
           <p id="verified-status" class="helper" role="status" aria-live="polite"></p>
           <div id="verified-list" class="results-grid verified-list" aria-label="Lista de streamers verificados"></div>
           <button id="verified-retry" class="ghost-btn" type="button" hidden>Tentar novamente</button>
+          <p class="helper verified-explainer">Selo do Radar. Não é um selo oficial do TikTok nem garantia de negociações.</p>
         </div>
       </section>
 
@@ -429,6 +429,14 @@ async function rpc(name, args = {}, admin = false) {
   });
   return parseResponse(response);
 }
+function goldStreamerSeal() {
+  return '<svg class="gold-seal" viewBox="0 0 24 24" role="img" aria-label="Verificado pelo Radar"><path fill="currentColor" d="M12 1l3 1.5 3.3.2 1.5 3 2.5 2.2-.5 3.3.5 3.3-2.5 2.2-1.5 3-3.3.2L12 23l-3-1.5-3.3-.2-1.5-3-2.5-2.2.5-3.3-.5-3.3 2.5-2.2 1.5-3 3.3-.2Z"/><path d="m7.5 12 3 3 6-6" fill="none" stroke="#25251a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function verifiedStreamerCard(streamer) {
+  const name=String(streamer.name || 'Streamer');
+  const link=tiktokProfileLink(streamer.handle);
+  return `<article class="verified-card"><div class="verified-card-profile">${profilePhoto(streamer.avatar_path,name,'verified-avatar')}<div class="verified-card-copy"><h2><span>${escapeHtml(name)}</span>${goldStreamerSeal()}</h2>${link?`<p>@${escapeHtml(streamer.handle)}</p>`:''}<p class="verified-caption">Verificado pelo Radar</p></div></div>${link?`<a class="verified-link" href="${link}" target="_blank" rel="noopener noreferrer">Ver perfil no TikTok ↗</a>`:'<p class="verified-unlinked helper">Perfil do TikTok ainda não vinculado.</p>'}</article>`;
+}
 let verifiedListSerial = 0;
 async function loadVerifiedStreamers() {
   const serial = ++verifiedListSerial;
@@ -441,7 +449,12 @@ async function loadVerifiedStreamers() {
     const streamers = await rpc('radar_public_verified_streamers');
     if (serial !== verifiedListSerial) return;
     if (!Array.isArray(streamers)) throw new Error('Lista indisponível.');
-    list.innerHTML = streamers.map(streamer => `<article class="verified-card"><span class="streamer-badge">✓ Verificado pelo Radar</span><h2>${escapeHtml(streamer.name)}</h2></article>`).join('');
+    list.innerHTML = streamers.map(verifiedStreamerCard).join('');
+    list.querySelectorAll('img.verified-avatar').forEach(image=>image.addEventListener('error',()=>{
+      const fallback=document.createElement('span');fallback.className='handle-avatar verified-avatar';
+      fallback.textContent=image.closest('.verified-card').querySelector('h2 span').textContent.slice(0,1).toUpperCase();
+      image.replaceWith(fallback);
+    },{once:true}));
     status.textContent = streamers.length ? `${streamers.length} ${streamers.length === 1 ? 'streamer verificado' : 'streamers verificados'}` : 'Ainda não há streamers com selo do Radar.';
   } catch (error) {
     if (serial !== verifiedListSerial) return;
@@ -1254,7 +1267,7 @@ document.getElementById('privacy-status-form').addEventListener('submit',async e
 
 async function loadDashboard() {
   try {
-    dashboard = await rpc('radar_admin_dashboard_v7', {}, true);
+    dashboard = await rpc('radar_admin_dashboard_v8', {}, true);
     document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
     renderDashboard();
     loadPublicStats();
@@ -1279,7 +1292,7 @@ function renderDashboard() {
     return `<details class="dash-row dash-fold review-row" data-review-id="${escapeHtml(r.id)}"><summary>${profilePhoto(r.avatar_path, '@' + r.handle, 'dash-avatar')}<span class="dash-row-main"><strong>@${escapeHtml(r.handle.replace(/^@/,''))}</strong><small>${escapeHtml(r.streamer_name)} · ${escapeHtml(formattedDate(r.created_at))} · ${escapeHtml(categoryLabels[r.category] || 'Outro')}</small></span><span class="fold-right"><span class="dash-status ${r.status === 'published' ? 'live' : ''}">${statusLabel}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">${r.event_date ? `Ocorrido em ${escapeHtml(r.event_date)} · ` : ''}${r.profile_verified ? 'Conta do TikTok identificada' : 'Identidade do perfil ainda não confirmada'}</p>${!r.profile_verified ? `<p class="profile-sync-feedback note" role="status"></p><button type="button" class="mini-btn subtle" data-retry-profile="${escapeHtml(r.id)}">Conferir perfil no TikTok</button>` : ''}${Number(r.upload_issues || 0)>0 ? `<p class="attachment-warning">${Number(r.upload_issues)} anexo(s) aguardam verificação. Confira com o streamer antes de publicar provas.</p>` : ''}<p class="row-reason">${escapeHtml(r.reason)}</p>${evidenceButtons(r.evidence)}<label class="review-label">Nota da revisão <textarea maxlength="500" placeholder="Contexto da decisão (opcional)">${escapeHtml(r.review_note || '')}</textarea></label><div class="row-buttons">${r.status==='published'?`<button class="mini-btn subtle" type="button" data-resolution-report="${escapeHtml(r.id)}">${r.resolution_status==='resolved'?'Caso resolvido · atualizar':'Marcar caso resolvido'}</button>`:''}${r.status !== 'published' ? `<button class="mini-btn" data-report="${escapeHtml(r.id)}" data-status="published">Publicar</button>` : ''}${r.status !== 'rejected' ? `<button class="mini-btn subtle" data-report="${escapeHtml(r.id)}" data-status="rejected">${r.status === 'published' ? 'Retirar' : 'Rejeitar'}</button>` : ''}</div></div></details>`;
   }).join('') : '<div class="list-empty">Nenhuma denúncia corresponde aos filtros. Use Limpar filtros para ver todas.</div>';
   const streamersList = document.getElementById('streamers-list');
-  streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)} ${streamerBadge(s.verified && s.active)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><div class="row-buttons"><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="verify">${s.verified ? 'Retirar selo' : 'Verificar streamer'}</button><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
+  streamersList.innerHTML = streamers.length ? streamers.map(s => `<details class="dash-row dash-fold" data-streamer-row="${escapeHtml(s.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(s.name)} ${streamerBadge(s.verified && s.active)}</strong><small>Acesso ${s.active ? 'ativo' : 'suspenso'}</small></span><span class="fold-right"><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="dash-detail-note">Criado em ${escapeHtml(formattedDate(s.created_at))} · PIN protegido</p><form class="streamer-tiktok-form" data-streamer-profile-form="${escapeHtml(s.id)}"><label class="field"><span>Perfil do TikTok</span><input data-streamer-handle maxlength="200" placeholder="@usuario ou link do perfil" value="${escapeHtml(s.tiktok_handle?'@'+s.tiktok_handle:'')}" required></label><p class="helper">Vincule o perfil para mostrar a foto e o link. Trocar a conta retira o selo para nova conferência.</p><div class="row-buttons"><button class="mini-btn" type="submit">${s.tiktok_profile_id?'Atualizar perfil':'Vincular TikTok'}</button>${s.tiktok_profile_id?`<button class="mini-btn subtle" type="button" data-streamer-unlink="${escapeHtml(s.id)}">Desvincular</button>`:''}</div><p class="helper" data-streamer-profile-status role="status"></p></form><div class="row-buttons"><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="verify">${s.verified ? 'Retirar selo' : 'Verificar streamer'}</button><button class="mini-btn" data-streamer="${escapeHtml(s.id)}" data-action="rotate">Novo PIN</button><button class="mini-btn subtle" data-streamer="${escapeHtml(s.id)}" data-action="toggle">${s.active ? 'Suspender' : 'Ativar'}</button></div></div></details>`).join('') : '<div class="list-empty">Nenhum streamer cadastrado ainda.</div>';
   document.getElementById('appeals-list').innerHTML = appeals.length ? appeals.map(a => `<details class="dash-row dash-fold review-row" data-appeal-id="${escapeHtml(a.id)}"><summary><span class="dash-row-main"><strong>${escapeHtml(a.handle)} contesta @${escapeHtml(a.report_handle)}</strong><small>${escapeHtml(formattedDate(a.created_at))}</small></span><span class="fold-right"><span class="dash-status ${a.status === 'accepted' ? 'live' : ''}">${({pending:'Em análise',accepted:'Aceito',denied:'Negado'})[a.status] || a.status}</span><span class="eye-toggle" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span></span></summary><div class="dash-details"><p class="row-reason">${escapeHtml(a.message)}</p>${evidenceButtons(a.evidence)}<label class="review-label">Resposta ao recurso <textarea maxlength="500" placeholder="Explique a decisão (opcional)">${escapeHtml(a.admin_note || '')}</textarea></label>${a.status === 'pending' ? `<div class="row-buttons"><button class="mini-btn" data-appeal="${escapeHtml(a.id)}" data-status="accepted">Aceitar e retirar</button><button class="mini-btn subtle" data-appeal="${escapeHtml(a.id)}" data-status="denied">Negar</button></div>` : ''}</div></details>`).join('') : '<div class="list-empty">Nenhum recurso corresponde ao filtro.</div>';
   const contacts=new Map((dashboard.appeal_contacts||[]).map(c=>[c.id,c]));
   document.querySelectorAll('[data-appeal-id]').forEach(row=>{
@@ -1562,6 +1575,37 @@ document.getElementById('privacy-list').addEventListener('click',async event=>{
   busy(button,true,'Salvando...');
   try { await rpc('radar_admin_review_privacy_request',{p_id:button.dataset.privacyReview,p_note:note},true); await loadDashboard(); toast('Resposta registrada.'); }
   catch(error){ toast(error.message,true); busy(button,false); }
+});
+function streamerTikTokHandle(value) {
+  let handle=String(value || '').trim();
+  if (/^https?:\/\//i.test(handle)) {
+    let url;try{url=new URL(handle)}catch{return ''}
+    if(url.protocol!=='https:' || !['www.tiktok.com','tiktok.com'].includes(url.hostname))return '';
+    const match=url.pathname.match(/^\/@([A-Za-z0-9._]{2,40})\/?$/);
+    if(!match)return '';handle=match[1];
+  } else handle=handle.replace(/^@/,'');
+  return /^[A-Za-z0-9._]{2,40}$/.test(handle)?handle:'';
+}
+document.getElementById('streamers-list').addEventListener('submit', async event => {
+  const form=event.target.closest('[data-streamer-profile-form]');if(!form)return;
+  event.preventDefault();
+  const handle=streamerTikTokHandle(form.querySelector('[data-streamer-handle]').value);
+  const status=form.querySelector('[data-streamer-profile-status]');
+  if(!handle){status.textContent='Informe um @ ou link de perfil do TikTok válido.';return;}
+  const button=form.querySelector('[type=submit]');busy(button,true,'Buscando perfil...');
+  status.textContent='Consultando o TikTok...';
+  try {
+    const result=await requestProfileSync({action:'streamer-profile',streamerId:form.dataset.streamerProfileForm,handle},true);
+    if(!result.linked){status.textContent=profileSyncMessage(result.error);return;}
+    await loadDashboard();toast('Perfil vinculado. Confira os dados antes de conceder o selo.');
+  } finally {busy(button,false);}
+});
+document.getElementById('streamers-list').addEventListener('click', async event => {
+  const button=event.target.closest('[data-streamer-unlink]');if(!button)return;
+  if(!confirm('Desvincular o TikTok e retirar o selo deste streamer?'))return;
+  busy(button,true,'Desvinculando...');
+  try{await rpc('radar_admin_link_streamer_profile',{p_streamer_id:button.dataset.streamerUnlink,p_profile_id:null},true);await loadDashboard();toast('Perfil desvinculado e selo retirado.');}
+  catch(error){toast(error.message,true);}finally{busy(button,false);}
 });
 document.getElementById('streamers-list').addEventListener('click', async event => {
   const button = event.target.closest('[data-streamer]');

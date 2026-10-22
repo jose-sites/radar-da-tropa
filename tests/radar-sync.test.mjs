@@ -32,7 +32,12 @@ function server(options = {}) {
   const admin = { async rpc() { calls.push('verifyPin'); return { data: options.invalidPin ? null : { id: 'streamer' }, error: null }; }, from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
   const caller = {
     auth: { async getUser() { calls.push('getUser'); return { data: { user: options.invalidUser ? null : { id: 'user' } }, error: null }; } },
-    async rpc() { calls.push('isAdmin'); return { data: options.isAdmin ?? true, error: null }; }
+    async rpc(name,args) {
+      if(name==='radar_is_admin'){calls.push('isAdmin');return {data:options.isAdmin ?? true,error:null};}
+      calls.push(name);if(args)calls.push(args);
+      if(name==='radar_admin_claim_streamer_lookup')return {data:!options.claimDenied,error:null};
+      return {data:null,error:options.linkFails?{message:'unavailable'}:null};
+    }
   };
   const context = vm.createContext({
     Request, Response, Date, Set, JSON, String, Boolean, Error, AbortController, URL, TextDecoder,
@@ -55,6 +60,13 @@ function server(options = {}) {
     const headers = { 'content-type':'application/json','origin':'https://radardatropa.pages.dev' };
     if(authorized) headers['x-radar-sync-token']='s'.repeat(48);
     const response=await handler(new Request('https://example.supabase.co/functions/v1/radar-sync',{method:'POST',headers,body:JSON.stringify(options)}));
+    return {status:response.status,body:await response.json()};
+  }, async streamerProfile(auth = 'Bearer user-token', payload = {}) {
+    const headers = {origin:'https://radardatropa.pages.dev','content-type':'application/json'};
+    if(auth)headers.authorization=auth;
+    const response=await handler(new Request('https://example.supabase.co/functions/v1/radar-sync',{
+      method:'POST',headers,body:JSON.stringify({action:'streamer-profile',streamerId:reportId,handle:'example',...payload})
+    }));
     return {status:response.status,body:await response.json()};
   }, async retry(auth = 'Bearer user-token') {
     const headers = { origin: 'https://radardatropa.pages.dev', 'content-type': 'application/json' };
@@ -391,4 +403,36 @@ for (const code of ['public_rate_limited', 'identity_mismatch']) test(`bio verif
   assert.equal((await app.verify()).status, 503);
   assert.deepEqual(app.providers, ['api-live']);
   assert.equal(app.changes.length, 0);
+});
+
+for (const [label, options, auth] of [
+  ['missing authorization',{},''],['invalid session',{invalidUser:true},'Bearer invalid'],['non-admin',{isAdmin:false},'Bearer ordinary']
+]) test(`streamer profile rejects ${label} before querying providers or private data`,async()=>{
+  const app=server(options);assert.equal((await app.streamerProfile(auth)).status,403);
+  assert.ok(!app.calls.includes('database'));assert.ok(!app.calls.includes('liveProvider'));
+  assert.ok(!app.calls.includes('radar_admin_claim_streamer_lookup'));
+});
+test('streamer profile reservation stops repeated lookups',async()=>{
+  const app=server({claimDenied:true});assert.equal((await app.streamerProfile()).status,429);
+  assert.ok(!app.calls.includes('liveProvider'));assert.ok(!app.calls.includes('database'));
+});
+test('failed TikTok lookup never replaces a streamer profile or grants a badge',async()=>{
+  const app=server();assert.equal((await app.streamerProfile()).status,502);
+  assert.ok(!app.calls.includes('radar_admin_link_streamer_profile'));
+});
+test('streamer linking saves a precise TikTok identity after administrator validation',async()=>{
+  const app=server({liveProfile:{id:'7434339024405300279',uniqueId:'example'}});
+  assert.equal((await app.streamerProfile()).body.linked,true);
+  assert.ok(app.calls.indexOf('isAdmin')<app.calls.indexOf('liveProvider'));
+  assert.ok(app.calls.includes('radar_admin_link_streamer_profile'));
+  assert.ok(app.calls.some(x=>x?.p_profile_id==='identified-profile'));
+  assert.ok(!app.calls.includes('radar_admin_set_verified'));
+});
+test('streamer linking reports persistence failures instead of a false success',async()=>{
+  const app=server({liveProfile:{id:'7434339024405300279',uniqueId:'example'},linkFails:true});
+  const result=await app.streamerProfile();assert.equal(result.status,502);assert.equal(result.body.linked,false);
+});
+test('streamer lookup rejects URLs and malicious handles before external access',async()=>{
+  const app=server();assert.equal((await app.streamerProfile('Bearer user-token',{handle:'https://internal.example'})).status,400);
+  assert.equal(app.calls.length,0);
 });
