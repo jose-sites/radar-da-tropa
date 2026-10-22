@@ -206,8 +206,31 @@ async function syncProfile(profile: { id: string; tiktok_user_id: string; curren
   }
 }
 
+// The administrator supplies the TikTok handle as the streamer name. Only fill
+// an empty link on an already approved entry; never grant or transfer a badge.
+async function resolveStreamerProfile(streamer: {id:string;display_name:string}, due:string) {
+  const handle=streamer.display_name.trim().replace(/^@/,'');
+  if(!handlePattern.test(handle) || ['admin','administrador'].includes(handle.toLowerCase())) return null;
+  const at=new Date().toISOString();
+  const {data:claimed,error:claimError}=await admin.from('radar_streamers').update({tiktok_lookup_at:at})
+    .eq('id',streamer.id).eq('display_name',streamer.display_name).eq('is_active',true).eq('is_verified',true)
+    .is('tiktok_profile_id',null).or(`tiktok_lookup_at.is.null,tiktok_lookup_at.lt.${due}`).select('id').maybeSingle();
+  if(claimError || !claimed)return null;
+  try {
+    const profile=await lookupReportProfile(handle,1);
+    const profileId=await saveProfile(profile);
+    const {data:linked,error}=await admin.from('radar_streamers').update({tiktok_profile_id:profileId})
+      .eq('id',streamer.id).eq('display_name',streamer.display_name).eq('is_active',true).eq('is_verified',true)
+      .is('tiktok_profile_id',null).eq('tiktok_lookup_at',at).select('id').maybeSingle();
+    if(error)throw new Error('streamer_link_failed');
+    return Boolean(linked);
+  } catch(error) {
+    console.error('streamer profile lookup failed:',streamer.id,error instanceof Error?error.message:'profile_lookup_failed');
+    return false;
+  }
+}
 async function scheduledSync(retryPending = false, refreshProfiles = false) {
-  let resolved = 0, updated = 0, failed = 0;
+  let resolved = 0, updated = 0, failed = 0, streamersLinked = 0;
   const deadline = Date.now() + 80000;
   const due = new Date(Date.now() - (retryPending ? 5 * 60 * 1000 : 30 * 60 * 1000)).toISOString();
   const refreshDue = new Date(Date.now() - (refreshProfiles ? 5 * 60 * 1000 : 24 * 60 * 60 * 1000)).toISOString();
@@ -223,6 +246,16 @@ async function scheduledSync(retryPending = false, refreshProfiles = false) {
     if (Date.now() >= deadline) break;
     (await resolveReport(report)) ? resolved++ : failed++;
   }
+  const {data:streamers,error:streamerError}=await admin.from('radar_streamers')
+    .select('id,display_name').eq('is_active',true).eq('is_verified',true).is('tiktok_profile_id',null)
+    .or(`tiktok_lookup_at.is.null,tiktok_lookup_at.lt.${due}`)
+    .order('tiktok_lookup_at',{ascending:true,nullsFirst:true}).limit(3);
+  if(streamerError)throw new Error('streamers_unavailable');
+  for(const streamer of streamers || []) {
+    if(Date.now()>=deadline)break;
+    const linked=await resolveStreamerProfile(streamer,due);
+    if(linked===true)streamersLinked++;else if(linked===false)failed++;
+  }
   const { data: profiles, error: profileError } = await admin.from('radar_profiles')
     .select('id,tiktok_user_id,current_handle').or(`last_attempt_at.is.null,last_attempt_at.lt.${refreshDue}`)
     .order('last_attempt_at', { ascending: true, nullsFirst: true }).limit(5);
@@ -234,7 +267,7 @@ async function scheduledSync(retryPending = false, refreshProfiles = false) {
     if (Date.now() >= deadline) break;
     (await syncProfile(profile)) ? updated++ : failed++;
   }
-  return { resolved, updated, failed };
+  return { resolved, updated, failed, streamersLinked };
 }
 
 Deno.serve(async (request) => {

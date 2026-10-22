@@ -29,7 +29,15 @@ function server(options = {}) {
     maybeSingle() { return Promise.resolve({ data: { id: 'identified-profile', current_handle: 'example', avatar_path: null }, error: null }); },
     then(resolve) { return Promise.resolve({ data:[], error: null }).then(resolve); }
   };
-  const admin = { async rpc() { calls.push('verifyPin'); return { data: options.invalidPin ? null : { id: 'streamer' }, error: null }; }, from(table) { calls.push('database'); return table === 'radar_reports' ? query : profileQuery; } };
+  const streamerUpdates=[],streamerFilters=[];
+  const streamerQuery={
+    select(){return this;},order(){return this;},limit(){return this;},or(value){streamerFilters.push(['or',value]);return this;},
+    eq(...args){streamerFilters.push(args);return this;},is(...args){streamerFilters.push(args);return this;},
+    update(values){streamerUpdates.push(values);return this;},
+    maybeSingle(){return Promise.resolve({data:options.streamerClaimDenied?null:{id:reportId},error:null});},
+    then(resolve){return Promise.resolve({data:options.pendingStreamers || [],error:null}).then(resolve);}
+  };
+  const admin = { async rpc() { calls.push('verifyPin'); return { data: options.invalidPin ? null : { id: 'streamer' }, error: null }; }, from(table) { calls.push('database'); return table === 'radar_reports' ? query : table === 'radar_streamers' ? streamerQuery : profileQuery; } };
   const caller = {
     auth: { async getUser() { calls.push('getUser'); return { data: { user: options.invalidUser ? null : { id: 'user' } }, error: null }; } },
     async rpc(name,args) {
@@ -51,7 +59,7 @@ function server(options = {}) {
   });
   vm.runInContext(publicScript, context);
   vm.runInContext(stripTypeScriptTypes(source.replace(/^import .*\n/gm, '')), context);
-  return { report, calls, async submit(pin = '0123456789') {
+  return { report, calls, streamerUpdates, streamerFilters, async resolveStreamer(streamer){return context.resolveStreamerProfile(streamer,new Date(Date.now()-1800000).toISOString());}, async submit(pin = '0123456789') {
     const response = await handler(new Request('https://example.supabase.co/functions/v1/radar-sync', {
       method: 'POST', headers: {origin:'https://radardatropa.pages.dev','content-type':'application/json'}, body: JSON.stringify({reportId,pin})
     }));
@@ -435,4 +443,25 @@ test('streamer linking reports persistence failures instead of a false success',
 test('streamer lookup rejects URLs and malicious handles before external access',async()=>{
   const app=server();assert.equal((await app.streamerProfile('Bearer user-token',{handle:'https://internal.example'})).status,400);
   assert.equal(app.calls.length,0);
+});
+
+test('approved streamer handles are linked automatically without granting or changing a badge',async()=>{
+ const app=server({pendingStreamers:[{id:reportId,display_name:'example'}],liveProfile:{id:'7434339024405300279',uniqueId:'example'}});
+ const result=await app.scheduled({});assert.equal(result.status,200);assert.equal(result.body.streamersLinked,1);
+ assert.ok(app.streamerUpdates.some(x=>x.tiktok_profile_id==='identified-profile'));
+ assert.ok(app.streamerUpdates.every(x=>!('is_verified' in x)));
+ assert.ok(app.streamerFilters.some(([name,value])=>name==='is_verified' && value===true));
+ assert.ok(app.streamerFilters.some(([name,value])=>name==='tiktok_profile_id' && value===null));
+});
+test('automatic streamer lookup stops when a reservation was lost',async()=>{
+ const app=server({streamerClaimDenied:true});assert.equal(await app.resolveStreamer({id:reportId,display_name:'example'}),null);
+ assert.ok(!app.calls.includes('liveProvider'));
+});
+test('failed lookup leaves the existing badge and empty profile link unchanged',async()=>{
+ const app=server();assert.equal(await app.resolveStreamer({id:reportId,display_name:'example'}),false);
+ assert.equal(app.streamerUpdates.length,1);assert.ok(!('tiktok_profile_id' in app.streamerUpdates[0]));
+});
+test('generic admin labels and names that are not handles are never mapped to unrelated TikTok accounts',async()=>{
+ const app=server();for(const name of ['admin','administrador','Streamer com espaços'])assert.equal(await app.resolveStreamer({id:reportId,display_name:name}),null);
+ assert.equal(app.streamerUpdates.length,0);assert.ok(!app.calls.includes('liveProvider'));
 });
