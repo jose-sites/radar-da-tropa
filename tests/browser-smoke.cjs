@@ -60,22 +60,23 @@ const stage=process.argv[2] || 'photos';
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
  if(stage==='collapse') {
   await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});
-  await page.waitForSelector('[data-review-id]');
-  assert.equal(await page.locator('.admin-section-toggle').count(),6);
+  await page.waitForSelector('[data-review-id]',{state:'attached'});
+  assert.equal(await page.locator('.admin-section-toggle[aria-expanded="false"]').count(),6);
+  assert.equal(await page.locator('.admin-section-body:visible').count(),0);
   const reports=page.locator('.dashboard-card').filter({has:page.locator('#reports-list')});
+  const toggle=reports.locator('.admin-section-toggle');await toggle.click();
   await page.locator('[data-review-id]').first().locator('summary').click();
   await page.locator('[data-review-id]').first().locator('textarea').fill('Rascunho preservado ao minimizar');
-  const toggle=reports.locator('.admin-section-toggle');await toggle.click();
-  assert.equal(await toggle.getAttribute('aria-expanded'),'false');assert.equal(await page.locator('#reports-list').isVisible(),false);
+  await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'false');
   const refreshed=page.waitForResponse(response=>response.url().endsWith('/rpc/radar_admin_dashboard_v8'));
   await page.locator('#refresh-dashboard').click();await refreshed;
   assert.equal(await toggle.getAttribute('aria-expanded'),'false');
   await toggle.focus();await page.keyboard.press('Enter');
-  assert.equal(await page.locator('#reports-list').isVisible(),true);
   assert.equal(await page.locator('[data-review-id]').first().locator('textarea').inputValue(),'Rascunho preservado ao minimizar');
-  for(const button of await page.locator('.admin-section-toggle').all()){await button.click();assert.equal(await button.getAttribute('aria-expanded'),'false');await button.click();assert.equal(await button.getAttribute('aria-expanded'),'true');}
+  await page.evaluate(()=>{showView('consultar',false);showView('admin',false);});
+  assert.equal(await page.locator('.admin-section-toggle[aria-expanded="false"]').count(),6);
   await page.locator('#create-streamer-open').click();await page.waitForSelector('#admin-modal:visible');
-  console.log('PASS collapse: six sections, keyboard, refresh, preserved draft and create-access action');
+  console.log('PASS collapse: minimized on entry and reentry, keyboard, refresh, preserved draft and create-access action');
  }
  if(stage==='routing') {
   await page.locator('[data-profile-id]').first().click();await page.waitForSelector('#detail-appeal');
@@ -90,7 +91,7 @@ const stage=process.argv[2] || 'photos';
   console.log('PASS routing: report and dossier deep-link reload, back, forward and menu history');
  }
  if(stage==='logout') {
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});
   await page.waitForSelector('[data-pin-request]');
   let release;state.dashboardGate=new Promise(resolve=>release=resolve);
   await page.locator('#refresh-dashboard').click();
@@ -102,7 +103,7 @@ const stage=process.argv[2] || 'photos';
   assert.equal(await page.evaluate(()=>dashboard.streamers.length+dashboard.reports.length),0,'A late response must not restore a closed session');
   assert.equal(await page.locator('#reports-list').textContent(),'');
   state.dashboardGate=null;
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();});
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});
   await page.waitForSelector('[data-pin-request]');
   let releaseEvidence;state.evidenceGate=new Promise(resolve=>releaseEvidence=resolve);
   await page.evaluate(path=>{void openEvidence(path)},`reports/${reportId}/${secondId}.jpg`);
@@ -157,7 +158,7 @@ const stage=process.argv[2] || 'photos';
   assert.equal(await page.locator('#verified-retry').isVisible(),false);
   await page.locator('.footer-links [data-go=admin]').click();
   await page.waitForSelector('#admin.active');
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();});
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});
   await page.waitForSelector('[data-streamer-row]');await page.locator('[data-streamer-row] summary').click();
   await page.locator('[data-streamer-handle]').fill('https://unsafe.example/@canal.exemplo');
   await page.locator('.streamer-tiktok-form [type=submit]').click();assert.equal(state.streamerLookupAttempts,0);
@@ -226,7 +227,7 @@ const stage=process.argv[2] || 'photos';
   const sample={...group,profile_verified:true,old_handles:['anterior'],handle:'perfil_atual'};
   await page.evaluate(sample=>renderReports([sample],''),sample);assert.match(await page.locator('.handle-change-notice').textContent(),/Antes @anterior.*agora @perfil_atual/);
   await page.evaluate(sample=>renderReports([{...sample,profile_verified:false}],''),sample);assert.equal(await page.locator('.handle-change-notice').count(),0);
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});await page.waitForSelector('[data-resolution-report]',{state:'attached'});
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});await page.waitForSelector('[data-resolution-report]',{state:'attached'});
   await page.locator('[data-review-id]').last().locator('summary').click();await page.locator('[data-resolution-report]').click();
   await page.locator('#resolution-note').fill('Pagamento confirmado pelas partes.');await page.locator('#resolution-form button[type=submit]').click();await page.waitForFunction(()=>!document.getElementById('resolution-dialog').open);
   assert.equal(state.resolution,'resolved');assert.equal(state.resolutionHistory.length,1);
@@ -320,7 +321,7 @@ const stage=process.argv[2] || 'photos';
   const whatsapp=new URL(await page.locator('#pin-request-whatsapp').getAttribute('href'));assert.equal(whatsapp.hostname,'wa.me');assert.equal(whatsapp.pathname,'/5527981325470');assert.equal(whatsapp.searchParams.get('text').includes(protocol),false);
   await page.reload();await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('.pin-request summary').first().click();await page.waitForSelector('#pin-request-receipt:visible');assert.equal(await page.locator('#pin-request-protocol').textContent(),protocol);assert.equal(state.pinAttempts,2);
   await page.locator('.pin-request summary').nth(1).click();await page.locator('#pin-tracking-form button').click();await page.waitForFunction(()=>document.getElementById('pin-tracking-result').textContent.includes('Recebido'));
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});await page.waitForSelector('[data-pin-request]');await page.locator('[data-pin-request] summary').click();
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});await page.waitForSelector('[data-pin-request]');await page.locator('[data-pin-request] summary').click();
   await page.locator('[data-pin-state]').selectOption('responded');await page.locator('[data-pin-reply]').fill('Entre em contato pelo WhatsApp.');await page.locator('[data-pin-note]').fill('Nota privada');await page.locator('[data-pin-save]').click();await page.waitForFunction(()=>document.querySelector('[data-pin-request] summary .dash-status').textContent==='Respondido');
   assert.equal(state.pinNote,'Nota privada');
   await page.evaluate(()=>showView('relatar',false));await page.locator('#pin-tracking-form button').click();await page.waitForFunction(()=>document.getElementById('pin-tracking-result').textContent.includes('Respondido'));
@@ -339,7 +340,7 @@ const stage=process.argv[2] || 'photos';
   console.log('PASS dossier: full history, safe text, pagination, deep-link reload and individual appeal');
  }
  if(stage==='panel') {
-  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();document.querySelectorAll('.admin-section-toggle[aria-expanded="false"]').forEach(button=>button.click());});
   await page.waitForSelector('[data-review-id]');assert.equal(await page.locator('[data-review-id]').count(),2);
   await page.locator('[data-review-id]').first().locator('summary').click();
   await page.locator('[data-review-id]').first().locator('textarea').fill('Rascunho preservado');

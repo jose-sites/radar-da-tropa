@@ -356,8 +356,9 @@ function setupAdminSections() {
     while(header.nextSibling)content.append(header.nextSibling);
     card.append(content);
     const button=document.createElement('button');button.type='button';button.className='admin-section-toggle';
-    button.setAttribute('aria-controls',content.id);button.setAttribute('aria-expanded','true');
-    button.setAttribute('aria-label','Recolher '+title);
+    button.setAttribute('aria-controls',content.id);button.setAttribute('aria-expanded','false');
+    content.hidden=true;card.classList.add('is-collapsed');
+    button.setAttribute('aria-label','Expandir '+title);
     button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     button.addEventListener('click',()=>{
       const collapsed=button.getAttribute('aria-expanded')==='true';
@@ -368,6 +369,10 @@ function setupAdminSections() {
   });
 }
 setupAdminSections();
+function minimizeAdminSections() {
+  document.querySelectorAll('.admin-section-toggle[aria-expanded="true"]').forEach(button=>button.click());
+  document.querySelector('#whatsapp-settings-form').closest('details').open=false;
+}
 function toast(message, isError = false) {
   const el = document.getElementById('toast');
   el.textContent = message;
@@ -378,6 +383,7 @@ function toast(message, isError = false) {
 }
 function showView(name, scroll = true, updateRoute = true) {
   if (!document.getElementById(name)?.classList.contains('view')) return;
+  if(name==='admin' && !document.getElementById('admin').classList.contains('active'))minimizeAdminSections();
   if (name !== 'relatar' && document.getElementById('relatar').classList.contains('active')) clearStreamerAccess();
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
@@ -1479,6 +1485,7 @@ document.getElementById('evidence-dialog').addEventListener('close',event => {
 });
 function openDashboard() {
   if(!adminSession)return;
+  minimizeAdminSections();
   document.getElementById('admin-login').style.display = 'none';
   document.getElementById('admin-dashboard').classList.add('show');
   loadDashboard();
