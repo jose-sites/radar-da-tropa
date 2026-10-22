@@ -15,7 +15,7 @@ const stage=process.argv[2] || 'photos';
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  const avatarData=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=600;c.height=600;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,600,600);g.addColorStop(0,'#7c9a65');g.addColorStop(1,'#15281e');x.fillStyle=g;x.fillRect(0,0,600,600);x.fillStyle='#c9d5a9';x.beginPath();x.arc(300,240,100,0,Math.PI*2);x.fill();x.fillStyle='#334c39';x.beginPath();x.ellipse(300,535,205,170,0,0,Math.PI*2);x.fill();return c.toDataURL('image/png').split(',')[1];});
- const state={streamerLinked:false,streamerLookupAttempts:0,verified:[],verifiedFails:false,reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
+ const state={evidenceGate:null,evidenceArrived:false,dashboardGate:null,dashboardArrived:false,appealCreates:0,identityBinds:0,streamerLinked:false,streamerLookupAttempts:0,verified:[],verifiedFails:false,reports:0,tickets:0,uploads:0,pinAttempts:0,pinProtocol:null,pinStatus:'received',pinReply:'',pinNote:'',publications:0,resolution:'open',resolutionNote:'',resolutionHistory:[],withdrawn:false,avatarLoads:0,avatarFails:false,templateFails:false};
  await page.route('**/*',async route=>{
   const request=route.request(),url=request.url();
   if(url.startsWith('https://radardatropa.pages.dev/story-approved-v1.webp'))return route.fulfill({status:state.templateFails?503:200,contentType:'image/webp',body:state.templateFails?Buffer.from('Unavailable'):fs.readFileSync(path.join(root,'story-approved-v1.webp'))});
@@ -33,10 +33,17 @@ const stage=process.argv[2] || 'photos';
   if(rpc==='radar_pin_request_status')return reply(request.postDataJSON().p_protocol===state.pinProtocol?{handle:'streamer_teste',status:state.pinStatus,reply:state.pinReply,updated_at:report.created_at}:null);
   if(rpc==='radar_admin_update_pin_request'){const args=request.postDataJSON();state.pinStatus=args.p_status;state.pinReply=args.p_reply;state.pinNote=args.p_note;return reply(null);}
   if(rpc==='radar_admin_resolve_report'){const args=request.postDataJSON();state.resolution=args.p_status;state.resolutionNote=args.p_note;state.resolutionHistory.push({status:args.p_status,note:args.p_note,created_at:report.created_at});return reply(null);}
-  if(rpc==='radar_admin_dashboard_v8')return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:stage==='verified'?[{id:streamerId,name:'Canal de teste',active:true,verified:false,created_at:report.created_at,tiktok_profile_id:state.streamerLinked?secondId:null,tiktok_handle:state.streamerLinked?'canal.exemplo':null}]:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});
+  if(rpc==='radar_admin_dashboard_v8'){if(state.dashboardGate){state.dashboardArrived=true;await state.dashboardGate;}return reply({pin_requests:[{id:secondId,name:'Streamer Teste',handle:'streamer_teste',context:'Participação fictícia nas lives.',contact:'5527999999999',status:state.pinStatus,public_reply:state.pinReply,admin_note:state.pinNote,created_at:report.created_at}],reports:[{...report,upload_issues:1},{...report,id:secondId,handle:'outro',status:'published',profile_verified:true,resolution_status:state.resolution,resolution_note:state.resolutionNote}],streamers:stage==='verified'?[{id:streamerId,name:'Canal de teste',active:true,verified:false,created_at:report.created_at,tiktok_profile_id:state.streamerLinked?secondId:null,tiktok_handle:state.streamerLinked?'canal.exemplo':null}]:[],appeals:[{id:secondId,handle:'outro',report_handle:'perfil_exemplo',created_at:report.created_at,status:'pending',message:'Contestação de teste',evidence:[]}],audit:[],privacy_requests:[],whatsapp_number:'5527981325470'});}
+  if(rpc==='radar_create_appeal'){state.appealCreates++;return reply({id:secondId,protocol:'A'.repeat(32)});}
+  if(rpc==='radar_bind_appeal_identity'){state.identityBinds++;return reply(null);}
+  if(url.includes('/functions/v1/radar-appeal-identity'))return reply(request.postDataJSON().action==='start'?{id:secondId,code:'RADAR-TEST'}:{verified:true});
   if(rpc==='radar_verify_pin')return reply({id:streamerId,name:'Streamer Teste',can_auto_publish:['owned','review'].includes(stage)});
   if(rpc==='radar_submit_report_v2'){state.reports++;return reply(secondId);}
   if(rpc==='radar_create_upload_ticket'){state.tickets++;return reply(`reports/${secondId}/aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa.jpg`);}
+  if(url.includes('/storage/v1/object/authenticated/radar-evidence/')){
+    if(state.evidenceGate){state.evidenceArrived=true;await state.evidenceGate;}
+    return route.fulfill({status:200,contentType:'image/png',body:Buffer.from(avatarData,'base64'),headers:{'access-control-allow-origin':'*'}});
+  }
   if(url.includes('/storage/v1/object/public/radar-avatars/')){state.avatarLoads++;return route.fulfill({status:state.avatarFails?503:200,contentType:'image/png',body:state.avatarFails?Buffer.from('Unavailable'):Buffer.from(avatarData,'base64'),headers:{'access-control-allow-origin':'*'}});}
   if(url.includes('/storage/v1/object/radar-evidence/')){state.uploads++;assert.equal(request.headers()['content-type'],'image/jpeg');if(state.uploads===1)return route.fulfill({status:503,contentType:'application/json',body:'{"message":"Falha temporária simulada. Tente novamente."}'});return reply({});}
   if(url.includes('/functions/v1/radar-publish-owned')){state.publications++;assert.equal(request.postDataJSON().pin,'1234512345');if(state.publications===1 && stage==='owned')return route.fulfill({status:503,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:'{"error":"Falha temporária ao confirmar a publicação"}'});return reply({published:true,proof_count:request.postDataJSON().expectedFiles});}
@@ -51,6 +58,59 @@ const stage=process.argv[2] || 'photos';
   return reply({});
  });
  await page.goto('https://radardatropa.pages.dev/');await page.waitForSelector('.result-card');
+ if(stage==='routing') {
+  await page.locator('[data-profile-id]').first().click();await page.waitForSelector('#detail-appeal');
+  const detailUrl=page.url();await page.reload();await page.waitForSelector('#detail-appeal');
+  assert.equal(page.url(),detailUrl,'Reload must preserve the report deep link');
+  await page.goBack();await page.waitForSelector('#consultar.active');
+  await page.goForward();await page.waitForSelector('#detail-appeal');assert.equal(page.url(),detailUrl);
+  await page.locator('.nav [data-go=consultar]').click();
+  await page.locator('[data-dossier-id]').first().click();await page.waitForSelector('#dossier-timeline');
+  const dossierUrl=page.url();await page.reload();await page.waitForSelector('#dossier-timeline');assert.equal(page.url(),dossierUrl);
+  await page.goBack();await page.waitForSelector('#consultar.active');
+  console.log('PASS routing: report and dossier deep-link reload, back, forward and menu history');
+ }
+ if(stage==='logout') {
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});showView('admin',false);openDashboard();});
+  await page.waitForSelector('[data-pin-request]');
+  let release;state.dashboardGate=new Promise(resolve=>release=resolve);
+  await page.locator('#refresh-dashboard').click();
+  await new Promise(resolve=>{const poll=()=>state.dashboardArrived?resolve():setTimeout(poll,10);poll();});
+  await page.locator('#close-dashboard').click();
+  assert.equal(await page.locator('#pin-requests-list').textContent(),'','Logout must clear private PIN contacts');
+  release();await page.waitForResponse(response=>response.url().endsWith('/rpc/radar_admin_dashboard_v8'));
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.evaluate(()=>dashboard.streamers.length+dashboard.reports.length),0,'A late response must not restore a closed session');
+  assert.equal(await page.locator('#reports-list').textContent(),'');
+  state.dashboardGate=null;
+  await page.evaluate(()=>{saveSession({access_token:'fixture',expires_at:Date.now()+3600000});openDashboard();});
+  await page.waitForSelector('[data-pin-request]');
+  let releaseEvidence;state.evidenceGate=new Promise(resolve=>releaseEvidence=resolve);
+  await page.evaluate(path=>{void openEvidence(path)},`reports/${reportId}/${secondId}.jpg`);
+  await new Promise(resolve=>{const poll=()=>state.evidenceArrived?resolve():setTimeout(poll,10);poll();});
+  await page.locator('#evidence-close').click();
+  const delivered=page.waitForResponse(response=>response.url().includes('/authenticated/radar-evidence/'));
+  releaseEvidence();await delivered;
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.locator('#evidence-content').textContent(),'');assert.equal(await page.locator('#evidence-content img').count(),0);
+  assert.equal(await page.locator('#evidence-dialog').getAttribute('data-object-url'),null);
+  await page.locator('#close-dashboard').click();
+  console.log('PASS logout: private contacts removed, late dashboard and private photo responses discarded');
+ }
+ if(stage==='appeals') {
+  await page.locator('[data-profile-id]').first().click();await page.waitForSelector('#detail-appeal');await page.locator('#detail-appeal').click();
+  await page.locator('#identity-start').click();await page.waitForSelector('#identity-code-box:visible');
+  await page.locator('#identity-verify').click();await page.waitForFunction(()=>verifiedChallengeId!==null);
+  await page.locator('#appeal-message').fill('Contexto fictício suficientemente detalhado para testar o recurso.');
+  await page.locator('#appeal-files').setInputFiles({name:'fixture.png',mimeType:'image/png',buffer:Buffer.from(avatarData,'base64')});
+  await page.locator('#appeal-form [type=submit]').click();await page.waitForFunction(()=>document.querySelector('#appeal-form [type=submit]').textContent.includes('Tentar anexos'));
+  await page.locator('#appeal-form [type=submit]').click();await page.waitForFunction(()=>pendingAppeal===null);
+  assert.equal(state.appealCreates,1,'Attachment retry must reuse the appeal');
+  assert.equal(await page.locator('#appeal-attachment-list').textContent(),'','Successful submission must clear private previews');
+  assert.equal(await page.evaluate(()=>verifiedChallengeId),null,'A used bio challenge must be cleared');
+  assert.equal(await page.locator('#identity-code-box').isVisible(),false);
+  console.log('PASS appeals: private photo retry, one appeal, protocol retained, previews and used challenge cleared');
+ }
  if(stage==='verified') {
   assert.equal(await page.locator('.nav [data-go=admin]').count(),0);
   assert.equal(await page.locator('.nav [data-go=relatar]').textContent(),'Denunciar');
@@ -203,6 +263,7 @@ const stage=process.argv[2] || 'photos';
   console.log('PASS cards: category first, author at bottom, separate dates/actions, five widths, grouped reports, escaped text and report navigation');
  }
  if(stage==='photos') {
+  await page.evaluate(()=>{window.__completedPercent=null;const original=setAttachmentState;setAttachmentState=(file,phase,message,percent)=>{if(phase==='done')window.__completedPercent=percent;return original(file,phase,message,percent);};});
   await page.locator('.nav-btn[data-go=relatar]').click();await page.locator('#pin-input').fill('A'.repeat(20));await page.locator('#pin-preview').click();await page.waitForSelector('#report-panel.show');
   await page.locator('#report-handle').fill('perfil_teste');await page.locator('#report-reason').fill('Teste fictício de foto sem gravar no banco de produção.');
   const filename='<b>minha foto</b>.png';
@@ -210,8 +271,8 @@ const stage=process.argv[2] || 'photos';
   assert.equal(await page.locator('.attachment-info strong').textContent(),filename);assert.equal(await page.locator('.attachment-item b').count(),0);assert.equal(await page.locator('.attachment-item img').count(),1);
   await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('#report-review-dialog[open]');await page.locator('#report-review-confirm').click();await page.waitForSelector('.attachment-item[data-phase=error]');
   assert.match(await page.locator('.attachment-status').textContent(),/Falha temporária/);assert.equal(await page.locator('#report-files').evaluate(el=>el.files.length),1);
-  await page.locator('#report-form button[type=submit]').click();await page.waitForSelector('.attachment-item[data-phase=done]');
-  assert.equal(await page.locator('.attachment-item progress').evaluate(el=>el.value),100);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,0);
+  await page.locator('#report-form button[type=submit]').click();await page.waitForFunction(()=>pendingReport===null && window.__completedPercent===100);
+  assert.equal(await page.locator('.attachment-item').count(),0);assert.equal(state.reports,1);assert.equal(state.tickets,1);assert.equal(state.uploads,2);assert.equal(state.publications,0);
   await page.locator('#back-to-pin').click();assert.equal(await page.locator('.attachment-item').count(),0);
   console.log('PASS photos: preview, escaped filename, measured upload, failure message, preserved retry, no duplicate report or ticket, preview cleanup');
  }

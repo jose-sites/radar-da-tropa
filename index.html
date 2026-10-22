@@ -341,7 +341,7 @@ const attachmentStates = new WeakMap();
 let adminSession = null;
 let dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
 const adminDrafts = new Map();
-let adminFilterTimer;
+let adminFilterTimer, dashboardRequestSerial = 0, evidenceRequestSerial = 0;
 let selectedAppealReport = null;
 let identityChallengeId = null, verifiedChallengeId = null;
 let setupSession = null;
@@ -355,15 +355,18 @@ function toast(message, isError = false) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 4200);
 }
-function showView(name, scroll = true) {
+function showView(name, scroll = true, updateRoute = true) {
   if (!document.getElementById(name)?.classList.contains('view')) return;
   if (name !== 'relatar' && document.getElementById('relatar').classList.contains('active')) clearStreamerAccess();
   views.forEach(view => view.classList.toggle('active', view.id === name));
   navButtons.forEach(button => button.classList.toggle('active', button.dataset.go === name));
   if (scroll) window.scrollTo({ top: 0, behavior: 'auto' });
-  const routeParams=new URLSearchParams(location.search);
-  if(name!=='perfil' && (routeParams.has('relato') || routeParams.has('ficha') || /^\/(perfil|ficha)\//.test(location.pathname))) history.replaceState(null,'','/#'+name);
-  else history.replaceState(null,'','#'+name);
+  if (updateRoute) {
+    const routeParams=new URLSearchParams(location.search);
+    const target=name!=='perfil' && (routeParams.has('relato') || routeParams.has('ficha') || /^\/(perfil|ficha)\//.test(location.pathname)) ? '/#'+name : '#'+name;
+    const next=new URL(target,location.href);
+    if(next.href!==location.href)history[scroll?'pushState':'replaceState'](null,'',target);
+  }
   if (name === 'admin' && adminSession) loadDashboard();
   if (name === 'verificados') loadVerifiedStreamers();
 }
@@ -563,7 +566,7 @@ async function loadRecentReports(expectedSerial = searchSerial) {
 async function openProfile(id, push = true) {
   const serial=++dossierSerial;
   if (!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
-  showView('perfil');
+  showView('perfil',true,false);
   if (push) history.pushState({profileId:id}, '', profileHref(id));
   const target = document.getElementById('profile-detail');
   target.innerHTML = '<div class="glass-card">Carregando relato...</div>';
@@ -780,7 +783,7 @@ function dossierReport(report) {
 }
 async function openDossier(id,push=true) {
   if(!/^[0-9a-f-]{36}$/i.test(id)) return showView('consultar');
-  const serial=++dossierSerial;showView('perfil');
+  const serial=++dossierSerial;showView('perfil',true,false);
   if(push) history.pushState({dossierId:id},'',dossierHref(id));
   const target=document.getElementById('profile-detail');target.innerHTML='<div class="glass-card dossier-full">Carregando ficha...</div>';
   let offset=0,seen=new Set();
@@ -998,7 +1001,7 @@ document.getElementById('report-form').addEventListener('submit', async event =>
     document.getElementById('preview-reason').textContent=uploadProblem?'Relato salvo. Uma prova falhou; toque em Tentar anexos pendentes. O relato não será duplicado.':publicationProblem?'Relato salvo, mas a publicação ainda não foi confirmada: '+publicationProblem+' Toque em Tentar publicação.':streamerAutoPublish?'Relato publicado automaticamente, com as provas enviadas. '+(profileResult?.profileVerified?'A conta do TikTok foi identificada.':profileSyncMessage(profileResult?.error)):profileResult?.profileVerified?'Relato e provas recebidos. A conta do TikTok foi identificada; o administrador vai analisar antes de publicar.':`Relato recebido. ${profileSyncMessage(profileResult?.error)} O administrador vai analisar antes de publicar.`;
     document.getElementById('report-preview').classList.add('show');
     if(!uploadProblem && !publicationProblem){
-      pendingReport=null;event.target.reset();button.dataset.oldText=streamerAutoPublish?'Revisar e publicar ↗':'Revisar relato ↗';
+      pendingReport=null;event.target.reset();clearAttachmentPreviews('report');button.dataset.oldText=streamerAutoPublish?'Revisar e publicar ↗':'Revisar relato ↗';
       for(const el of event.target.querySelectorAll('[data-upload-locked]')){el.disabled=false;delete el.dataset.uploadLocked;}
       toast(streamerAutoPublish?'Relato e provas publicados.':'Relato enviado para análise.');
       if(streamerAutoPublish){searchReports(document.getElementById('search-input').value);loadPublicStats();}
@@ -1225,7 +1228,14 @@ document.getElementById('appeal-form').addEventListener('submit',async event => 
     output.hidden=false;
     document.getElementById('appeal-protocol').textContent=created.protocol;
     document.getElementById('appeal-upload-status').textContent=failures ? `${failures} arquivo(s) não foram enviados. Tente novamente sem duplicar o recurso.` : 'Recurso e arquivos recebidos para análise.';
-    if (!failures) {pendingAppeal=null;event.target.reset();button.dataset.oldText='Enviar recurso ↗';}
+    if (!failures) {
+      pendingAppeal=null;event.target.reset();clearAttachmentPreviews('appeal');
+      identityChallengeId=null;verifiedChallengeId=null;
+      document.getElementById('identity-code-box').hidden=true;
+      document.getElementById('identity-code').textContent='';
+      document.getElementById('identity-result').textContent='';
+      button.dataset.oldText='Enviar recurso ↗';
+    }
     else {button.dataset.oldText='Tentar anexos pendentes';}
     toast('Recurso registrado. Guarde seu protocolo.');
   } catch(error) { toast(error.message,true); }
@@ -1266,12 +1276,16 @@ document.getElementById('privacy-status-form').addEventListener('submit',async e
 });
 
 async function loadDashboard() {
+  if(!adminSession)return;
+  const serial=++dashboardRequestSerial;
   try {
-    dashboard = await rpc('radar_admin_dashboard_v8', {}, true);
+    const result = await rpc('radar_admin_dashboard_v8', {}, true);
+    if(!adminSession || serial!==dashboardRequestSerial)return;
+    dashboard=result;
     document.getElementById('whatsapp-settings-number').value = dashboard.whatsapp_number || '';
     renderDashboard();
     loadPublicStats();
-  } catch (error) { toast(error.message, true); }
+  } catch (error) { if(adminSession && serial===dashboardRequestSerial)toast(error.message, true); }
 }
 function renderDashboard() {
   captureAdminDrafts();
@@ -1402,6 +1416,8 @@ async function removePublicEvidence(reportId) {
   }
 }
 async function openEvidence(path) {
+  if(!adminSession)return;
+  const serial=++evidenceRequestSerial;
   const dialog = document.getElementById('evidence-dialog');
   const holder = document.getElementById('evidence-content');
   holder.textContent='Carregando prova privada...';
@@ -1413,11 +1429,12 @@ async function openEvidence(path) {
     });
     if (!response.ok) throw new Error('Não foi possível abrir esta prova.');
     const blob=await response.blob();
+    if(!adminSession || serial!==evidenceRequestSerial || !dialog.open)return;
     const url=URL.createObjectURL(blob);
     if (dialog.dataset.objectUrl) URL.revokeObjectURL(dialog.dataset.objectUrl);
     dialog.dataset.objectUrl=url;
     holder.innerHTML=blob.type.startsWith('video/') ? `<video controls playsinline src="${url}"></video>` : `<img src="${url}" alt="Prova privada enviada para revisão">`;
-  } catch(error) { holder.textContent=error.message; }
+  } catch(error) { if(adminSession && serial===evidenceRequestSerial && dialog.open)holder.textContent=error.message; }
 }
 document.getElementById('admin-dashboard').addEventListener('click',event => {
   const retry = event.target.closest('[data-retry-profile]');
@@ -1434,11 +1451,13 @@ document.getElementById('admin-dashboard').addEventListener('click',event => {
 });
 document.getElementById('evidence-close').addEventListener('click',() => document.getElementById('evidence-dialog').close());
 document.getElementById('evidence-dialog').addEventListener('close',event => {
+  ++evidenceRequestSerial;
   const dialog=event.target;
   document.getElementById('evidence-content').textContent='';
   if(dialog.dataset.objectUrl) { URL.revokeObjectURL(dialog.dataset.objectUrl); delete dialog.dataset.objectUrl; }
 });
 function openDashboard() {
+  if(!adminSession)return;
   document.getElementById('admin-login').style.display = 'none';
   document.getElementById('admin-dashboard').classList.add('show');
   loadDashboard();
@@ -1515,12 +1534,17 @@ document.getElementById('admin-password').addEventListener('keydown', event => {
 });
 document.getElementById('close-dashboard').addEventListener('click', async () => {
   const token = adminSession?.access_token;
+  ++dashboardRequestSerial;
   adminSession = null; sessionStorage.removeItem(SESSION_KEY);
   dashboard = { reports: [], streamers: [], appeals: [], audit: [] };
   adminDrafts.clear();
-  for (const id of ['reports-list','streamers-list','appeals-list','audit-list']) document.getElementById(id).textContent = '';
+  for (const id of ['reports-list','streamers-list','appeals-list','audit-list','privacy-list','pin-requests-list']) document.getElementById(id).textContent = '';
   if (document.getElementById('evidence-dialog').open) document.getElementById('evidence-dialog').close();
   closeModal();
+  document.getElementById('resolution-dialog').close();
+  document.getElementById('resolution-form').reset();
+  document.getElementById('whatsapp-settings-form').reset();
+  document.querySelectorAll('#admin-dashboard .metric strong').forEach(el=>el.textContent='—');
   document.getElementById('admin-dashboard').classList.remove('show');
   document.getElementById('admin-login').style.display = 'block';
   if (token) fetch(`${SUPABASE_URL}/auth/v1/logout`, { method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${token}`} }).catch(() => {});
@@ -1656,6 +1680,7 @@ document.getElementById('new-streamer-form').addEventListener('submit', async ev
   finally { busy(button, false); }
 });
 function showPin(name, pin) {
+  if(!adminSession)return;
   modal.hidden = false;
   document.getElementById('pin-output').hidden = false;
   document.getElementById('pin-owner').textContent = name;
