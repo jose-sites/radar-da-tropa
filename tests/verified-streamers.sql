@@ -13,7 +13,7 @@ begin
  d:=public.radar_public_verified_streamers();
  if not d @> jsonb_build_array(jsonb_build_object('name','TEST PUBLIC VERIFIED '||a,'avatar_path',p::text||'.webp')) then raise exception 'Active verified streamer photo missing'; end if;
  if d::text like '%TEST UNVERIFIED%' or d::text like '%TEST INACTIVE%' then raise exception 'Unverified or inactive streamer exposed'; end if;
- if exists(select 1 from jsonb_array_elements(d) item where (select count(*) from jsonb_object_keys(item))<>3 or not item ?& array['name','handle','avatar_path']) then raise exception 'Unexpected public fields'; end if;
+ if exists(select 1 from jsonb_array_elements(d) item where (select count(*) from jsonb_object_keys(item))<>4 or not item ?& array['name','handle','avatar_path','is_administration']) then raise exception 'Unexpected public fields'; end if;
  update public.radar_profiles set current_handle='fixture_renamed' where id=p;
  if not public.radar_public_verified_streamers() @> jsonb_build_array(jsonb_build_object('name','TEST PUBLIC VERIFIED '||a,'handle','fixture_renamed')) then raise exception 'Renamed account lost'; end if;
  if not has_function_privilege('anon','public.radar_public_verified_streamers()','execute') then raise exception 'Public access missing'; end if;
